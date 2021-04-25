@@ -1,0 +1,66 @@
+{% extends 'tadeus/base_default.html' %}
+
+{% block content %}
+
+
+<h1>Structural Variants evaluation</h1> 
+
+<p>To evaluate structural variant select "Evalute SVs" menu option.</p>
+
+<h2>Entering coordinates of breakpoints of structural variants</h2>
+
+<p>Input data needed for the evaluation are simply coordinates of structural variant.</p>
+
+<p>User can provide input data using following methods:</p>
+
+
+<ul>
+    <li>Enter coordinates of breakpoints using form </li>
+    <li>Enter list of coordinates in BED format in text area</li>
+    <li>Upload file containing list of coordinates in BED format</li>
+</ul>
+
+
+<h3>Entering coordinates of breakpoints using form</h3>
+
+<p>After selecting "Evalute SVs" menu option click "Create" button.</p>
+<p>Then fill the form with name of evaluation.</p>
+
+{% include 'tadeus/help/figure.html' with title='"Evaluation of SVs" form' img_src='help/sv-eval-form.png' no='1' %} 
+
+<p>Click "Add new breakpoint" button and fill the form with:</p>
+
+<ul>
+    <li>Name</li>
+    <li>Chromosome</li>
+    <li>Start coordinate</li>
+    <li>End coordinte</li>
+</ul>
+
+<p>of the breakpoint.</p>
+
+{% include 'tadeus/help/figure.html' with title='"New breakpoint of structural variant" form' img_src='help/sv-eval-coord-form.png' no='2' %} 
+
+<h3>Entering list of coordinates in BED format using text area</h3>
+
+<p>After selecting "Evalute SVs" menu option click "Create by direct input" button.</p>
+<p>Then fill the form with the name of evaluation and paste in the coordinates of breakpoints in BED format. Click "Create" button.</p>
+
+{% include 'tadeus/help/figure.html' with title='"Evaluation of SVs" form' img_src='help/sv-eval-paste.png' no='3' %} 
+
+<h3>Uploading file containing list of coordinates in BED format</h3>
+
+<p>After selecting "Evalute SVs" menu option click "Create by file upoad" button.</p>
+<p>Then fill the form with name of evaluation and upload file in BED format. Click "Create" button.</p>
+
+{% include 'tadeus/help/figure.html' with title='"Evaluation of SVs" form' img_src='help/sv-eval-file.png' no='4' %} 
+
+<!--
+<h3>List of the results</h3>
+
+<h2>Interpretation of the results</h2>
+
+<p></p>-->
+
+
+{% endblock %}

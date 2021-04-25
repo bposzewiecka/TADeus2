@@ -1,0 +1,64 @@
+{% extends 'tadeus/base_card.html' %}
+{% load render_table from django_tables2 %}
+
+
+{% block begin %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+    <li class="breadcrumb-item">Breakpoints</li>
+  </ol>
+</nav>
+
+{% endblock %}
+
+{% block header %}
+
+  <div role="group">
+    Breakpoints
+  </div>
+
+{% endblock %}
+
+{% block body %}
+
+  {% if filter %}
+
+    <div style="margin-bottom: 20px">
+      <form action="" method="get" class="form-inline">
+  
+        <label for="{{ filter.form.sample.id_for_label }}" class="mr-sm-2">Sample</label>
+        <select  id="{{ filter.form.sample.id_for_label }}" class="form-control mb-2 mr-sm-2 mb-sm-0" name="{{ filter.form.sample.html_name }}">
+        <option value="">All</option>
+        {% for sample in samples %}
+              <option value="{{ sample.id }}" {% if filter.form.sample.value|add:0   == sample.id %} selected{% endif %}>{{ sample.name }}</option>  
+        {% endfor %}
+        </select>
+
+
+        <label for="{{ filter.form.chrom.id_for_label }}" class="mr-sm-2">Chromosome</label>
+        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.chrom.html_name }}" id="{{ filter.form.chrom.id_for_label }}"
+       {% if filter.form.chrom.value  is not None %} value="{{ filter.form.chrom.value }}" {% endif %}>
+       
+        <label for="{{ filter.form.min_range.id_for_label }}" class="mr-sm-2">Min. range</label>
+        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.min_range.html_name }}" id="{{ filter.form.min_range.id_for_label }}"
+        {% if filter.form.min_range.value  is not None %} value="{{ filter.form.min_range.value }}" {% endif %}>
+
+        <label for="{{ filter.form.max_range.id_for_label }}" class="mr-sm-2">Max. range</label>
+        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.max_range.html_name }}" id="{{ filter.form.max_range.id_for_label }}"
+         {% if filter.form.max_range.value  is not None %} value="{{ filter.form.max_range.value }}" {% endif %}>
+       
+        <button class="btn btn-primary active" role="button" aria-pressed="true" >Filter</button>
+      </form>
+    </div>
+
+  {% endif %}
+
+  {% if table %}
+    {% render_table table %}
+  {% endif %}
+  
+{% endblock %}
+
+

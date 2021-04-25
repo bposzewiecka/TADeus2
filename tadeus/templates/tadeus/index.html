@@ -1,0 +1,62 @@
+{% extends 'tadeus/base.html' %}
+{% load render_table from django_tables2 %}
+{% load socialaccount %}
+{% load static %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        Welcome to TADeus!
+    </div>
+    <div class="card-body">
+        
+        <div class="row">
+
+            <div class="col-md-6">
+                {% if user.is_authenticated %}
+                    <p>Welcome {{ user.username }} !!!</p>
+                {% endif %}
+
+                <p>TADeus is an web service dedicated for clinical evaluation of variants in genes whose expression may be affected by chromosomal rearrangements.</p>
+
+                <p>TADeus:</p>
+
+                <ul>
+                    <li>provides a view of regulatory landscape of regions surrounding breakpoints of the rearrangements</li>
+                    <li>predicts pathogenicity of structrual variants</li>
+                    <li>prioritizes genes using haploinsufficiency score, number of interrupted enhancer-promoter interactions, the distance from the breakpoints, and the phenotypic data</li>
+                </ul>
+
+                <p>TADeus can serve as a genomic browser that shows Hi-C matrices with one-dimensional genomic data and allows users to compare Hi-C data from different tissues. </p>
+            </div>
+
+            <div class="col-md-6">
+                <img class="img-fluid" src="{% static 'PLP1.png' %}" alt="Plot"/>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="card" style="margin-top: 40px">
+    <div class="card-header">
+        Use cases 
+    </div>
+    <div class="card-body">
+    
+    {% if table %}
+        {% render_table table %}
+    {% endif %}
+    
+
+    </div>
+</div>
+
+
+{% endblock %}
+

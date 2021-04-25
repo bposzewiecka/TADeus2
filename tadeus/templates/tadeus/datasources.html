@@ -1,0 +1,73 @@
+{% extends 'tadeus/base_card.html' %}
+{% load render_table from django_tables2 %}
+{% load bootstrap3 %}
+
+{% block begin %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+    <li class="breadcrumb-item">Datasources</li>
+  </ol>
+</nav>
+
+{% endblock %}
+
+
+{% block header %}
+
+	<div class="float-right" role="group">
+
+	<a href="{% url 'index' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+	
+		<a href="{% url 'add_datasource' p_type='text'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create from text input</a>
+		<a href="{% url 'add_datasource' p_type='file' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create from file</a>
+	
+	</div>
+
+{% endblock %}
+
+{% block body %}
+
+
+{% if filter %}
+
+	<div style="margin-bottom: 20px">
+		<form action="" method="get" class="form-inline">
+			<label for="{{ filter.form.assembly.id_for_label }}" class="mr-sm-2">Assembly</label>
+			<select id="{{ filter.form.assembly.id_for_label }}" class="form-control mb-2 mr-sm-2 mb-sm-0"   name="{{ filter.form.assembly.html_name }}">
+			
+		  	{% for value, text in filter.form.assembly.field.choices %}
+		  			{% if value != '' %}
+						<option value="{{ value }}">{{ text }}</option>
+					{% else %}
+						<option value="">All</option>
+					{% endif %}
+			{% endfor %}
+
+				</select>
+
+			<label for="{{ filter.form.name.id_for_label }}" class="mr-sm-2">File type</label>
+		    <select id="{{ filter.form.file_type.id_for_label }}" class="form-control mb-2 mr-sm-2 mb-sm-0"   name="{{ filter.form.file_type.html_name }}" class="mr-sm-2">
+
+		    	{% for value, text in filter.form.file_type.field.choices %}
+		  			{% if value != '' %}
+		  				{% if value != 'BM' and value != 'XA'%}
+						<option value="{{ value }}">{{ text }}</option>
+		  				{% endif %}
+					{% else  %}
+						<option value="">All</option>
+					{% endif %}
+				{% endfor %}
+				</select> 
+
+			<label for="{{ filter.form.name.id_for_label }}" class="mr-sm-2">Name</label>
+		    <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.name.html_name }}" id="{{ filter.form.name.id_for_label }}">
+
+			<button class="btn btn-primary active" role="button" aria-pressed="true" >Filter</button>
+		</form>
+	</div>
+{% endif %}
+
+	{% render_table table %}
+{% endblock %}

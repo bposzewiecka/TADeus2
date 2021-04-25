@@ -1,0 +1,5 @@
+
+
+DEFAULT_EDIT_ICON = 'fa-edit'
+DEFAULT_BROWSER_ICON = 'fa-sliders-h'
+DEFAULT_WIDTH_PROP = 1000

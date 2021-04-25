@@ -1,0 +1,75 @@
+{% extends 'tadeus/base_card.html' %}
+{% load render_table from django_tables2 %}
+
+
+{% block begin %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'evals' %}">Evaluations of SVs</a></li>
+
+
+  </ol>
+</nav>
+
+{% endblock %}
+
+{% block header %}
+<form method="post">
+<div class="float-right" role="group">
+  <a href="{% url 'edit_eval' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+  <button type="submit" class="btn btn-primary btn-lg active">Add</button>
+
+
+</div>
+
+{% endblock %}
+
+{% block body %}
+  {% csrf_token %}
+
+  {{ form.errors }}
+  <div class="form-row">
+    <div class="form-group col-md-6">
+
+      <label for="{{ form.name.id_for_label }}">Name</label>
+      {{ form.name.errors }}
+      <input type="text" class="form-control"  name="{{ form.name.html_name }}" id="{{ form.name.id_for_label }}" value="{% if form.name.value %}{{ form.name.value}}{% endif %}" required>
+    </div>
+
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-2">
+      <label for="{{ form.chrom.id_for_label }}">Chormosome</label>
+      {{ form.chrom.errors }}
+        <select name="{{ form.chrom.html_name }}" class="form-control"  id="{{ form.chrom.id_for_label }}">
+            {% for chrom in chroms %}
+              <option value="{{ chrom.name }}" {% if form.chrom.value|add:0   == chrom.name %} selected{% endif %}>{{ chrom.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group col-md-2">
+      <label for="{{ form.start.id_for_label }}">Start coordinate</label>
+      {{ form.start.errors }}
+      <input type="number" class="form-control"  name="{{ form.start.html_name }}" id="{{ form.start.id_for_label }}" value="{% if form.start.value %}{{ form.start.value}}{% endif %}" required min="0">
+    </div>
+    <div class="form-group col-md-2">
+      <label for="{{ form.end.id_for_label }}">End coordinate</label>
+      {{ form.end.errors }}
+      <input type="number" class="form-control"  name="{{ form.end.html_name }}" id="{{ form.end.id_for_label }}" value="{% if form.end.value %}{{ form.end.value}}{% endif %}" required min="0">
+    </div>
+  </div>
+
+
+
+{% endblock %}
+
+
+{% block end %}
+
+
+</form>
+
+
+{% endblock %}

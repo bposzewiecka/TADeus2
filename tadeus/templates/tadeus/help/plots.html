@@ -1,0 +1,248 @@
+{% extends 'tadeus/base_default.html' %}
+
+{% load static %}
+
+{% block content %}
+
+
+<h1>Plots</h1> 
+
+<p>To add or customise plot select "Plots" menu option.</p>
+
+<ul>
+    <li>Use name and title input to filter the list</li>
+    <li>Click <a href="#"><i class="fas fa-sliders-h"></i></a> on plot list to show the plot in the genome browser</li>
+    <li>Click <a href="#"><i class="fas fa-edit"></i></a> on plot list to edit the plot</li>
+</ul>
+
+{% include 'tadeus/help/figure.html' with title='List of plots available for user' img_src='help/plot-list.png' no='1' %} 
+
+<h2>Adding new plot</h2>
+
+<p>To add a new plot click on "Create" button and complete the form with the name, the title and the assembly of the new plot.</p>
+
+{% include 'tadeus/help/figure.html' with title='"Create plot" form' img_src='help/plot-new.png' no='2' %} 
+
+<p>After clicking "Create" modified form will be displayed.</p>
+
+<ul>
+    <li>Click "Delete" button to delete the plot</li>
+    <li>Click "Add track" button to add new genomic track</li>
+    <li>Click "Save" button to save modified data</li>
+    <li>Click <a href="#"><i class="fas fa-sliders-h"></i></a> to show the plot in the genome browser</li>
+</ul>
+
+{% include 'tadeus/help/figure.html' with title='"Plot" form' img_src='help/plot-form.png' no='3' %} 
+
+<h2>Adding new track</h2>
+
+<p>Each datasource can be displayed in browser as a separate track. To add new track to the plot click on "Add track" button.</p>
+
+{% include 'tadeus/help/figure.html' with title='"Create track" form' img_src='help/track-new.png' no='4' %} 
+
+<p>Then choose the datasource from the select list of available datasources. You have to complete other fields of the form including:</p>
+
+<ul>
+    <li>Title — title of the track</li>
+    <li>No. — number of the track. Used to order tracks in the plot</li>
+    <li>Height — height of the track. If none default size is used</li>
+    <li>Column — colum number. Plots can have many columns</li>
+</ul>
+
+<p>After filling the form click "Create". Then form complemented with fields specific for type of datasource (BED3, BED6, BED9, BED12, BEDGraph or Hi-C) will be shown. Detail description of each field is presented in the table below.</p>
+
+{% include 'tadeus/help/figure.html' with title='"Create plot" form' img_src='help/track-form.png' no='5' %} 
+
+<h2>List of track properties</h2>
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Datasource type</th>
+            <th>Values</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Title</td>
+            <td>All</td>
+            <td>Text</td>
+            <td>Name of the track</td>
+        </tr>
+
+        <tr>
+            <td>No.</td>
+            <td>All</td>
+            <td>Integer</td>
+            <td>Track number. Used to order tracks in the plot</td>
+        </tr>
+
+        <tr>
+            <td>Height</td>
+            <td>All</td>
+            <td>Integer</td>
+            <td>Height of the track. If none default size is used</td>
+        </tr>
+
+        <tr>
+            <td>Column</td>
+            <td>All</td>
+            <td>Integer</td>
+            <td>Column number</td>
+        </tr>
+
+        <tr>
+            <td>Color</td>
+            <td>All BED, BEDGaph</td>
+            <td>Color in hex RGB without leading hash</td>
+            <td>Color of feature</td>
+        </tr>
+
+        
+        <tr>
+            <td>Border color</td>
+            <td>All BED, BEDGraph</td>
+            <td>Color in hex RGB without leading hash</td>
+            <td>Border color of feature</td>
+        </tr>
+
+        <tr>
+            <td>Colormap</td>
+            <td>BED6, BED9, BED12, Hi-C</td>
+            <td>List of Python Matplotlib Colormaps</td>
+            <td>Colormap used to display values from 'score' column of BED datasource entry, or to display frequencies of Hi-C map</td>
+        </tr>
+ 
+        <tr>
+            <td>Minimum value of colormap</td>
+            <td>BED6, BED9, BED12, Hi-C</td>
+            <td>Number</td>
+            <td>Minimum value of colormap</td>
+        </tr>
+
+        <tr>
+            <td>Maximum value of colormap</td>
+            <td>BED6, BED9, BED12, Hi-C</td>
+            <td>Number</td>
+            <td>Maximum value of colormap</td>
+        </tr>
+
+        <tr>
+            <td>BEDGraph Style</td>
+            <td>BEDGraph</td>
+            <td>Line, Line with borders, Area, Area with border</td>
+            <td>
+               Available options:
+                <ul>
+                    <li>Line — data will be displayed as line chart</li>
+                    <li>Line with borders — data will be displayed as line chart with borders</li>
+                    <li>Area — data will be displayed as area chart</li>
+                    <li>Area with border — data will be displayed as area chart with borders</li>
+                </ul> 
+            </td>
+        </tr>
+
+        <tr>
+            <td>BED Style</td>
+            <td>All BED</td>
+            <td>Tiles, With Introns, Flybase, Domains, Arcs</td>
+            <td>
+                Available options:
+                <ul>
+                    <li>Tiles — each entry will be displayed as tile</li>
+                    <li>With Introns — each entry will be displayed as gene with introns (available only form BED12 fromat)</li>
+                    <li>Flybase — each entry will be displayed in Flybase format (available only form BED12 fromat)</li>
+                    <li>Domains — each entry will be displayed as triangle with one vertex lying in the middle of entry's coordinates</li>
+                    <li>Arcs — each entry will be displayed as semiellipse passing through coordinates of entry</li>
+                </ul>
+            </td>
+        </tr>
+
+        <tr>
+            <td>Display</td>
+            <td>All BED</td>
+            <td>Stacked, Collapsed, Interlaced</td>
+            <td>
+                Available options:
+                <ul>
+                    <li>Stacked — tiles will be displayed  stacked </li>
+                    <li>Collapsed — tiles will be displayed  collapsed (all shown in one line)</li>
+                    <li>Interlaced — tiles will be displayed interlaced (shown in two lines alternately)</li>
+                </ul> 
+            </td>
+        </tr>
+
+        <tr>
+            <td>Print option</td>
+            <td>All BED</td>
+            <td>Tiles, Vertical Lines, Tiles and Vertical Lines</td>
+            <td>
+                Available options:
+                <ul>
+                    <li>Tiles — coordinates of entries from BED datasource will be displayed as tiles on the track</li>
+                    <li>Vertical Lines — coordinates of entries from BED datasource will be displayed as vertical dotted lines on all tracks of the plot</li>
+                    <li>Tiles and Vertical Lines — coordinates of entries from BED datasource will be displayed as tiles on the track and as as vertical dotted lines on all tracks of the plot</li>
+                </ul>
+
+            </td>
+        </tr>
+
+        <tr>
+            <td>Labels</td>
+            <td>All BED</td>
+            <td>Yes, No</td>
+            <td>If value is set to 'Yes' labels for each feature will be printed using  'name' column value of BED</td>
+        </tr> 
+
+        <tr>
+            <td>Name filter</td>
+            <td>BED6, BED9, BED12</td>
+            <td>Yes, No</td>
+            <td>If set to 'Yes' user can filter entries from BED datasource by 'name' column value</td>
+        </tr>  
+
+        <tr>
+            <td>Transform</td>
+            <td>Hi-C</td>
+            <td>none,  log1p, log, -log</td>
+            <td>
+                Available options:
+                <ul>
+                    <li>none — values of Hi-C matrix are displayed without any transformation</li>
+                    <li>log1p — values of Hi-C matrix are increased by 1 and then log transformed </li>
+                    <li>log — values of Hi-C matrix are log transformed</li>
+                    <li>-log — values of Hi-C matrix are log transformed and multiplyed by -1</li>
+                </ul>
+
+            </td>
+        </tr>  
+
+        <tr>
+            <td>Domains datasource</td>
+            <td>Hi-C</td>
+            <td>List of data in BED format (public and private for user)</td>
+            <td>Coordinates of the entries from the chosen BED datasource will be used to draw domians on Hi-C track</td>
+        </tr>  
+
+   
+
+        <tr>
+            <td>Inverted</td>
+            <td>Hi-C</td>
+            <td>Yes, No</td>
+            <td>If set to 'Yes' Hi-C matrix will be displayed inverted</td>
+        </tr> 
+
+    </tbody>
+</table>
+
+<h2>Customising plot</h2>
+
+<p>To customize plot click <a href="#"><i class="fas fa-edit"></i></a> on plot list to edit the plot. Then click <a href="#"><i class="fas fa-edit"></i></a> to customize specific track.</p>
+
+{% include 'tadeus/help/figure.html' with title='"Create plot" form' img_src='help/edit-track.png' no='6' %} 
+
+{% endblock %}

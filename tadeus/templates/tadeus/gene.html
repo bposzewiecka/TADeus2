@@ -1,0 +1,74 @@
+{% extends 'tadeus/base_card.html' %}
+{% load render_table from django_tables2 %}
+
+
+{% block begin %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'genes' %}">Genes</a></li>
+    <li class="breadcrumb-item">{{gene.gene_symbol}}</li>
+  </ol>
+</nav>
+
+{% endblock %}
+
+
+
+
+{% block header %}
+
+  <div role="group">
+    Phenotypes
+  </div>
+
+{% endblock %}
+
+
+
+{% block body %}
+
+  {% if filter %}
+
+    <div style="margin-bottom: 20px">
+      <form action="" method="get" class="form-inline">
+  
+        <label for="{{ filter.form.db.id_for_label }}" class="mr-sm-2">Database</label>
+        <select id="{{ filter.form.db.id_for_label }}" class="form-control mb-2 mr-sm-2 mb-sm-0"   name="{{ filter.form.db.html_name }}">
+            <option value="">All</option>
+            <option value="OMIM" {% if filter.form.db.value == "OMIM" %} selected {% endif %}>OMIM</option>
+            <option value="HPO" {% if filter.form.db.value == "HPO" %} selected {% endif %}>HPO</option>
+            <option value="ORPHA" {% if filter.form.db.value == "ORPHA" %} selected {% endif %}>ORPHA</option>
+        </select>
+  
+
+        <label for="{{ filter.form.pheno_id.id_for_label }}" class="mr-sm-2">Id</label>
+        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.pheno_id.html_name }}" id="{{ filter.form.pheno_id.id_for_label }}"
+        {% if filter.form.pheno_id.value  is not None %}  value="{{ filter.form.pheno_id.value }}" {% endif %}>
+
+        <label for="{{ filter.form.name.id_for_label }}" class="mr-sm-2">Name</label>
+        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.name.html_name }}" id="{{ filter.form.name.id_for_label }}"  
+        {% if filter.form.name.value  is not None %} value="{{ filter.form.name.value }}" {% endif %}>
+
+        <label for="{{ filter.form.definition.id_for_label }}" class="mr-sm-2">Definition</label>
+        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.definition.html_name }}" id="{{ filter.form.definition.id_for_label }}"
+        {% if filter.form.definition.value  is not None %} value="{{ filter.form.definition.value }}" {% endif %}>
+
+
+        <label for="{{ filter.form.comment.id_for_label }}" class="mr-sm-2">Comment</label>
+        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.comment.html_name }}" id="{{ filter.form.comment.id_for_label }}"
+        {% if filter.form.comment.value  is not None %} value="{{ filter.form.comment.value }}"  {% endif %}>
+
+        <button class="btn btn-primary active" role="button" aria-pressed="true" >Filter</button>
+      </form>
+    </div>
+
+  {% endif %}
+
+  {% if table %}
+    {% render_table table %}
+  {% endif %}
+  
+{% endblock %}
+

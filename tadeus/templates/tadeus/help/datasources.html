@@ -1,0 +1,21 @@
+{% extends 'tadeus/base_default.html' %}
+
+{% block content %}
+
+<h1>Datasources</h1>
+
+<h2>Public datasources</h2>
+
+<p>TADues provide public datasources that can be used to create  track of plots.
+This includes all Hi-C datasources. Since Hi-C datasources are large they can be uploaded only upon request.
+List of public datasets are avialable on <a href="http://bioputer.mimuw.edu.pl:82/datasources/">http://bioputer.mimuw.edu.pl:82/datasources/</a>).</p>
+
+<h2>Private datasources</h2>
+
+<p>User can upload own datasource in BED3, BED6, BED9, BED12 or BEDGraph format.</p>
+
+<p>To create private datasource select "Datasource" menu option. Then click on "Create from text input" or "Create from file" button and complete the form specifing the name of the datasource and the assembly. Remember that chosen assembly must match plot assembly. Dependng on input method provide file with datasource or paste in the data.</p>
+
+{% include 'tadeus/help/figure.html' with title='"Datasource" form' img_src='help/datasource-form.png' no='1' %} 
+
+{% endblock %}
