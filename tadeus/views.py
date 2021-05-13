@@ -344,8 +344,6 @@ def breakpoint_browser(request, p_id, p_breakpoint_id):
 
     breakpoint = Breakpoint.objects.get(id = p_breakpoint_id)
 
-    p_id = 1
-
     p_plot = Plot.objects.get(id = p_id)
 
     if request.method == 'GET': 
@@ -378,7 +376,6 @@ def breakpoint_browser(request, p_id, p_breakpoint_id):
         breakpoint.left_width_prop = int(left_size / p_size * DEFAULT_WIDTH_PROP)
         breakpoint.right_width_prop = int(right_size / p_size * DEFAULT_WIDTH_PROP)
     
-
     elif p_size  <= 2 * p_shift:
 
         breakpoint.left_start = breakpoint.left_coord  - p_shift - p_size
@@ -391,7 +388,15 @@ def breakpoint_browser(request, p_id, p_breakpoint_id):
         breakpoint.right_end = breakpoint.right_coord - p_shift
    
         breakpoint.right_width_prop = DEFAULT_WIDTH_PROP
-    
+
+    url_params = {}
+
+    if breakpoint.left_start: url_params['left_start'] = breakpoint.left_start
+    if breakpoint.left_end: url_params['left_end'] = breakpoint.left_end
+    if breakpoint.right_start: url_params['right_start'] = breakpoint.right_start
+    if breakpoint.right_end: url_params['right_end'] = breakpoint.right_end
+
+    get_url = '?' +  urlencode(url_params, quote_via=quote_plus)
 
     return TemplateResponse(request, 'tadeus/browser_breakpoint.html', {'p_id': p_id, 
                            'p_plot': p_plot,
@@ -405,7 +410,7 @@ def breakpoint_browser(request, p_id, p_breakpoint_id):
                                 ),
                            'zoom_in': zoom_breakpoint( p_size, p_shift, perc_zoom, True),
                            'zoom_out': zoom_breakpoint( p_size, p_shift, perc_zoom, False),
-                           'get_url':  ''
+                           'get_url':  get_url
             })
 
 
@@ -488,6 +493,8 @@ def browser(request, p_id,  p_chrom = None, p_start = None, p_end = None):
 
 def image(request, p_cols, p_id, p_chrom, p_start, p_end, p_breakpoint_id = None, p_left_side = None, p_width_prop = None):
     
+    p_start = int(p_start)
+
     track = Track.objects.get(id = p_id)
     breakpoint = None
 
@@ -508,8 +515,16 @@ def image(request, p_cols, p_id, p_chrom, p_start, p_end, p_breakpoint_id = None
         if p_breakpoint_id:
             breakpoint = Breakpoint.objects.get(id = p_breakpoint_id)
 
+        breakpoint_coordinates = {}
+        breakpoint_coordinates['left_start'] = int(request.GET.get('left_start', '-1'))
+        breakpoint_coordinates['left_end'] = int(request.GET.get('left_end', '-1'))
+        breakpoint_coordinates['right_start'] = int(request.GET.get('right_start', '-1'))
+        breakpoint_coordinates['right_end'] = int(request.GET.get('right_end', '-1'))
+
     fig = track.draw_track(p_cols, chrom = p_chrom, start = p_start, end = p_end, 
-        interval_start = interval_start, interval_end = interval_end, name_filter = name_filter,  breakpoint = breakpoint, left_side = p_left_side, width_prop = p_width_prop)
+        interval_start = interval_start, interval_end = interval_end, name_filter = name_filter,  
+        breakpoint = breakpoint, left_side = p_left_side, 
+        width_prop = p_width_prop, breakpoint_coordinates = breakpoint_coordinates)
 
     buf = BytesIO()
     fig.savefig(buf, format='png')
@@ -1018,7 +1033,6 @@ def gene(request,p_id):
 def breakpoints(request):
 
     breakpoints = Breakpoint.objects.all()
-
 
     if request.method == 'GET': 
         min_range = request.GET.get('min_range')

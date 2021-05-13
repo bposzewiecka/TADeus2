@@ -8,7 +8,7 @@ class TrackForm(forms.ModelForm):
         fields = ('height', 'colormap', 'min_value', 'max_value', 'style', 'column',
             'display', 'labels', 'inverted', 'x_labels', 'name_filter',
         'no', 'transform', 'color', 'edgecolor', 'title', 'bedgraph_style', 'bed_print_options', 'domains_file',
-        'chromosome', 'coordinate', 'neighbourhood', 'neighbourhood_transform')
+        'chromosome', 'start_coordinate', 'end_coordinate', 'aggregate_function')
 
 class CreateTrackForm(forms.ModelForm):
 

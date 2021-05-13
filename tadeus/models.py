@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.html import format_html
 import tadeus.statistics as  statistics 
+import pyBigWig
 
 from tadeus.defaults import DEFAULT_WIDTH_PROP
 
@@ -54,18 +55,19 @@ class TrackFile(models.Model):
     )
 
     assembly = models.ForeignKey(Assembly, on_delete = models.PROTECT) 
-    sample =  models.ForeignKey(Sample, on_delete = models.PROTECT, null=True) 
+    sample =  models.ForeignKey(Sample, on_delete = models.PROTECT, null = True) 
     name = models.CharField(max_length = 200)
-    source_name = models.CharField(max_length = 200, null =True, blank = True)
-    source_url = models.URLField(max_length = 2000, null =True, blank = True)
-    file_type = models.CharField(max_length=2, choices=FILE_TYPES)
-    owner =  models.ForeignKey(User, on_delete = models.PROTECT, null=True) 
+    source_name = models.CharField(max_length = 200, null = True, blank = True)
+    source_url = models.URLField(max_length = 2000, null = True, blank = True)
+    file_type = models.CharField(max_length = 2, choices = FILE_TYPES)
+    owner =  models.ForeignKey(User, on_delete = models.PROTECT, null = True) 
     public = models.BooleanField(default = False)
     approved = models.BooleanField(default = False)
-    reference = models.CharField(max_length = 500, null =True, blank = True)
-    file_path = models.CharField(max_length = 500, null =True)
-    bin_sizes = models.CharField(max_length = 500, null=True)
-    auth_cookie = models.CharField(max_length = 60, null=True)
+    reference = models.CharField(max_length = 500, null = True, blank = True)
+    file_path = models.CharField(max_length = 500, null = True)
+    bin_sizes = models.CharField(max_length = 500, null = True)
+    auth_cookie = models.CharField(max_length = 60, null = True)
+    big = models.BooleanField(default = False)    
 
     FILE_SUB_TYPES = (
         ('Bed3', 'Bed3'),
@@ -77,6 +79,15 @@ class TrackFile(models.Model):
     file_sub_type = models.CharField(max_length=5, choices=FILE_SUB_TYPES, null = True)
 
     def get_entries(self, chrom, start, end, name_filter = None):
+
+        if self.big:
+            return self.get_entries_big(chrom, start, end, name_filter)
+        else:
+            return self.get_entries_db(chrom, start, end, name_filter)
+
+
+    def get_entries_db(self, chrom, start, end, name_filter = None):
+
         q = self.file_entries.filter(chrom=chrom)
 
         if name_filter:
@@ -85,6 +96,41 @@ class TrackFile(models.Model):
         q = q.filter(Q(end__range=(start, end))| Q(start__range=(start, end)) | (Q(start__lte=start) & Q(end__gte=end))).order_by('start', 'end')
 
         return q
+
+
+    def get_entries_big(self, chrom, start, end, name_filter = None):
+
+        big_bed = pyBigWig.open(self.file_path)
+
+        entries = []
+
+        for big_bed_entry in  big_bed.entries(chrom, start, end):
+
+            entry = BedFileEntry(FileEntry)
+
+            data = big_bed_entry[2].split('\t')
+
+            entry.start = big_bed_entry[0]
+            entry.end = big_bed_entry[1]
+
+            if self.file_sub_type in ('Bed6', 'Bed9', 'Bed12'):
+                entry.name =  data[0]
+                entry.score = int(data[1])
+                entry.stand = data[2]
+
+            if self.file_sub_type in ('Bed9', 'Bed12'):
+                entry.thick_start = int(data[3])
+                entry.thick_end = int(data[4])
+                entry.itemRGB = '{:02x}{:02x}{:02x}'.format(*map(int, data[5].split(',')))
+
+            if self.file_sub_type == 'Bed12':
+                block_count =  int(data[6])
+                block_sizes = data[7]
+                block_starts = data[8]
+
+            entries.append(entry)
+ 
+        return entries
 
     @property
     def organism(self):
@@ -106,6 +152,7 @@ class TrackFile(models.Model):
                 bed_entry.save()
 
         save_bed_entries(bed_entries)
+
 
 class FileEntry(models.Model):
 
@@ -172,6 +219,8 @@ class BedFileEntry(FileEntry):
 
         self.score = statistics.get_eval_pvalue(max(n1,n2))
 
+
+
 class Gene(BedFileEntry):
     pass
 
@@ -194,6 +243,7 @@ class Breakpoint(models.Model):
 
     owner = models.ForeignKey(User, on_delete = models.PROTECT, null=True) 
     public = models.BooleanField(default = False)
+    assembly = models.ForeignKey(Assembly, on_delete = models.PROTECT, related_name='breakpoints')
 
 
 class Plot(models.Model):
@@ -329,17 +379,17 @@ class Track(models.Model):
     name_filter =  models.BooleanField(default = False)
 
     chromosome = models.ForeignKey(Chromosome, on_delete = models.PROTECT, null = True, blank=True)
-    coordinate =  models.IntegerField(null = True, blank=True,  default = 0)
-    neighbourhood =  models.IntegerField(null = True, blank=True,  default = 0)
+    start_coordinate =  models.IntegerField(null = True, blank=True,  default = 0)
+    end_coordinate =  models.IntegerField(null = True, blank=True,  default = 0)
 
-    NEIGHBOURHOOD_TRANSFORM_OPTIONS = (
+    AGGREGATE_FUNCTION_OPTIONS = (
         ('sum', 'sum'),
         ('avg', 'avg'),
         ('min', 'min'),
         ('max', 'max'),
     )
 
-    neighbourhood_transform = models.CharField(max_length = 5, choices = NEIGHBOURHOOD_TRANSFORM_OPTIONS, default = 'sum')
+    aggregate_function = models.CharField(max_length = 5, choices = AGGREGATE_FUNCTION_OPTIONS, default = 'sum')
   
     HIC_DISPLAY_OPTIONS = (
         ('hic', 'HIC'),
@@ -371,7 +421,8 @@ class Track(models.Model):
     def get_entries(self, chrom, start, end, name_filter = None):
         return  self.track_file.get_entries( chrom, start, end, name_filter)
 
-    def draw_track(self, col, chrom, start, end, interval_start, interval_end, name_filter = None, breakpoint = None, left_side = None, width_prop = DEFAULT_WIDTH_PROP):
+    def draw_track(self, col, chrom, start, end, interval_start, interval_end, 
+        name_filter = None, breakpoint = None, left_side = None, width_prop = DEFAULT_WIDTH_PROP, breakpoint_coordinates = None):
 
         if not self.name_filter:
             name_filter = None
@@ -395,7 +446,18 @@ class Track(models.Model):
         elif file_type == 'XA':
             trackPlot  = PlotXAxis(model = self)
 
-        return trackPlot.draw_track(col, chrom, start, end, interval_start, interval_end, name_filter, breakpoint, left_side, width_prop)
+        return trackPlot.draw_track(col, chrom, start, end, interval_start, interval_end, name_filter, breakpoint, left_side, width_prop,   breakpoint_coordinates )
+
+
+    def get_aggregate_function(self):
+        if self.aggregate_function == 'sum':
+            return sum
+        if self.aggregate_function == 'avg':
+            return np.mean
+        if self.aggregate_function == 'min':
+            return min
+        if self.aggregate_function == 'max':
+            return max
     
     @property
     def file_name(self):

@@ -79,11 +79,14 @@ class hiCMatrix:
 
         return  self.cooler_file.matrix(balance = False).fetch((chrom_region1, start_region1, end_region1), (chrom_region2, start_region2, end_region2))
 
-    def get_start_pos(self, chrom_region, start_region, end_region):
+    def get_start_positions(self, chrom_region, start_region, end_region):
         return self.cooler_file.bins().fetch((chrom_region, start_region, end_region))['start']
         
-    def get_sub_region(self, chrom_region, start_region, end_region):
-        m = self.cooler_file.matrix(balance = False).fetch((chrom_region, start_region, end_region), ('chr1'))
+    def get_column_region(self, chrom_region, start_region, end_region, chrom_column):
+        m = self.cooler_file.matrix(balance = False).fetch((chrom_region, start_region, end_region), (chrom_column))
         print(np.shape(self.cooler_file.matrix(balance = False).fetch((chrom_region))))
         print(np.shape(m))
         return  m
+
+    def get_chromosome_size(self, chrom_name):
+        return self.cooler_file.chromsizes[chrom_name]

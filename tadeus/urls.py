@@ -5,8 +5,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('track_image/<int:p_cols>/<int:p_id>/<int:p_width_prop>/<int:p_breakpoint_id>/<int:p_left_side>/<p_chrom>:<int:p_start>-<int:p_end>', views.image, name='image'),
-    path('track_image/<int:p_cols>/<int:p_id>/<p_chrom>:<int:p_start>-<int:p_end>', views.image, name='image'),
+    path('track_image/<int:p_cols>/<int:p_id>/<int:p_width_prop>/<int:p_breakpoint_id>/<int:p_left_side>/<p_chrom>:<p_start>-<int:p_end>', views.image, name='image'),
+    path('track_image/<int:p_cols>/<int:p_id>/<p_chrom>:<p_start>-<int:p_end>', views.image, name='image'),
     path('browser/<int:p_id>', views.browser, name='browser'),
     path('browser/<int:p_id>/<p_chrom>:<int:p_start>-<int:p_end>', views.browser, name='browser'),
     path('breakpoint_browser/<int:p_id>/<int:p_breakpoint_id>/', views.breakpoint_browser, name='breakpoint_browser'),

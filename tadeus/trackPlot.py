@@ -32,9 +32,10 @@ from importlib import reload
 import textwrap
 import copy
 
+
 reload(sys)
 
-DEFAULT_HICMATRIX_HEIGHT = 8
+DEFAULT_HICMATRIX_HEIGHT = 10
 DEFAULT_BED_HEIGHT = 4
 DEFAULT_BEDGRAPH_HEIGHT = 3
 DEFAULT_DOMAIN_HEIGHT = 3
@@ -132,8 +133,10 @@ class TrackPlot(object):
         self.x_labels = model.x_labels
         self.domains_file = model.domains_file
 
-        self.coordiante = model.coordinate
+        self.start_coordinate = model.start_coordinate
+        self.end_coordinate = model.end_coordinate
         self.v4c_chromosome = model.chromosome
+        self.aggregate_function = model.get_aggregate_function()
 
         from tadeus.models import Plot
 
@@ -154,7 +157,7 @@ class TrackPlot(object):
                               linewidth=DEFAULT_VLINE_WIDTH,
                               color=color, alpha= DEFAULT_VLINE_ALPHA)
 
-    def draw_track(self, cols, chrom, start, end, interval_start, interval_end, name_filter, breakpoint = None, left_side = None , width_prop = None):
+    def draw_track(self, cols, chrom, start, end, interval_start, interval_end, name_filter, breakpoint = None, left_side = None , width_prop = None,  breakpoint_coordinates = None):
         self.dpi = 600
         if width_prop is None:
             width_prop = DEFAULT_WIDTH_PROP
@@ -167,6 +170,10 @@ class TrackPlot(object):
         self.breakpoint = breakpoint
         self.left_side = left_side
         self.width_prop = width_prop
+        self.breakpoint_coordinates = breakpoint_coordinates
+        self.visualize_breakpoint = self.breakpoint_coordinates and \
+                                                'left_start' in self.breakpoint_coordinates and \
+                                                'right_start' in self.breakpoint_coordinates  
 
         width = self.get_figure_width()
 
@@ -731,13 +738,11 @@ class PlotBedGraph(TrackPlot):
 
     def draw(self, chrom, start, end, width):
         
-
         self.draw_title()
 
         self.axis.set_frame_on(False)
         self.axis.axes.get_xaxis().set_visible(False)
         self.axis.set_xlim(start, end)
-
 
         score_list = []
         pos_list = []
@@ -788,7 +793,6 @@ class PlotBedGraph(TrackPlot):
                          "[{}-{}]".format(min_value_print, max_value_print),
                          horizontalalignment='left', fontsize= 8,
                          verticalalignment='bottom')
-
 
 class PlotDomains(TrackPlot):
 
@@ -1031,7 +1035,6 @@ class PlotHiCMatrix(TrackPlot):
 
     def get_sub_matrix(self, chrom_name, adj_start, adj_end, bin_size):
         
-        #adj_chrom_size = self.bin_adjust(chrom.size, bin_size)
 
         adj_size = adj_end - adj_start
         no_bins = adj_size // bin_size
@@ -1045,67 +1048,97 @@ class PlotHiCMatrix(TrackPlot):
         diff_bins_start = (adj_hic_start - adj_start) // bin_size
         diff_bins_end = (adj_end - adj_hic_end) // bin_size
 
-        print( (adj_hic_start - adj_start), diff_bins_start, diff_bins_end)
-
         submatrix  = self.hic_ma.get_sub_matrix(chrom_name, adj_hic_start, adj_hic_end)
-        print(np.shape(submatrix))
-
-        print(diff_bins_start, diff_bins_end)
-
+ 
         matrix[diff_bins_start:no_bins - diff_bins_end, diff_bins_start:no_bins - diff_bins_end] = submatrix
 
         return matrix
 
-    def get_breakpoint_matrix(self,  bin_size, left_no_bins, right_no_bins):
+    def get_chromosome_size(self, chrom_name):
+        return self.hic_ma.get_chromosome_size(chrom_name)
 
-        adj_left_coord = self.bin_adjust(self.breakpoint.left_coord, bin_size)
-        adj_right_coord = self.bin_adjust(self.breakpoint.right_coord, bin_size)
+
+    def get_sub_matrix(self, bin_size,  chrom_name1, adj_start1, adj_end1, chrom_name2 = None, adj_start2 = None, adj_end2 = None):
+
+        def get_range(chrom_name, adj_start, adj_end):
+        
+            adj_size = adj_end - adj_start
+            no_bins = adj_size // bin_size
+
+            adj_hic_start = max(adj_start, 0)
+            chrom_size = self.get_chromosome_size(chrom_name)
+            adj_hic_end = min(adj_end, self.bin_adjust(chrom_size, bin_size))
+
+            diff_bins_start = (adj_hic_start - adj_start) // bin_size
+            diff_bins_end = (adj_end - adj_hic_end) // bin_size
+
+            return  no_bins, adj_hic_start, adj_hic_end, diff_bins_start, no_bins - diff_bins_end
+
+        if chrom_name2 is None:
+            chrom_name2  = chrom_name1
+            adj_start2 = adj_start1
+            adj_end2 = adj_end1    
+
+        no_bins1, adj_hic_start1, adj_hic_end1, diff_bins_start1, diff_bins_end1 = get_range(chrom_name1, adj_start1, adj_end1)
+        no_bins2, adj_hic_start2, adj_hic_end2, diff_bins_start2, diff_bins_end2 = get_range(chrom_name2, adj_start2, adj_end2)
+
+        matrix = np.empty((no_bins1, no_bins2,))
+        matrix[:] = np.nan
+
+        submatrix = self.hic_ma.get_sub_matrix(chrom_name1, adj_hic_start1, adj_hic_end1, chrom_name2, adj_hic_start2, adj_hic_end2)
+ 
+        matrix[diff_bins_start1:diff_bins_end1, diff_bins_start2:diff_bins_end2] = submatrix
+
+        return matrix
+
+
+    def get_breakpoint_matrix(self, bin_size, adj_depth):
 
         left_inverse = self.breakpoint.left_inverse
-        right_inverse =  self.breakpoint.right_inverse
+        right_inverse = self.breakpoint.right_inverse
 
-        if not left_inverse:
-            left_start = adj_left_coord - bin_size * left_no_bins
-            left_end = adj_left_coord  
+        left_start = self.breakpoint_coordinates['left_start']
+        left_end = self.breakpoint_coordinates['left_end']
+
+        right_start = self.breakpoint_coordinates['right_start']
+        right_end = self.breakpoint_coordinates['right_end']
+
+        print(left_start, left_end, right_start, right_end)
+
+        if not self.breakpoint.left_inverse:
+            left_start_adj = self.bin_adjust(left_start, bin_size) - adj_depth 
+            left_end_adj = self.bin_adjust(left_end + bin_size // 2, bin_size)  
         else:
-            left_start = adj_left_coord
-            left_end =  adj_left_coord + bin_size * left_no_bins
-
-        print(left_start, left_end - bin_size, left_no_bins)
-
-        if not right_inverse:
-            right_start = adj_right_coord
-            right_end = adj_right_coord + bin_size * right_no_bins    
+            left_start_adj = self.bin_adjust(left_start, bin_size) - adj_depth 
+            left_end_adj = self.bin_adjust(left_end + bin_size // 2, bin_size)  + adj_depth
+ 
+        if not self.breakpoint.right_inverse:                
+            right_start_adj = self.bin_adjust(right_start + bin_size // 2, bin_size)
+            right_end_adj = self.bin_adjust(right_end + bin_size, bin_size)  + adj_depth
         else:
-            right_start =  adj_right_coord - bin_size * right_no_bins  
-            right_end = adj_right_coord 
+            right_start_adj = self.bin_adjust(right_start + bin_size // 2, bin_size) - adj_depth
+            right_end_adj = self.bin_adjust(right_end + bin_size, bin_size)
 
-        if not left_inverse:
-            breakpoint_start_left = adj_left_coord  - bin_size * left_no_bins
-            breakpoint_end_left = adj_left_coord + bin_size * right_no_bins
+        left_no_bins = (left_end_adj - left_start_adj) // bin_size
+        right_no_bins = (right_end_adj - right_start_adj) // bin_size 
+        no_bins = left_no_bins + right_no_bins 
+
+        if not self.breakpoint.left_inverse:
+            left_br_start = left_start_adj
         else:
-            breakpoint_start_left = adj_left_coord - bin_size * right_no_bins 
-            breakpoint_end_left = adj_left_coord + bin_size * left_no_bins
+            left_br_start = left_end_adj - no_bins * bin_size
 
-        if not right_inverse:
-            breakpoint_start_right = adj_right_coord - bin_size * left_no_bins
-            breakpoint_end_right = adj_right_coord + bin_size * right_no_bins
+        if not self.breakpoint.right_inverse:
+            right_br_start = right_start_adj - left_no_bins * bin_size 
         else:
-            breakpoint_start_right = adj_right_coord - bin_size * right_no_bins
-            breakpoint_end_right = adj_right_coord + bin_size * left_no_bins
+            right_br_start = left_end_adj - right_no_bins * bin_size  
 
-        print(breakpoint_start_left, breakpoint_end_left, breakpoint_start_right, breakpoint_end_right)
-        print('Bins', left_no_bins, right_no_bins)
-
-        matrix = np.empty((left_no_bins + right_no_bins, left_no_bins + right_no_bins,))
+        matrix = np.empty((no_bins,no_bins,))
 
         matrix[:] = np.nan
 
-        # self.hic_ma.get_sub_matrix(left_chrom.name, breakpoint_start_left, breakpoint_end_left, right_chrom, breakpoint_start_right, breakpoint_end_right)
-
-        print(matrix.shape)
-
-        #return matrix
+        matrix = self.get_sub_matrix(bin_size, self.breakpoint.left_chrom.name, left_br_start, left_br_start +  no_bins * bin_size, 
+                                     self.breakpoint.right_chrom.name, right_br_start, right_br_start +  no_bins * bin_size)
 
         if left_inverse:
             matrix = np.flipud(matrix)
@@ -1113,92 +1146,66 @@ class PlotHiCMatrix(TrackPlot):
         if right_inverse:
             matrix = np.fliplr(matrix)
 
-        matrix_len = matrix.shape[0] 
+        matrix_size = matrix.shape[0] 
 
-        print( left_start, left_end - bin_size)
-
-        left_matrix = self.get_sub_matrix(self.breakpoint.left_chrom.name, left_start, left_end, bin_size)
-
-        #self.hic_ma.get_sub_matrix(left_chrom.name, left_start, left_end)
+        left_matrix = self.get_sub_matrix(bin_size, self.breakpoint.left_chrom.name, left_start_adj, left_end_adj)
 
         if left_inverse:
             left_matrix = np.flipud(left_matrix)
             left_matrix = np.fliplr(left_matrix)
 
-        
         left_matrix_size = left_matrix.shape[0]
-        matrix[0:left_matrix_size,0:left_matrix_size] = left_matrix
-
-        """
-        right_matrix = self.hic_ma.get_sub_matrix(right_chrom, right_start, right_end)
-        right_matrix_len = right_matrix.shape[0] 
-
+        #matrix[0:left_matrix_size,0:left_matrix_size] = left_matrix
+        
+        right_matrix = self.get_sub_matrix(bin_size, self.breakpoint.right_chrom.name, right_start_adj, right_end_adj)
+        
         if right_inverse:
-            right_matrix =  np.flipud(right_matrix)
-            right_matrix =  np.fliplr(right_matrix)
+            right_matrix = np.flipud(right_matrix)
+            right_matrix = np.fliplr(right_matrix)
 
-        matrix[matrix_len - right_matrix_len:matrix_len, matrix_len - right_matrix_len:matrix_len] = right_matrix
-        """
+        right_matrix_size = right_matrix.shape[0] 
+        #matrix[matrix_size - right_matrix_size:matrix_size, matrix_size - right_matrix_size:matrix_size] = right_matrix
 
-        return matrix
+        if self.left_side:
+            start_matrix = left_start_adj
+        else:
+            start_matrix = right_start_adj - left_no_bins * bin_size
+
+        print(no_bins, left_start_adj, left_end_adj, left_no_bins, right_start_adj, right_end_adj, right_no_bins, start_matrix)
+        print(matrix_size, left_matrix_size, right_matrix_size)
+
+        return matrix, start_matrix
 
 
     def draw(self, chrom, start, end, width):
 
-        self.resolution = 10
+        self.resolution = 1
 
-        self.hic_ma = HiCMatrix.hiCMatrix('/home/basia/CNVBrowser/tadeus/4DNFIQI8SFNE.mcool::resolutions/50000')
+        self.hic_ma = HiCMatrix.hiCMatrix('/home/basia/CNVBrowser/tadeus2/4DNFI18UHVRO.mcool::resolutions/50000')
 
         bin_size = 50 * 1000
+        depth =   2000 * 1000
 
-        depth =   4000 * 1000
-       
         adj_depth = self.bin_adjust(depth, bin_size)
-
-        #adj_left_coord = self.bin_adjust(self.breakpoint.left_coord, bin_size) 
-        #adj_right_coord = self.bin_adjust(self.breakpoint.right_coord, bin_size)     
-
-        adj_start = self.bin_adjust(start, bin_size)
-        adj_end = self.bin_adjust(end, bin_size) 
-        adj_size = adj_end - adj_start
-
-        if self.breakpoint:
-
-            print((DEFAULT_WIDTH_PROP - self.width_prop) / DEFAULT_WIDTH_PROP )
-
-            left_no_bins = int((adj_size + adj_depth) // bin_size)
-            right_no_bins = int(((DEFAULT_WIDTH_PROP - self.width_prop) / self.width_prop * adj_size + adj_depth) // bin_size)
-
-            print(self.left_side, left_no_bins , right_no_bins, (DEFAULT_WIDTH_PROP - self.width_prop) / DEFAULT_WIDTH_PROP * adj_size )
-            print('bin left:', left_no_bins , 'bin_right', right_no_bins)
-
-            if not self.left_side:
-                left_no_bins, right_no_bins = right_no_bins, left_no_bins       
-
-            if self.left_side:
-                start_matrix = adj_start - adj_depth
-            else:
-                start_matrix = adj_start - left_no_bins * bin_size
-
-            end_matrix = start_matrix + (left_no_bins + right_no_bins) * bin_size
-        
-            print(start_matrix, end_matrix , end_matrix - start_matrix)
-  
-            #starrt_pos = self.hic_ma.get_start_pos(chrom, max(start_matrix, 0),  end_matrix + bin_size)
-            no_bins = left_no_bins + right_no_bins
-            matrix = self.get_breakpoint_matrix(bin_size, left_no_bins = left_no_bins, right_no_bins = right_no_bins)
+       
+        if self.visualize_breakpoint:
+            
+            matrix, start_matrix = self.get_breakpoint_matrix(bin_size, adj_depth)
+            no_bins = np.shape(matrix)[0]
             
         else:
+            
+            adj_start = self.bin_adjust(start, bin_size)
+            adj_end = self.bin_adjust(end, bin_size) 
+            adj_size = adj_end - adj_start
+
             no_bins = int((adj_size + 2 * adj_depth) // bin_size)
             start_matrix = adj_start - adj_depth
             end_matrix =  adj_start + adj_depth + adj_size 
-           
-            print(no_bins, start_matrix, end_matrix)
-            matrix = self.get_sub_matrix(chrom, start_matrix, end_matrix, bin_size)
 
-       
+            matrix = self.get_sub_matrix(chrom, start_matrix, end_matrix, bin_size )
+
         start_pos =  list(range(start_matrix, start_matrix + bin_size * (no_bins + 1), bin_size))
-        print(len(start_pos), np.shape(matrix))
 
         matrix += 1
         self.norm = matplotlib.colors.LogNorm()
@@ -1208,7 +1215,8 @@ class PlotHiCMatrix(TrackPlot):
 
         print(start, end)
         self.axis.set_xlim(start, end)
-        self.axis.set_ylim(0, adj_depth)
+        #self.axis.set_xlim(start_pos[0], start_pos[-1])
+        self.axis.set_ylim(- adj_depth, adj_depth)
 
         self.draw_colorbar(img = img)
 
@@ -1243,18 +1251,39 @@ class PlotHiCMatrix(TrackPlot):
                                 vmin=vmin, vmax=vmax, cmap=self.cmap, norm=self.norm)
         return im
 
-
 class PlotVirtualHIC(TrackPlot):
 
     def __init__(self, *args, **kwarg):
         super(PlotVirtualHIC, self).__init__(*args, **kwarg)
         self.hic_ma = HiCMatrix.hiCMatrix('/home/basia/CNVBrowser/tadeus/4DNFIQI8SFNE.mcool::resolutions/50000')
+        self.bin_size = 50 * 1000
 
-        bin_size = 50 * 1000
+    def aggregate_and_transform(self, columns):
+        agg = np.apply_along_axis(self.aggregate_function, 0, columns)
+        return agg
+
 
     def draw(self, chrom, start, end, width):
-        print(self.v4c_chromosome, self.coordiante)
-        self.hic_ma.get_sub_region( self.v4c_chromosome.name, self.coordiante, self.coordiante)
+        print(self.v4c_chromosome, self.start_coordinate, self.end_coordinate)
+        
+        all_columns = self.hic_ma.get_column_region(self.v4c_chromosome.name, self.start_coordinate, self.end_coordinate, chrom)
+        columns = self.hic_ma.get_sub_matrix(self.v4c_chromosome.name, self.start_coordinate, self.end_coordinate, chrom, start, end)
+
+
+        all_values =  self.aggregate_and_transform(all_columns)
+        values =  self.aggregate_and_transform(columns)
+
+        start_positions =  list(self.hic_ma.get_start_positions(chrom, start, end))
+        
+        for start_position, value in zip(start_positions, values):
+            self.axis.add_patch(Rectangle((start_position, 0), self.bin_size, value, edgecolor=self.edgecolor, linewidth = 1))
+
+        max_value = np.max(values)
+
+        #self.axis.set_ylim(-max_value * 0.05, max_value * 1.05)
+        self.axis.set_ylim(-max_value * 0.05, 40)
+        self.axis.set_xlim(start, end)
+
 
     def get_height(self):
         return self.height if self.height is not None else DEFAULT_VIRTUAL4C_HEIGHT
