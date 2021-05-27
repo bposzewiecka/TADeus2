@@ -183,7 +183,7 @@ class TrackPlot(object):
         
         self.axis = axisartist.Subplot(fig, grids[0, 0])
         fig.add_subplot(self.axis)
-        self.axis.axis[:].set_visible(False)
+        #self.axis.axis[:].set_visible(False)
        
     
         # to make the background transparent
@@ -773,6 +773,120 @@ class PlotBedGraph(TrackPlot):
 
         if self.min_value is None:
             self.min_value = min(score_list)
+
+        if float(self.max_value) % 1 == 0:
+            max_value_print = int(self.max_value)
+        else:
+            max_value_print = "{:.1f}".format(self.max_value)
+
+        if float(self.min_value) % 1 == 0:
+            min_value_print = int(self.min_value)
+        else:
+            min_value_print = "{:.1f}".format(self.min_value)
+
+        self.axis.set_ylim(self.min_value, self.max_value)
+        ydelta = self.max_value - self.min_value
+        small_x = 0.005 * (end - start)
+
+        if self.show_data_range:
+            self.axis.text(start + small_x, self.max_value - ydelta * 0.2,
+                         "[{}-{}]".format(min_value_print, max_value_print),
+                         horizontalalignment='left', fontsize= 8,
+                         verticalalignment='bottom')
+
+
+
+class PlotBedGraph(TrackPlot):
+
+    def __init__(self, *args, **kwargs):
+        super(PlotBedGraph, self).__init__(*args, **kwargs)
+
+    def get_height(self):
+        return self.height if self.height is not None else DEFAULT_BEDGRAPH_HEIGHT
+
+    def draw(self, chrom, start, end, width):
+
+        self.draw_title()
+
+        self.axis.set_frame_on(False)
+        self.axis.axes.get_xaxis().set_visible(False)
+        self.axis.set_xlim(start, end)
+
+        self.bedgraph_style = 'A'
+        self.display == 'stacked'
+
+        entries_list = self.model.get_entries(chrom, start, end)
+
+        no_of_layers = len(entries_list)
+
+        no_of_bins = len(entries_list[0])
+
+        if self.display == 'stacked':
+            for i in range(no_of_layers - 1):
+                for j in range(no_of_bins):
+
+                    entries_list[no_of_layers - i - 2][j].score += entries_list[no_of_layers - i - 1][j].score
+                    
+        self.model.get_entries(chrom, start, end)
+
+        min_value = entries_list[0][0].score
+        max_value = entries_list[0][0].score
+
+        i = 0
+
+        for entries in entries_list:
+
+            score_list = []
+            pos_list = []
+
+            for entry in entries:
+                if entry.score is not  None:
+                    score_list += [entry.score, entry.score]
+                    pos_list += [entry.start, entry.end ]
+
+                    max_value = max(max_value, entry.score)
+                    min_value = min(min_value, entry.score)
+
+            if len(score_list) == 0:
+                continue            
+
+            if i == 0:
+                self.color = '#FF8080'            
+            if i == 1:
+                self.color = '#FFD480'    
+            if i == 2:
+                self.color = '#78EBCC'
+            if i == 3:
+                self.color = '#80D4FF'  
+            if i == 4:
+                self.color = '#8080FF'
+            if i == 5:
+                self.color = '#D480FF'  
+            if i == 6:
+                self.color = '#FF80D4'                  
+            
+            if self.bedgraph_style in ('L','LB'):
+                self.axis.plot(pos_list, score_list, '-', color=self.color, linewidth=0.7)
+            if self.bedgraph_style == 'LB':
+               self.axis.vlines(pos_list, [0], score_list, color=self.color, linewidth=0.5)
+            if self.bedgraph_style in ('A','AB'):
+                self.axis.fill_between(pos_list, score_list,
+                                     facecolor=self.color,
+                                     edgecolor='none')
+            if self.bedgraph_style == 'AB':
+                self.axis.vlines(pos_list, [0], score_list, color=self.edgecolor, linewidth=0.5)
+                self.axis.plot(pos_list, score_list, '-', color=self.edgecolor, linewidth=0.7)
+
+            i+=1
+
+        if self.max_value is None:
+            self.max_value = max_value
+
+        if self.min_value is None:
+            self.min_value = min_value
+
+        self.min_value = 0
+        #self.max_value = 90
 
         if float(self.max_value) % 1 == 0:
             max_value_print = int(self.max_value)

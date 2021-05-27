@@ -1,14 +1,22 @@
 from django import forms
-from tadeus.models import Track, Plot, TrackFile, Eval, Assembly, BedFileEntry
+from django.forms.widgets import CheckboxSelectMultiple
+from tadeus.models import Track, Plot, TrackFile, Eval, Assembly, BedFileEntry, Subtrack
 
 class TrackForm(forms.ModelForm):
 
-     class Meta:
+    class Meta:
         model = Track
         fields = ('height', 'colormap', 'min_value', 'max_value', 'style', 'column',
             'display', 'labels', 'inverted', 'x_labels', 'name_filter',
         'no', 'transform', 'color', 'edgecolor', 'title', 'bedgraph_style', 'bed_print_options', 'domains_file',
-        'chromosome', 'start_coordinate', 'end_coordinate', 'aggregate_function')
+        'chromosome', 'start_coordinate', 'end_coordinate',  'subtracks')
+
+    def __init__(self, *args, **kwargs):
+        
+        super(forms.ModelForm, self).__init__(*args, **kwargs)
+        
+        self.fields["subtracks"].widget = CheckboxSelectMultiple()
+        self.fields["subtracks"].queryset = Subtrack.objects.filter(track_file = self.instance.track_file)
 
 class CreateTrackForm(forms.ModelForm):
 

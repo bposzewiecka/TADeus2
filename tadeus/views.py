@@ -88,7 +88,6 @@ def get_region_or_err_msg(search_text, plot_id):
     if start >= end:
         return 'End coordinate should be greater than start coordinate. Your position query: {search_text}'.format(search_text = search_text)
 
-
     try:    
         chrom_size = get_chrom_length(plot_id, chrom)
        
@@ -646,8 +645,12 @@ def edit_track(request, p_id):
     if track.get_file_type() == 'HI':
         domains_files = TrackFile.objects.filter(file_type = 'BE').filter(only_public_or_user(request),  Q(eval__isnull=True)).order_by('name', 'id')
 
+
+    print(track.track_file.subtracks.all())
+
     return render(request, 'tadeus/track.html', {'form': form,
                    'p_id':  p_id, 
+                   'track': track,
                    'plot_id': track.plot.id,
                    'file_type': track.get_file_type(), 
                    'file_sub_type': track.get_file_sub_type(),
@@ -659,7 +662,8 @@ def edit_track(request, p_id):
                    'domains_files': domains_files,
                    'hic_display': track.hic_display,
                    'hic_display_name': track.get_hic_display_display(),
-                   'chroms': chroms})
+                   'chroms': chroms,
+                   'subtracks': track.track_file.subtracks.all()})
 
 
 def delete_track(request, p_id):

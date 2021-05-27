@@ -7,8 +7,13 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.html import format_html
 import tadeus.statistics as  statistics 
 import pyBigWig
+import bbi
 
 from tadeus.defaults import DEFAULT_WIDTH_PROP
+from multiprocessing import Pool
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Species(models.Model):
     name = models.CharField(max_length = 50, unique = True)
@@ -38,6 +43,7 @@ class Chromosome(models.Model):
 
 class Sample(models.Model):
     name = models.CharField(max_length = 200)     
+    tissue = models.CharField(max_length = 100)
     description =  models.CharField(max_length = 1000)
     species =  models.ForeignKey(Species, on_delete = models.PROTECT) 
 
@@ -64,7 +70,6 @@ class TrackFile(models.Model):
     public = models.BooleanField(default = False)
     approved = models.BooleanField(default = False)
     reference = models.CharField(max_length = 500, null = True, blank = True)
-    file_path = models.CharField(max_length = 500, null = True)
     bin_sizes = models.CharField(max_length = 500, null = True)
     auth_cookie = models.CharField(max_length = 60, null = True)
     big = models.BooleanField(default = False)    
@@ -81,7 +86,7 @@ class TrackFile(models.Model):
     def get_entries(self, chrom, start, end, name_filter = None):
 
         if self.big:
-            return self.get_entries_big(chrom, start, end, name_filter)
+            return self.get_entries_big_wig(chrom, start, end, name_filter)
         else:
             return self.get_entries_db(chrom, start, end, name_filter)
 
@@ -98,7 +103,7 @@ class TrackFile(models.Model):
         return q
 
 
-    def get_entries_big(self, chrom, start, end, name_filter = None):
+    def get_entries_big_bed(self, chrom, start, end, name_filter = None):
 
         big_bed = pyBigWig.open(self.file_path)
 
@@ -132,6 +137,49 @@ class TrackFile(models.Model):
  
         return entries
 
+    def get_entries_big_wig(self, chrom, start, end, name_filter = None):
+
+        BIN_SIZE = 25
+
+        bws = ['wgEncodeBroadHistoneGm12878H3k4me1StdSig.bigWig',
+               #'wgEncodeBroadHistoneH1hescH3k4me1StdSig.bigWig',
+               #'wgEncodeBroadHistoneHsmmH3k4me1StdSig.bigWig',
+               #'wgEncodeBroadHistoneHuvecH3k4me1StdSig.bigWig',
+               #'wgEncodeBroadHistoneK562H3k4me1StdSig.bigWig',
+               #'wgEncodeBroadHistoneNhekH3k4me1StdSig.bigWig',
+               #'wgEncodeBroadHistoneNhlfH3k4me1StdSig.bigWig'
+               ]
+
+        bins_start = start // BIN_SIZE * BIN_SIZE
+        bins_end = end // BIN_SIZE * BIN_SIZE +  BIN_SIZE
+
+        bins = (bins_end  - bins_start) // BIN_SIZE
+
+        entries = []
+       
+        for bw in bws:
+
+            with bbi.open(bw) as f:
+
+                entries_big_wig = []
+
+                print(f.fetch(chrom, bins_start, bins_end, bins=bins))
+
+                for i, score in enumerate(f.fetch(chrom, bins_start, bins_end, bins=bins)):
+                    pass
+                    
+                    entry = BedFileEntry(FileEntry)
+
+                    entry.chorm = chrom
+                    entry.start = bins_start + i * BIN_SIZE
+                    entry.end = bins_start + (i + 1) * BIN_SIZE
+                    entry.score = score if score else 0
+                    entries_big_wig.append(entry)
+                                  
+                entries.append(entries_big_wig)
+
+        return entries
+
     @property
     def organism(self):
         return self.assembly.organism
@@ -153,6 +201,14 @@ class TrackFile(models.Model):
 
         save_bed_entries(bed_entries)
 
+
+class Subtrack(models.Model):
+    track_file =  models.ForeignKey(TrackFile, on_delete = models.CASCADE, related_name='subtracks') 
+    file_path = models.CharField(max_length = 500, null = True)
+    rgb = models.CharField(max_length = 7, null = True)
+    sample = models.ForeignKey(Sample, on_delete = models.PROTECT, related_name='subtracks', null=True) 
+    name =  models.CharField(max_length = 500, null = True)
+    default = models.BooleanField(default = False)
 
 class FileEntry(models.Model):
 
@@ -300,6 +356,7 @@ class Plot(models.Model):
 
 class Track(models.Model):
     plot = models.ForeignKey(Plot, on_delete = models.CASCADE, related_name='tracks')
+    subtracks = models.ManyToManyField(Subtrack)
     track_file = models.ForeignKey(TrackFile, on_delete = models.PROTECT)
     no = models.IntegerField()
     column = models.IntegerField(default = 1)
@@ -463,6 +520,10 @@ class Track(models.Model):
     def file_name(self):
         return self.track_file.name
 
+@receiver(post_save, sender=Track)
+def add_default_subtracks(sender, instance, **kwargs):
+    default_subtracks = instance.track_file.subtracks.filter(default = True)
+    instance.subtracks.set(default_subtracks)
 
 class Eval(models.Model):
     owner = models.ForeignKey(User, on_delete = models.PROTECT, null=True) 
