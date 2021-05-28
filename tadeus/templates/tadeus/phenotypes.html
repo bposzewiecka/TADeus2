@@ -5,60 +5,50 @@
 {% block begin %}
 
 <nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-    <li class="breadcrumb-item"> {{db}}</li>
-  </ol>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item"> {{db}}</li>
+    </ol>
 </nav>
 
 {% endblock %}
 
-
-
-
 {% block header %}
 
-  <div role="group">
+<div role="group">
     {{db}}
-  </div>
+</div>
 
 {% endblock %}
-
-
 
 {% block body %}
 
-  {% if filter %}
+{% if filter %}
 
     <div style="margin-bottom: 20px">
-      <form action="" method="get" class="form-inline">
+        <form action="" method="get" class="form-inline">
   
-        <label for="{{ filter.form.pheno_id.id_for_label }}" class="mr-sm-2">Id</label>
-        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.pheno_id.html_name }}" id="{{ filter.form.pheno_id.id_for_label }}"
-        {% if filter.form.pheno_id.value  is not None %}  value="{{ filter.form.pheno_id.value }}" {% endif %}>
+            <label for="{{ filter.form.pheno_id.id_for_label }}" class="mr-sm-2">Id</label>
+            <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.pheno_id.html_name }}" id="{{ filter.form.pheno_id.id_for_label }}" {% if filter.form.pheno_id.value  is not None %}  value="{{ filter.form.pheno_id.value }}" {% endif %}>
 
-        <label for="{{ filter.form.name.id_for_label }}" class="mr-sm-2">Name</label>
-        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.name.html_name }}" id="{{ filter.form.name.id_for_label }}"  
-        {% if filter.form.name.value  is not None %} value="{{ filter.form.name.value }}" {% endif %}>
-
-        <label for="{{ filter.form.definition.id_for_label }}" class="mr-sm-2">Definition</label>
-        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.definition.html_name }}" id="{{ filter.form.definition.id_for_label }}"
-        {% if filter.form.definition.value  is not None %} value="{{ filter.form.definition.value }}" {% endif %}>
+            <label for="{{ filter.form.name.id_for_label }}" class="mr-sm-2">Name</label>
+            <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.name.html_name }}" id="{{ filter.form.name.id_for_label }}" {% if filter.form.name.value  is not None %} value="{{ filter.form.name.value }}" {% endif %}>
+  
+            <label for="{{ filter.form.definition.id_for_label }}" class="mr-sm-2">Definition</label>
+            <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.definition.html_name }}" id="{{ filter.form.definition.id_for_label }}" {% if filter.form.definition.value  is not None %} value="{{ filter.form.definition.value }}" {% endif %}>
 
 
-        <label for="{{ filter.form.comment.id_for_label }}" class="mr-sm-2">Comment</label>
-        <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.comment.html_name }}" id="{{ filter.form.comment.id_for_label }}"
-        {% if filter.form.comment.value  is not None %} value="{{ filter.form.comment.value }}"  {% endif %}>
+            <label for="{{ filter.form.comment.id_for_label }}" class="mr-sm-2">Comment</label>
+            <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.comment.html_name }}" id="{{ filter.form.comment.id_for_label }}"  {% if filter.form.comment.value  is not None %} value="{{ filter.form.comment.value }}"  {% endif %}>
 
-        <button class="btn btn-primary active" role="button" aria-pressed="true" >Filter</button>
-      </form>
+            <button class="btn btn-primary active" role="button" aria-pressed="true" >Filter</button>
+        </form>
     </div>
 
-  {% endif %}
+{% endif %}
 
-  {% if table %}
+{% if table %}
     {% render_table table %}
-  {% endif %}
+{% endif %}
   
 {% endblock %}
-

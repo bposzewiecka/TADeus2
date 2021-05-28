@@ -4,12 +4,12 @@
 
 {% block begin %}
 
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-    <li class="breadcrumb-item">Evaluations of SVs</li>
-  </ol>
-</nav>
+	<nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+	        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+	        <li class="breadcrumb-item">Evaluations of SVs</li>
+	    </ol>
+	</nav>
 
 {% endblock %}
 
@@ -18,11 +18,11 @@
 
 	<div class="float-right" role="group">
 
-	<a href="{% url 'index' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
-	
-	<a href="{% url 'create_eval' p_type='blank'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create</a>
-	<a href="{% url 'create_eval' p_type='text'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create by direct input</a>
-	<a href="{% url 'create_eval' p_type='file' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create by file upload</a>
+		<a href="{% url 'index' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+
+		<a href="{% url 'create_eval' p_type='blank'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create</a>
+		<a href="{% url 'create_eval' p_type='text'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create by direct input</a>
+		<a href="{% url 'create_eval' p_type='file' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create by file upload</a>
 
 	</div>
 

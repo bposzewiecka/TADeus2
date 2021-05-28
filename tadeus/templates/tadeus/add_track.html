@@ -5,12 +5,12 @@
 
 
 <nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'plots' %}">Plots</a></li>
-    <li class="breadcrumb-item"><a href="{% url 'edit_plot' p_id=plot.id %}">{{ plot.name }}</a></li>
-    <li class="breadcrumb-item">New track</li>
-  </ol>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'plots' %}">Plots</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'edit_plot' p_id=plot.id %}">{{ plot.name }}</a></li>
+        <li class="breadcrumb-item">New track</li>
+    </ol>
 </nav>
 
 
@@ -20,55 +20,59 @@
 
 {% block header %}
 
-  <div class="float-right" role="group">
-  <a href="{% url 'edit_plot' p_id=p_plot_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
-  <button type="submit" class="btn btn-primary btn-lg active">Create</button>
-  </div>
+    <div class="float-right" role="group">
+        <a href="{% url 'edit_plot' p_id=p_plot_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+        <button type="submit" class="btn btn-primary btn-lg active">Create</button>
+    </div>
 
 {% endblock %}
 
 {% block body %}
-  {% csrf_token %}
+    {% csrf_token %}
 
-  <div class="form-row">
-    <div class="form-group col-md-10">
-      <label for="{{ form.track_file.id_for_label }}">Track file</label>
-      <select id="{{ form.track_file.id_for_label }}" class="form-control" name="{{ form.track_file.html_name }}">
-        {% for track_file in track_files %}
-            <option value="{{ track_file.id }}" {% if form.track_file.value|add:0   == track_file.id %} selected{% endif %}>{{ track_file.name }}</option>    
-        {% endfor %}
-      </select>
-    </div>
-    <div class="form-group col-md-2">
-      {{ form.hic_display.errors }}
-      <label for="{{ form.hic_display.id_for_label }}">Display</label>
-      <select id="{{ form.hic_display.id_for_label }}" class="form-control" name="{{ form.hic_display.html_name }}">
-      {% for x,y in form.fields.hic_display.choices %}
-          <option value="{{ x }}">{{ y }}</option>
-      {% endfor %}
-      </select>
-    </div>
-  </div>
+    <div class="form-row">
+        <div class="form-group col-md-10">
+            <label for="{{ form.track_file.id_for_label }}">Track file</label>
+            <select id="{{ form.track_file.id_for_label }}" class="form-control" name="{{ form.track_file.html_name }}">
 
-  <div class="form-group">
-    <label for="{{ form.title.id_for_label }}">Title</label>
-    {{ form.title.errors }}
-    <input class="form-control" name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}" 
-    {% if form.title.value  %} value="{{ form.title.value}}" {% endif %}>
-  </div>
+            {% for track_file in track_files %}
+                <option value="{{ track_file.id }}" {% if form.track_file.value|add:0   == track_file.id %} selected{% endif %}>{{ track_file.name }}</option>    
+            {% endfor %}
+            </select>
+        </div>
 
-  <div class="form-row">
-    <div class="form-group col-md-6">
-      <label for="{{ form.no.id_for_label }}">No.</label>
-      {{ form.no.errors }}
-      <input class="form-control" type="number" name="{{ form.no.html_name }}" id="{{ form.no.id_for_label }}" value="{{form.no.value}}">
+        <div class="form-group col-md-2">
+            {{ form.hic_display.errors }}
+            <label for="{{ form.hic_display.id_for_label }}">Display</label>
+
+            <select id="{{ form.hic_display.id_for_label }}" class="form-control" name="{{ form.hic_display.html_name }}">
+
+            {% for x,y in form.fields.hic_display.choices %}
+                <option value="{{ x }}">{{ y }}</option>
+            {% endfor %}
+
+            </select>
+        </div>
     </div>
+
+    <div class="form-group">
+        <label for="{{ form.title.id_for_label }}">Title</label>
+        {{ form.title.errors }}
+        <input class="form-control" name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}" {% if form.title.value  %} value="{{ form.title.value}}" {% endif %}>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="{{ form.no.id_for_label }}">No.</label>
+            {{ form.no.errors }}
+            <input class="form-control" type="number" name="{{ form.no.html_name }}" id="{{ form.no.id_for_label }}" value="{{form.no.value}}">
+        </div>
     
-  <div class="form-group col-md-6">
-      <label for="{{ form.height.id_for_label }}">Height</label>
-      {{ form.height.errors }}
-      <input class="form-control" type="number" name="{{ form.height.html_name }}" id="{{ form.height.id_for_label }}" value="{{ form.height.value}}" >
-    </div>
+        <div class="form-group col-md-6">
+            <label for="{{ form.height.id_for_label }}">Height</label>
+            {{ form.height.errors }}
+            <input class="form-control" type="number" name="{{ form.height.html_name }}" id="{{ form.height.id_for_label }}" value="{{ form.height.value}}" >
+        </div>
 
     <!--<div class="form-group col-md-6">
       <label for="{{ form.column.id_for_label }}">Column</label>
@@ -76,9 +80,9 @@
       <input class="form-control" type="number" name="{{ form.column.html_name }}" id="{{ form.column.id_for_label }}" value="{{ form.column.value}}" 
      {% if readonly %}readonly{% endif %}>
     </div>-->
-    <input class="form-control" type="hidden" name="{{ form.column.html_name }}" id="{{ form.column.id_for_label }}" value="{{ form.column.value}}" >
+        <input class="form-control" type="hidden" name="{{ form.column.html_name }}" id="{{ form.column.id_for_label }}" value="{{ form.column.value}}" >
 
-  </div>
+    </div>
 
 
 {% endblock %}
