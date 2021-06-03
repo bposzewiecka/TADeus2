@@ -6,9 +6,9 @@ class TrackForm(forms.ModelForm):
 
     class Meta:
         model = Track
-        fields = ('height', 'colormap', 'min_value', 'max_value', 'style', 'column', 'display', 'labels', 'inverted', 'x_labels', 'name_filter',
-                  'no', 'transform', 'color', 'edgecolor', 'title', 'bedgraph_style', 'bed_print_options', 'domains_file',
-                  'chromosome', 'start_coordinate', 'end_coordinate',  'subtracks', 'bedgraph_display', 'bin_size')
+        fields = ('height', 'colormap', 'min_value', 'max_value', 'subtracks'  ) # 'display', 'labels', 'inverted', 'x_labels', 'name_filter',
+                  #'no', 'transform', 'color', 'edgecolor', 'title', 'bedgraph_style', 'bed_display', 'domains_file',
+                  #'chromosome', 'start_coordinate', 'end_coordinate',  'subtracks', 'bedgraph_display', 'bin_size')
 
     def __init__(self, *args, **kwargs):
         
@@ -21,7 +21,7 @@ class CreateTrackForm(forms.ModelForm):
 
      class Meta:
         model = Track
-        fields = ('no',  'title', 'height', 'track_file', 'column', 'hic_display')
+        fields = ('no',  'title', 'height', 'track_file', 'hic_display')
 
 
 class PlotForm(forms.ModelForm):

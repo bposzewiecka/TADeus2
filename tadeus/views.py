@@ -567,7 +567,7 @@ def create_plot(request):
 def edit_plot(request, p_id):
 
     plot = Plot.objects.get(pk =p_id)
-    tracks = plot.tracks.all().order_by('column', 'no','id')
+    tracks = plot.tracks.all().order_by('no','id')
     table = TrackTable(tracks)
     RequestConfig(request).configure(table)
 
@@ -651,7 +651,7 @@ def edit_track(request, p_id):
                    'track': track,
                    'plot_id': track.plot.id,
                    'file_type': track.get_file_type(), 
-                   'file_sub_type': track.get_file_sub_type(),
+                   'file_sub_type': track.get_bed_sub_type(),
                    'readonly': readonly,
                    'plot_br': track.plot.name,
                    'track_br': track.track_file.name,
@@ -694,7 +694,7 @@ def create_track(request, p_plot_id):
             return redirect(edit_track, p_id = track.id)
 
     else:
-        form = CreateTrackForm(initial={'no': track_number, 'column': 1})
+        form = CreateTrackForm(initial={'no': track_number})
 
     track_files = TrackFile.objects.filter(Q(assembly = plot.assembly), only_public_or_user(request), Q(eval__isnull=True)).order_by(Lower('name'),'id')
 

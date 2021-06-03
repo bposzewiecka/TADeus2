@@ -60,7 +60,7 @@ class TrackTable(tables.Table):
         model = Track
 
         template_name = 'django_tables2/bootstrap.html'
-        sequence = ('id', 'title',  'file_name', 'no', 'column', 'height')
+        sequence = ('id', 'title',  'file_name', 'no', 'height')
         fields = sequence
 
 
