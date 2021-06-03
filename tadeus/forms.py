@@ -6,10 +6,9 @@ class TrackForm(forms.ModelForm):
 
     class Meta:
         model = Track
-        fields = ('height', 'colormap', 'min_value', 'max_value', 'style', 'column',
-            'display', 'labels', 'inverted', 'x_labels', 'name_filter',
-        'no', 'transform', 'color', 'edgecolor', 'title', 'bedgraph_style', 'bed_print_options', 'domains_file',
-        'chromosome', 'start_coordinate', 'end_coordinate',  'subtracks')
+        fields = ('height', 'colormap', 'min_value', 'max_value', 'style', 'column', 'display', 'labels', 'inverted', 'x_labels', 'name_filter',
+                  'no', 'transform', 'color', 'edgecolor', 'title', 'bedgraph_style', 'bed_print_options', 'domains_file',
+                  'chromosome', 'start_coordinate', 'end_coordinate',  'subtracks', 'bedgraph_display', 'bin_size')
 
     def __init__(self, *args, **kwargs):
         
@@ -65,9 +64,7 @@ class EvalAddEntryForm(forms.ModelForm):
         end = cleaned_data.get("end")
 
         if start > end:
-            raise forms.ValidationError(
-                "The start coordinate should be less or equal to the end coordinate."
-            )
+            raise forms.ValidationError("The start coordinate should be less or equal to the end coordinate.")
 
         distance_limit =  10 * 1000 * 1000
 

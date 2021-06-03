@@ -4,65 +4,61 @@
 
 {% block header %}
 
-
-
 <div style="display: table; margin: 0 auto;">
 
-<div class="btn-toolbar mb-3" role="toolbar" aria-label="" style="padding-top: 20px;">
+    <div class="btn-toolbar mb-3" role="toolbar" aria-label="" style="padding-top: 20px;">
 
-  <form action="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=p_start p_end=p_end %}" method="get" >
-    <div class="form-row">
+        <form action="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=p_start p_end=p_end %}" method="get" >
+            <div class="form-row">
 
-      <div class="btn-group mr-2" role="group" aria-label="">
-      	<a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=zoom_in.0  p_end=zoom_in.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom in"><i class="fas fa-search-plus"></i></a>
-      	<a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=zoom_out.0  p_end=zoom_out.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom out"><i class="fas fa-search-minus"></i></a>
-      </div>
+                <div class="btn-group mr-2" role="group" aria-label="">
+                    <a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=zoom_in.0  p_end=zoom_in.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom in"><i class="fas fa-search-plus"></i></a>
+                    <a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=zoom_out.0  p_end=zoom_out.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom out"><i class="fas fa-search-minus"></i></a>
+                </div>
 
-      <div class="btn-group mr-2" role="group" aria-label="">
-      	<a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=move.0.0  p_end=move.0.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.0.2 }} % the left"><i class="fas fa-angle-double-left"></i></a>
-      	<a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=move.1.0  p_end=move.1.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.1.2 }} % the left"><i class="fas fa-angle-left"></i></a>
-      	<a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=move.2.0  p_end=move.2.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.2.2 }} % the right"><i class="fas fa-angle-right"></i></a>
-      	<a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=move.3.0  p_end=move.3.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.3.2 }} % the right"><i class="fas fa-angle-double-right"></i></a>
-      </div>
+                <div class="btn-group mr-2" role="group" aria-label="">
+                    <a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=move.0.0  p_end=move.0.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.0.2 }} % the left"><i class="fas fa-angle-double-left"></i></a>
+                    <a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=move.1.0  p_end=move.1.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.1.2 }} % the left"><i class="fas fa-angle-left"></i></a>
+                    <a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=move.2.0  p_end=move.2.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.2.2 }} % the right"><i class="fas fa-angle-right"></i></a>
+                    <a href="{% url 'browser' p_id=p_id p_chrom=p_chrom p_start=move.3.0  p_end=move.3.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.3.2 }} % the right"><i class="fas fa-angle-double-right"></i></a>
+                </div>
 
-    	<div class="input-group mr-2">
-    	  <div class="input-group-prepend">
-    	    <span class="input-group-text">{{ p_chrom }}:{{p_start |intcomma }}-{{p_end |intcomma}}</span>
-    	  </div>
-    	  <div class="input-group-append">
-    	    <span class="input-group-text">{{ region_len | intcomma}}  bp.</span>
-    	  </div>
-    	</div>
+                  <div class="input-group mr-2">
+                      <div class="input-group-prepend">
+                          <span class="input-group-text">{{ p_chrom }}:{{p_start |intcomma }}-{{p_end |intcomma}}</span>
+                      </div>
+                      <div class="input-group-append">
+                         <span class="input-group-text">{{ region_len | intcomma}}  bp.</span>
+                      </div>
+                  </div>
 
-    	<div class="input-group mr-2">
-    	  <input type="text" class="form-control" placeholder="Enter position"  name="search_text" style="width: 400px">
-    	  <div class="input-group-append">
-    	    <button class="btn btn-secondary btn-lg" type="submit" value="Submit"><i class="fas fa-search"></i></button>
-    	  </div>
-    	</div>
+                  <div class="input-group mr-2">
+                      <input type="text" class="form-control" placeholder="Enter position"  name="search_text" style="width: 400px">
+                      <div class="input-group-append">
+                          <button class="btn btn-secondary btn-lg" type="submit" value="Submit"><i class="fas fa-search"></i></button>
+                      </div>
+                  </div>
 
-  {% if p_name_filters %}
-      <div class="input-group mr-2">
-        <select name="name_filter" class="form-control" style="height: 48px">
-            <option value="" {% if name_filter is None %} selected{% endif %}>All</option>
-            {% for x in p_name_filters %}
-              <option value="{{ x }}" {% if name_filter == x %} selected{% endif %}>{{ x }}</option>
-            {% endfor %}
-        </select>
-        <div class="input-group-append">
-          <button class="btn btn-secondary btn-lg" type="submit" value="Submit"><i class="fas fa-filter"></i></button>
-        </div>   
-      </div>
+                {% if p_name_filters %}
+                    <div class="input-group mr-2">
+                        <select name="name_filter" class="form-control" style="height: 48px">
+                            <option value="" {% if name_filter is None %} selected{% endif %}>All</option>
+                            {% for x in p_name_filters %}
+                                <option value="{{ x }}" {% if name_filter == x %} selected{% endif %}>{{ x }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary btn-lg" type="submit" value="Submit"><i class="fas fa-filter"></i></button>
+                        </div>   
+                    </div>
+                {% endif %}
 
-  {% endif %}
-    <input type="hidden" name="interval_start" value="{{ interval_start }}">
-    <input type="hidden" name="interval_end" value="{{ interval_end }}">
-    <a href="{% url 'edit_plot' p_id=p_id %}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="edit"><i class="fas fa-edit"></i></a>
-
+                <input type="hidden" name="interval_start" value="{{ interval_start }}">
+                <input type="hidden" name="interval_end" value="{{ interval_end }}">
+                <a href="{% url 'edit_plot' p_id=p_id %}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="edit"><i class="fas fa-edit"></i></a>
+            </div>
+          </form>
     </div>
-	</form>
-  
-  </div>
 </div>
 
 {% endblock %}
@@ -70,77 +66,78 @@
 
 {% block body %}
 
-  <div style="display: table; margin: 0 auto;">
+<div style="display: table; margin: 0 auto;">
 
     {% for col, tracks in p_plot.getColumnsDict.items %}
 
-      <div style="float:left">
+    <div style="float:left">
         {% for p_track in  tracks %}
-          <div>
+        <div>
             <img src="{% url 'image' p_id=p_track.id p_cols=p_cols p_chrom=p_chrom p_start=p_start p_end=p_end %}{{ get_url|safe }}" alt="">
-          </div>
+        </div>
         {% endfor %}
-      </div>
+    </div>
 
     {% endfor %}
 
-  </div>
+</div>
 
 {% if results %}
 
 <div class="container" style="margin-top:30px;">
-  <table class="table">
-    <thead>
-      <tr>
-        <th width="8%">Gene symbol</th>
-        <th width="8%">pLI</th>
-        <th width="8%">ClinGen</th>
-        <th width="8%">ClinGen score</th>
-        <th width="8%">Enhancer- promoter interactions number</th>     
-        <th width="8%">Enhancer- promoter interactions score</th> 
-        <th width="8%">Phenotype score</th>
-        <th width="8%">Distance from breakpoints</th>
-        <th width="8%">Distance from breakpoints score (distance below 1Mb)</th>    
-        <th width="8%">Rank</th>  
-        <th>Phenotype information</th>         
-      </tr>
-     </thead>
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="8%">Gene symbol</th>
+                <th width="8%">pLI</th>
+                <th width="8%">ClinGen</th>
+                <th width="8%">ClinGen score</th>
+                <th width="8%">Enhancer- promoter interactions number</th>     
+                <th width="8%">Enhancer- promoter interactions score</th> 
+                <th width="8%">Phenotype score</th>
+                <th width="8%">Distance from breakpoints</th>
+                <th width="8%">Distance from breakpoints score (distance below 1Mb)</th>    
+                <th width="8%">Rank</th>  
+                <th>Phenotype information</th>         
+            </tr>
+        </thead>
     
-     <tbody>
-     {% for result in results  %}
-        <tr {% if result.1.rank >= 300 %} style="background-color: #f8d7da;" 
-            {% elif result.1.rank >= 200 %}  style="background-color: #fcedee;"  
-          {% endif %}>
-          <td>{{result.0}}</td>
-          <td>{{result.1.pLI|floatformat:4}}</td>
-          <td>{{result.1.clingen|floatformat:0}}</td>
-          <td>{{result.1.clingen_score|floatformat:0}}</td>
-          <td>{{result.1.enh_prom|floatformat}}</td>
-          <td>{{result.1.enh_prom_score|floatformat:0}}</td>
-          <td>{{result.1.phenotype_score}}</td>
-          <td>{{result.1.distance|intcomma}}</td>
-          <td>{{result.1.distance_1Mb_score}}</td>
-          <td>{{result.1.rank|floatformat:0}}</td>
-          <td>
+        <tbody>
+            {% for result in results  %}
+                <tr {% if result.1.rank >= 300 %} style="background-color: #f8d7da;"{% elif result.1.rank >= 200 %}  style="background-color: #fcedee;"{% endif %}>
+                    <td>{{result.0}}</td>
+                    <td>{{result.1.pLI|floatformat:4}}</td>
+                    <td>{{result.1.clingen|floatformat:0}}</td>
+                    <td>{{result.1.clingen_score|floatformat:0}}</td>
+                    <td>{{result.1.enh_prom|floatformat}}</td>
+                    <td>{{result.1.enh_prom_score|floatformat:0}}</td>
+                    <td>{{result.1.phenotype_score}}</td>
+                    <td>{{result.1.distance|intcomma}}</td>
+                    <td>{{result.1.distance_1Mb_score}}</td>
+                    <td>{{result.1.rank|floatformat:0}}</td>
+                    <td>
 
-            {% if result.1.phenotypes.count != 0 %}
-              <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapse-{{ result.1.gene.id }}" aria-expanded="false" aria-controls="collapseExample">Show phenotypes</button>
-              <ul style="margin-top:1rem; margin-bottom: 1rem;" class="list-unstyled collapse" id="collapse-{{ result.1.gene.id }}">
+                        {% if result.1.phenotypes.count != 0 %}
+                            <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapse-{{ result.1.gene.id }}" 
+                            aria-expanded="false" aria-controls="collapseExample">Show phenotypes</button>
 
-              {% for phenotype in result.1.phenotypes.all %}
-                  <li>{{ phenotype.link}}  {% if  phenotype.name %}- {{ phenotype.name }} {% endif %}</li>
-              {% endfor %}
-              </ul>
+                            <ul style="margin-top:1rem; margin-bottom: 1rem;" class="list-unstyled collapse" id="collapse-{{ result.1.gene.id }}">
 
-            {% else %}
-              No associated phenotypes
-            {% endif %}
+                            {% for phenotype in result.1.phenotypes.all %}
+                                <li>{{ phenotype.link}}  {% if  phenotype.name %}- {{ phenotype.name }} {% endif %}</li>
+                            {% endfor %}
 
-          </td>
-        </tr>
-     {% endfor %}
-     </tbody>
-  </table>
+                            </ul>
+
+                        {% else %}
+                          No associated phenotypes
+                        {% endif %}
+
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endif %}
 

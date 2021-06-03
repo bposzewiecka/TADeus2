@@ -96,16 +96,13 @@ class TrackPlot(object):
 
         if self.bin_sizes is not None:
             self.bin_sizes =  [ int(bin_size) for bin_size in self.bin_sizes.split() ]
+    
+        if model.title:
 
-        self.file_path = self.track_file.file_path
-        
-
-        self.title = self.track_file.name
-
-        if model.track_file.file_type == 'HI':
-            self.title = textwrap.fill(self.title, 35) 
-        else:
-            self.title = textwrap.fill(self.title, 25)    
+            if model.track_file.file_type == 'HI':
+                self.title = textwrap.fill(model.title, 35) 
+            else:
+                self.title = textwrap.fill(model.title, 25)    
 
         self.color = '#' + model.color
         self.edgecolor =  '#' + model.edgecolor
@@ -136,7 +133,10 @@ class TrackPlot(object):
         self.start_coordinate = model.start_coordinate
         self.end_coordinate = model.end_coordinate
         self.v4c_chromosome = model.chromosome
+
         self.aggregate_function = model.get_aggregate_function()
+        self.bedgraph_display = model.bedgraph_display
+
 
         from tadeus.models import Plot
 
@@ -760,10 +760,7 @@ class PlotBedGraph(TrackPlot):
         if self.bedgraph_style == 'LB':
            self.axis.vlines(pos_list, [0], score_list, color=self.color, linewidth=0.5)
         if self.bedgraph_style in ('A','AB'):
-            self.axis.fill_between(pos_list, score_list,
-                                 facecolor=self.color,
-                                 edgecolor='none')
-
+            self.axis.fill_between(pos_list, score_list, facecolor=self.color, edgecolor='none')
         if self.bedgraph_style == 'AB':
             self.axis.vlines(pos_list, [0], score_list, color=self.edgecolor, linewidth=0.5)
             self.axis.plot(pos_list, score_list, '-', color=self.edgecolor, linewidth=0.7)
@@ -794,8 +791,6 @@ class PlotBedGraph(TrackPlot):
                          horizontalalignment='left', fontsize= 8,
                          verticalalignment='bottom')
 
-
-
 class PlotBedGraph(TrackPlot):
 
     def __init__(self, *args, **kwargs):
@@ -813,7 +808,6 @@ class PlotBedGraph(TrackPlot):
         self.axis.set_xlim(start, end)
 
         self.bedgraph_style = 'A'
-        self.display == 'stacked'
 
         entries_list = self.model.get_entries(chrom, start, end)
 
@@ -821,20 +815,15 @@ class PlotBedGraph(TrackPlot):
 
         no_of_bins = len(entries_list[0])
 
-        if self.display == 'stacked':
+        if self.bedgraph_display == self.model.BEDGRAPH_DISPLAY_OPTION_STACKED:
             for i in range(no_of_layers - 1):
                 for j in range(no_of_bins):
-
                     entries_list[no_of_layers - i - 2][j].score += entries_list[no_of_layers - i - 1][j].score
                     
-        self.model.get_entries(chrom, start, end)
-
         min_value = entries_list[0][0].score
         max_value = entries_list[0][0].score
 
-        i = 0
-
-        for entries in entries_list:
+        for entries, subtrack in zip(entries_list, self.model.subtracks.all()):
 
             score_list = []
             pos_list = []
@@ -849,35 +838,22 @@ class PlotBedGraph(TrackPlot):
 
             if len(score_list) == 0:
                 continue            
+               
+            color = subtrack.rgb 
+            egde_color = self.edgecolor
 
-            if i == 0:
-                self.color = '#FF8080'            
-            if i == 1:
-                self.color = '#FFD480'    
-            if i == 2:
-                self.color = '#78EBCC'
-            if i == 3:
-                self.color = '#80D4FF'  
-            if i == 4:
-                self.color = '#8080FF'
-            if i == 5:
-                self.color = '#D480FF'  
-            if i == 6:
-                self.color = '#FF80D4'                  
-            
             if self.bedgraph_style in ('L','LB'):
-                self.axis.plot(pos_list, score_list, '-', color=self.color, linewidth=0.7)
+                self.axis.plot(pos_list, score_list, '-', color=color, linewidth=0.7)
             if self.bedgraph_style == 'LB':
-               self.axis.vlines(pos_list, [0], score_list, color=self.color, linewidth=0.5)
+               self.axis.vlines(pos_list, [0], score_list, color=color, linewidth=0.5)
             if self.bedgraph_style in ('A','AB'):
-                self.axis.fill_between(pos_list, score_list,
-                                     facecolor=self.color,
+                a = self.axis.fill_between(pos_list, score_list, interpolate = True, alpha = 0.4,
+                                     facecolor= color,
                                      edgecolor='none')
+                matplotlib.pyplot.setp(a, facecolor = color)
             if self.bedgraph_style == 'AB':
-                self.axis.vlines(pos_list, [0], score_list, color=self.edgecolor, linewidth=0.5)
-                self.axis.plot(pos_list, score_list, '-', color=self.edgecolor, linewidth=0.7)
-
-            i+=1
+                self.axis.vlines(pos_list, [0], score_list, color=egde_color, linewidth=0.5)
+                self.axis.plot(pos_list, score_list, '-', color=egde_color, linewidth=0.7)
 
         if self.max_value is None:
             self.max_value = max_value

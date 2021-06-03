@@ -12,8 +12,10 @@ import bbi
 from tadeus.defaults import DEFAULT_WIDTH_PROP
 from multiprocessing import Pool
 
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+
+from concurrent.futures import ThreadPoolExecutor
 
 class Species(models.Model):
     name = models.CharField(max_length = 50, unique = True)
@@ -55,7 +57,6 @@ class TrackFile(models.Model):
     FILE_TYPES = (
         ('BE', 'Bed'),
         ('BG', 'BedGraph'),
-        ('BM', 'BedGraphMatrix'),
         ('HI', 'HiCMatrix'),
         ('XA', 'XAxis'),
     )
@@ -73,6 +74,7 @@ class TrackFile(models.Model):
     bin_sizes = models.CharField(max_length = 500, null = True)
     auth_cookie = models.CharField(max_length = 60, null = True)
     big = models.BooleanField(default = False)    
+    bin_size = models.IntegerField(null = True)
 
     FILE_SUB_TYPES = (
         ('Bed3', 'Bed3'),
@@ -83,13 +85,7 @@ class TrackFile(models.Model):
 
     file_sub_type = models.CharField(max_length=5, choices=FILE_SUB_TYPES, null = True)
 
-    def get_entries(self, chrom, start, end, name_filter = None):
-
-        if self.big:
-            return self.get_entries_big_wig(chrom, start, end, name_filter)
-        else:
-            return self.get_entries_db(chrom, start, end, name_filter)
-
+    bin_size = models.IntegerField(default = 25) 
 
     def get_entries_db(self, chrom, start, end, name_filter = None):
 
@@ -102,14 +98,13 @@ class TrackFile(models.Model):
 
         return q
 
-
     def get_entries_big_bed(self, chrom, start, end, name_filter = None):
 
         big_bed = pyBigWig.open(self.file_path)
 
         entries = []
 
-        for big_bed_entry in  big_bed.entries(chrom, start, end):
+        for big_bed_entry in big_bed.entries(chrom, start, end):
 
             entry = BedFileEntry(FileEntry)
 
@@ -137,53 +132,10 @@ class TrackFile(models.Model):
  
         return entries
 
-    def get_entries_big_wig(self, chrom, start, end, name_filter = None):
-
-        BIN_SIZE = 25
-
-        bws = ['wgEncodeBroadHistoneGm12878H3k4me1StdSig.bigWig',
-               #'wgEncodeBroadHistoneH1hescH3k4me1StdSig.bigWig',
-               #'wgEncodeBroadHistoneHsmmH3k4me1StdSig.bigWig',
-               #'wgEncodeBroadHistoneHuvecH3k4me1StdSig.bigWig',
-               #'wgEncodeBroadHistoneK562H3k4me1StdSig.bigWig',
-               #'wgEncodeBroadHistoneNhekH3k4me1StdSig.bigWig',
-               #'wgEncodeBroadHistoneNhlfH3k4me1StdSig.bigWig'
-               ]
-
-        bins_start = start // BIN_SIZE * BIN_SIZE
-        bins_end = end // BIN_SIZE * BIN_SIZE +  BIN_SIZE
-
-        bins = (bins_end  - bins_start) // BIN_SIZE
-
-        entries = []
-       
-        for bw in bws:
-
-            with bbi.open(bw) as f:
-
-                entries_big_wig = []
-
-                print(f.fetch(chrom, bins_start, bins_end, bins=bins))
-
-                for i, score in enumerate(f.fetch(chrom, bins_start, bins_end, bins=bins)):
-                    pass
-                    
-                    entry = BedFileEntry(FileEntry)
-
-                    entry.chorm = chrom
-                    entry.start = bins_start + i * BIN_SIZE
-                    entry.end = bins_start + (i + 1) * BIN_SIZE
-                    entry.score = score if score else 0
-                    entries_big_wig.append(entry)
-                                  
-                entries.append(entries_big_wig)
-
-        return entries
 
     @property
     def organism(self):
         return self.assembly.organism
-
 
     def read_bed(self):
 
@@ -276,10 +228,8 @@ class BedFileEntry(FileEntry):
         self.score = statistics.get_eval_pvalue(max(n1,n2))
 
 
-
 class Gene(BedFileEntry):
     pass
-
 
 class Breakpoint(models.Model):
 
@@ -453,7 +403,23 @@ class Track(models.Model):
         ('v4c', 'Virtual 4C'),
     )
 
-    hic_display = models.CharField(max_length = 3, choices =  HIC_DISPLAY_OPTIONS, default = 'hic')
+    hic_display = models.CharField(max_length = 3, choices = HIC_DISPLAY_OPTIONS, default = 'hic')
+
+    BEDGRAPH_DISPLAY_OPTION_NONE = 0
+    BEDGRAPH_DISPLAY_OPTION_TRANSPARENT = 1
+    BEDGRAPH_DISPLAY_OPTION_SOLID = 2
+    BEDGRAPH_DISPLAY_OPTION_STACKED = 3
+
+    BEDGRAPH_DISPLAY_OPTION_OPTIONS = (
+        #(1, 'None'),
+        (BEDGRAPH_DISPLAY_OPTION_TRANSPARENT, 'Transparent'),
+        (BEDGRAPH_DISPLAY_OPTION_SOLID, 'Solid'),
+        (BEDGRAPH_DISPLAY_OPTION_STACKED, 'Stacked')
+    )
+
+    bedgraph_display = models.IntegerField(choices = BEDGRAPH_DISPLAY_OPTION_OPTIONS, default = 0)   
+    
+    bin_size = models.IntegerField() 
 
     def get_file_type(self):
         return self.track_file.file_type
@@ -474,9 +440,6 @@ class Track(models.Model):
 
     def draw_vlines(self):
         return  self.bed_print_options in ('V', 'A') and self.track_file.file_type == 'BE'
-
-    def get_entries(self, chrom, start, end, name_filter = None):
-        return  self.track_file.get_entries( chrom, start, end, name_filter)
 
     def draw_track(self, col, chrom, start, end, interval_start, interval_end, 
         name_filter = None, breakpoint = None, left_side = None, width_prop = DEFAULT_WIDTH_PROP, breakpoint_coordinates = None):
@@ -505,7 +468,6 @@ class Track(models.Model):
 
         return trackPlot.draw_track(col, chrom, start, end, interval_start, interval_end, name_filter, breakpoint, left_side, width_prop,   breakpoint_coordinates )
 
-
     def get_aggregate_function(self):
         if self.aggregate_function == 'sum':
             return sum
@@ -516,9 +478,56 @@ class Track(models.Model):
         if self.aggregate_function == 'max':
             return max
     
+
+    def get_entries(self, chrom, start, end, name_filter = None):
+
+        if self.track_file.big and self.track_file.file_type == 'BG':
+            return self.get_entries_big_wig(chrom, start, end, name_filter)
+        elif self.track_file.big and self.track_file.file_type == 'BE':
+            return self.track_file.get_entries_big_bed(chrom, start, end, name_filter)
+        else:
+            return self.track_file.get_entries_db(chrom, start, end, name_filter)
+
+
+    def get_entries_big_wig(self, chrom, start, end, name_filter = None):
+
+        def get_entries_subtrack(file_path):
+
+            with bbi.open(file_path) as f:     
+
+                entries_big_wig = []
+
+                for i, score in enumerate(f.fetch(chrom, bins_start, bins_end, bins=bins)):
+                    
+                    entry = BedFileEntry(FileEntry)
+
+                    entry.chorm = chrom
+                    entry.start = bins_start + i * self.bin_size
+                    entry.end = bins_start + (i + 1) * self.bin_size
+                    entry.score = score if score else 0
+                    entries_big_wig.append(entry)
+
+                return entries_big_wig 
+
+        bins_start = start // self.bin_size * self.bin_size
+        bins_end = end // self.bin_size * self.bin_size +  self.bin_size
+
+        bins = (bins_end - bins_start) // self.bin_size
+       
+        file_paths = [ subtrack.file_path for subtrack in self.subtracks.all()]
+
+        with ThreadPoolExecutor() as executor:
+            entries = executor.map(get_entries_subtrack, file_paths)
+
+        return list(entries)
+
     @property
     def file_name(self):
         return self.track_file.name
+
+@receiver(pre_save, sender=Track)
+def add_defaults(sender, instance, **kwargs):
+    instance.bin_size = instance.track_file.bin_size
 
 @receiver(post_save, sender=Track)
 def add_default_subtracks(sender, instance, **kwargs):

@@ -531,8 +531,6 @@ def image(request, p_cols, p_id, p_chrom, p_start, p_end, p_breakpoint_id = None
 
     return HttpResponse(buf, content_type="image/png")
 
-
-
 def plots(request):
 
     plots = Plot.objects.filter(only_public_or_user(request))
