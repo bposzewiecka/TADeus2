@@ -68,17 +68,14 @@
 
 <div style="display: table; margin: 0 auto;">
 
-    {% for col, tracks in p_plot.getColumnsDict.items %}
 
     <div style="float:left">
-        {% for p_track in  tracks %}
+        {% for p_track in  p_plot.tracks.all %}
         <div>
             <img src="{% url 'image' p_id=p_track.id p_cols=p_cols p_chrom=p_chrom p_start=p_start p_end=p_end %}{{ get_url|safe }}" alt="">
         </div>
         {% endfor %}
     </div>
-
-    {% endfor %}
 
 </div>
 

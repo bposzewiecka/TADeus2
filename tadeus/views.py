@@ -224,98 +224,6 @@ def ranking(eval, p_chrom, p_interval_start, p_interval_end):
     results = list(genes.items())
     results.sort(key = lambda x : (-x[1]['rank'], -x[1]['enh_prom'], x[1]['distance'], x[1]['gene_name']))
 
-    """
-    with open('/home/basia/CNVBrowser/latex/eval_' + str(eval.id) + '_' +  p_chrom + '.txt', 'w') as f_out:
-
-
-        f_out.write(\\begin{center}
-    \\begin{longtable}{ | l | l | l | l | l | l | l |}
-  \\hline
-   &  & &  Enhancer  &  & &\\\\ 
-   &  & &  -promoter  & Distance  &  &\\\\ 
-   Gene name  & pLI & Clingen & interactions & from & Phenotypes & Rank \\\\  
-   &  &  & number & breakpoints & & \\\\  
-  \\hline
-"")
- 
-        for gene_name, gene in results:
-
-            if gene['rank'] == 0:
-                continue
-
-            f_out.write(gene_name)
-            f_out.write(' & ')
-            f_out.write("{0:.4f}".format(gene['pLI']))
-            f_out.write(' & ')
-            f_out.write("{0:.0f}".format(gene['clingen']))
-            f_out.write(' & ')
-            f_out.write(str(gene['enh_prom']))
-            f_out.write(' & ')
-            f_out.write(str(gene['distance']))
-            f_out.write(' & ')
-            f_out.write('Yes' if gene['phenotypes'] else 'No')
-            f_out.write(' & ')
-            f_out.write(str(gene['rank']))
-            f_out.write('\\\\\n')
-
-        f_out.write('\\hline \\end{longtable} \\end{center}')
-
-        f_out.write('\n\n')
-
-
-
-        for gene_name, gene in results:
-
-            phenotypes = gene['phenotypes']
-
-            if not phenotypes:
-                continue
-
-            f_out.write('\\begin{center}\n')
-            f_out.write('\t\\begin{longtable}{ | p{3cm} |  p{10cm} |}\n')
-
-            f_out.write('\t\t\\hline\n')
-            f_out.write('\\multicolumn{2}{ |c| }{' + gene_name + '} \\\\\n')
-
-            f_out.write('\t\t\\hline\n')
-            f_out.write('\t\t Name  & Definition and comments \\\\\n')
-            f_out.write('\t\t\\hline\n')
-
-
-            for phenotype in phenotypes:
-
-
-
-                f_out.write(phenotype.name)
-                f_out.write(' \href{' + phenotype.url + '}{' + phenotype.pheno_id +'}')
-                f_out.write(' & ')
-
-                info = []
-
-                if phenotype.definition:
-                    definition = 'Definition: ' + phenotype.definition.replace('%', '\%')
-                    info.append(definition)
-                if phenotype.comment:
-                    comment = 'Comment: ' + phenotype.comment.replace('%', '\%')
-                    info.append(comment)
-
-                if phenotype.pheno_id in ('HP:0000006', 'HP:0000007'):
-                    info = []
-
-                if len(info) > 0:
-                    f_out.write(info[0])
-
-                f_out.write('\\\\\n')
-
-                if len(info) == 2:
-                    f_out.write(' & ')
-                    f_out.write(info[1])                                         
-                    f_out.write('\\\\\n')     
-
-                f_out.write('\t\t\\hline\n')               
-        
-            f_out.write("\\end{longtable} \\end{center}")
-"""
     return results    
 
 def zoom_breakpoint(size, shift, perc, zoom_in):
@@ -352,7 +260,7 @@ def breakpoint_browser(request, p_id, p_breakpoint_id):
     else:
         pass
 
-    if 2 * abs(p_shift) < p_size :
+    if 2 * abs(p_shift) < p_size:
 
         right_size = int(p_size / 2) - p_shift
 
@@ -419,8 +327,6 @@ def browser(request, p_id,  p_chrom = None, p_start = None, p_end = None):
     perc_zoom = 1.25
 
     p_plot = Plot.objects.get(id = p_id)
-
-    p_columns_dict = p_plot.getColumnsDict()
     
     c_chrom, c_start, c_end, c_interval_start, c_interval_end = getPlotCookie(request, p_id)
 
@@ -470,8 +376,7 @@ def browser(request, p_id,  p_chrom = None, p_start = None, p_end = None):
     return TemplateResponse(request, 'tadeus/browser.html', {'p_id': p_id, 
                            'p_plot': p_plot,
                            'p_name_filters': p_name_filters,
-                           'p_columns_dict': p_columns_dict,
-                           'p_cols': len(p_columns_dict,),
+                           'p_cols': 1,
                            'p_chrom': p_chrom, 
                            'p_start': p_start, 
                            'p_end': p_end,

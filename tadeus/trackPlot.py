@@ -72,7 +72,7 @@ def cm2inch(*tupl):
 
 class PlotTracks(object):
 
-    def __init__(self, plot, fig_width=DEFAULT_FIGURE_WIDTH, dpi=None):
+    def __init__(self, plot, fig_width = DEFAULT_FIGURE_WIDTH, dpi = None):
 
         self.plot = plot
         self.fig_width = fig_width
@@ -99,7 +99,7 @@ class TrackPlot(object):
     
 
         if model.title:
-            if self.file_type == self.track_file.FILE_TYPE_HIC:
+            if self.track_file.file_type == self.track_file.FILE_TYPE_HIC:
                 self.title = textwrap.fill(model.title, 35) 
             else:
                 self.title = textwrap.fill(model.title, 25)  
@@ -118,8 +118,6 @@ class TrackPlot(object):
         self.max_value = model.max_value
 
         self.transform = model.transform
-
-        self.show_data_range = model.show_data_range
 
         self.bed_display = model.bed_display
         self.bed_style = model.bed_style
@@ -768,76 +766,13 @@ class PlotBedGraph(TrackPlot):
     def get_height(self):
         return self.height if self.height is not None else DEFAULT_BEDGRAPH_HEIGHT
 
-    def draw(self, chrom, start, end, width):
-        
-        #self.draw_title()
-
-        self.axis.set_frame_on(False)
-        self.axis.axes.get_xaxis().set_visible(False)
-        self.axis.set_xlim(start, end)
-
-        score_list = []
-        pos_list = []
-
-        for entry in self.model.get_entries(chrom, start, end):
-            if entry.score is not  None:
-                score_list.append(entry.score)
-                pos_list.append(entry.start + (entry.end - entry.start) / 2)
-
-        if len(score_list) == 0:
-            return
-        
-        if self.bedgraph_style in ('L','LB'):
-            self.axis.plot(pos_list, score_list, '-', color=self.color, linewidth=0.7)
-        if self.bedgraph_style == 'LB':
-           self.axis.vlines(pos_list, [0], score_list, color=self.color, linewidth=0.5)
-        if self.bedgraph_style in ('A','AB'):
-            self.axis.fill_between(pos_list, score_list, facecolor=self.color, edgecolor='none')
-        if self.bedgraph_style == 'AB':
-            self.axis.vlines(pos_list, [0], score_list, color=self.edgecolor, linewidth=0.5)
-            self.axis.plot(pos_list, score_list, '-', color=self.edgecolor, linewidth=0.7)
-        
-        if self.max_value is None:
-            self.max_value = max(score_list)
-
-        if self.min_value is None:
-            self.min_value = min(score_list)
-
-        if float(self.max_value) % 1 == 0:
-            max_value_print = int(self.max_value)
-        else:
-            max_value_print = "{:.1f}".format(self.max_value)
-
-        if float(self.min_value) % 1 == 0:
-            min_value_print = int(self.min_value)
-        else:
-            min_value_print = "{:.1f}".format(self.min_value)
-
-        self.axis.set_ylim(self.min_value, self.max_value)
-        ydelta = self.max_value - self.min_value
-        small_x = 0.005 * (end - start)
-
-        if self.show_data_range:
-            self.axis.text(start + small_x, self.max_value - ydelta * 0.2,
-                         "[{}-{}]".format(min_value_print, max_value_print),
-                         horizontalalignment='left', fontsize= 8,
-                         verticalalignment='bottom')
-
-class PlotBedGraph(TrackPlot):
-
-    def __init__(self, *args, **kwargs):
-        super(PlotBedGraph, self).__init__(*args, **kwargs)
-
-    def get_height(self):
-        return self.height if self.height is not None else DEFAULT_BEDGRAPH_HEIGHT
-
     def stack_entries(self):
-        no_of_layers = len(entries_list)
-        no_of_bins = len(entries_list[0])
+        no_of_layers = len(self.entries_list)
+        no_of_bins = len(self.entries_list[0])
 
         for i in range(no_of_layers - 1):
             for j in range(no_of_bins):
-                entries_list[no_of_layers - i - 2][j].score += entries_list[no_of_layers - i - 1][j].score
+                self.entries_list[no_of_layers - i - 2][j].score += self.entries_list[no_of_layers - i - 1][j].score
 
     def draw(self, chrom, start, end, width):
 
@@ -846,24 +781,22 @@ class PlotBedGraph(TrackPlot):
         self.axis.set_frame_on(False)
         self.axis.axes.get_xaxis().set_visible(False)
 
-        entries_list = self.model.get_entries(chrom, start, end)
+        self.entries_list = self.model.get_entries(chrom, start, end)
 
-        if self.bedgraph_display in (self.model.BEDGRAPH_DISPLAY_OPTION_STACKED, self.model.BEDGRAPH_DISPLAY_OPTION_INTERPOLATION_STACKED):
+        if self.bedgraph_display == self.model.BEDGRAPH_DISPLAY_STACKED:
             self.stack_entries()
-
-        min_value = entries_list[0][0].score
-        max_value = entries_list[0][0].score
-
-        # setting graphical patameters
 
         interpolate = True
         alpha = 1
 
-        if self.bedgraph_display in (self.model.BEDGRAPH_DISPLAY_OPTION_TRANSPARENT, self.model.BEDGRAPH_DISPLAY_OPTION_INTERPOLATION_TRANSPATENT):
+        if self.bedgraph_display == self.model.BEDGRAPH_DISPLAY_TRANSPARENT:
             interpolate = False
             alpha = 0.4
 
-        for entries, subtrack in zip(entries_list, self.model.subtracks.all()):
+        min_value = self.entries_list[0][0].score
+        max_value = self.entries_list[0][0].score            
+
+        for entries, subtrack in zip(self.entries_list, self.model.subtracks.all()):
 
             score_list = []
             pos_list = []
@@ -871,11 +804,9 @@ class PlotBedGraph(TrackPlot):
             for entry in entries:
                 if entry.score is not  None:
 
-                    if self.bedgraph_display in  (self.model.BEDGRAPH_DISPLAY_OPTION_INTERPOLATION_SOLID,  \
-                                                  self.model.BEDGRAPH_DISPLAY_OPTION_INTERPOLATION_STACKED,  \
-                                                  self.model.BEDGRAPH_DISPLAY_OPTION_INTERPOLATION_TRANSPATENT):
+                    if self.bedgraph_type == self.model.BEDGRAPH_TYPE_LINECHART:
                         score_list.append(entry.score)
-                        pos_ist.append(entry.start + (entry.end - entry.start) / 2)
+                        pos_list.append(entry.start + (entry.end - entry.start) / 2)
                     else:
                         score_list += [entry.score, entry.score]
                         pos_list += [entry.start, entry.end ]
@@ -889,23 +820,10 @@ class PlotBedGraph(TrackPlot):
             color = subtrack.rgb 
             egde_color = self.edgecolor
 
-            # with borders only for reasonable numbers of entries
-
-            if self.bedgraph_style[-1] == 'B' and len(entries) > DEFAULT_BEDGRAPH_WITH_BORDERS_STYLE_MAX_NUMBER_OF_ENTRIES:
-                self.bedgraph_style = self.bedgraph_style[0]
-
-            if self.bedgraph_style in ('L', 'LB'):
+            if self.bedgraph_style == self.model.BEDGRAPH_STYLE_LINE:
                 self.axis.plot(pos_list, score_list, '-', color = color, linewidth = 0.7)
-
-            if self.bedgraph_style == 'LB':
-               self.axis.vlines(pos_list, [0], score_list, color = color, linewidth = 0.5)
-
-            if self.bedgraph_style in ('A', 'AB'):
+            else:
                 self.axis.fill_between(pos_list, score_list, interpolate = interpolate, alpha = alpha, facecolor = color, edgecolor = 'none')
-                
-            if self.bedgraph_style == 'AB':
-                self.axis.vlines(pos_list, [0], score_list, color = egde_color, linewidth = 0.5)
-                self.axis.plot(pos_list, score_list, '-', color = egde_color, linewidth = 0.7)
 
         if self.max_value is None:
             self.max_value = max_value
