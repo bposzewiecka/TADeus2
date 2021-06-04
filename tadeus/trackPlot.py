@@ -50,15 +50,16 @@ DEFAULT_FIGURE_WIDTH = 35  # in centimeters
 # proportion of width dedicated to (figure, legends)
 DEFAULT_WIDTH_RATIOS = (0.82, 0.18)
 
-
 DEFAULT_MARGINS = {'left': 0, 'right': 1, 'bottom': 0, 'top': 1}
-
 
 DEFAULT_VLINE_WIDTH = 1
 DEFAULT_VLINE_ALPHA = 0.5
 DEFAULT_VLINE_COLOR = (0, 0, 0, 0.7)
 HIGHLIGHT_VLINE_COLOR = (1, 0, 0)
 DEFAULT_VLINE_LINE_STYLE =  'dashed'
+
+VSMALL_RELATIVE = 0.005
+SMALL_RELATIVE  = 0.02
 
 from tadeus.defaults import DEFAULT_WIDTH_PROP
 
@@ -185,7 +186,7 @@ class TrackPlot(object):
         
         self.axis = axisartist.Subplot(fig, grids[0, 0])
         fig.add_subplot(self.axis)
-        #self.axis.axis[:].set_visible(False)
+        self.axis.axis[:].set_visible(False)
        
     
         # to make the background transparent
@@ -272,34 +273,31 @@ class TrackPlot(object):
             labels[-1].set_verticalalignment('top')
         cobar.ax.set_yticklabels(labels)
 
-    def print_data_range(self):
+    def print_data_range(self, start, end):
 
-        return
 
-        if float(self.max_value) % 1 == 0:
-            max_value_print = int(self.max_value)
-        else:
-            max_value_print = "{:.1f}".format(self.max_value)
+        def get_value_print(value):
+            if float(value) % 1 == 0:
+                return int(value)
+            else:
+                return "{:.1f}".format(value)
 
-        if float(self.min_value) % 1 == 0:
-            min_value_print = int(self.min_value)
-        else:
-            min_value_print = "{:.1f}".format(self.min_value)
+        min_value_print = get_value_print(self.min_value)
+        max_value_print = get_value_print(self.max_value)
 
-        self.axis.set_ylim(self.min_value, self.max_value)
         ydelta = self.max_value - self.min_value
-        small_x = 0.005 * (end - start)
 
-        if self.show_data_range:
+        small_x = VSMALL_RELATIVE * (end - start)
+        small_y = 0.04 * (self.max_value - self.min_value)
 
-            self.axis.text(
-                start + small_x, 
-                self.max_value - ydelta * 0.2, 
-                "[{}-{}]".format(min_value_print, max_value_print),
-                horizontalalignment = 'left', 
-                fontsize = 8,
-                verticalalignment = 'bottom'
-            )
+        self.axis.text(
+            start + small_x, 
+            self.max_value - small_y, 
+            "[{}-{}]".format(min_value_print, max_value_print),
+            horizontalalignment = 'left', 
+            fontsize = 8,
+            verticalalignment = 'top'
+        )
 
 
 class PlotBed(TrackPlot):
@@ -818,12 +816,23 @@ class PlotBedGraph(TrackPlot):
                 continue            
                
             color = subtrack.rgb 
-            egde_color = self.edgecolor
+            edgecolor = self.edgecolor
 
-            if self.bedgraph_style == self.model.BEDGRAPH_STYLE_LINE:
+            if DEFAULT_BEDGRAPH_WITH_BORDERS_STYLE_MAX_NUMBER_OF_ENTRIES < len(entries) and self.model.BEDGRAPH_STYLE_LINE_WITH_BORDER:
+                self.bedgraph_style = self.model.BEDGRAPH_STYLE_LINE
+
+            if DEFAULT_BEDGRAPH_WITH_BORDERS_STYLE_MAX_NUMBER_OF_ENTRIES < len(entries) and self.model.BEDGRAPH_STYLE_AREA_WITH_BORDER:
+                self.bedgraph_style = self.model.BEDGRAPH_STYLE_AREA
+
+            if self.bedgraph_style in (self.model.BEDGRAPH_STYLE_LINE, self.model.BEDGRAPH_STYLE_LINE_WITH_BORDER):
                 self.axis.plot(pos_list, score_list, '-', color = color, linewidth = 0.7)
-            else:
+            if self.bedgraph_style == self.model.BEDGRAPH_STYLE_LINE_WITH_BORDER:
+               self.axis.vlines(pos_list, [0], score_list, color = color, linewidth = 0.5)
+            if self.bedgraph_style in (self.model.BEDGRAPH_STYLE_AREA, self.model.BEDGRAPH_STYLE_AREA_WITH_BORDER):
                 self.axis.fill_between(pos_list, score_list, interpolate = interpolate, alpha = alpha, facecolor = color, edgecolor = 'none')
+            if self.bedgraph_style == self.model.BEDGRAPH_STYLE_AREA_WITH_BORDER:
+                self.axis.vlines(pos_list, [0], score_list, color = edgecolor, linewidth = 0.5)
+                self.axis.plot(pos_list, score_list, '-', color = edgecolor, linewidth = 0.7)
 
         if self.max_value is None:
             self.max_value = max_value
@@ -831,7 +840,8 @@ class PlotBedGraph(TrackPlot):
         if self.min_value is None:
             self.min_value = min_value
 
-        self.print_data_range()    
+        self.print_data_range(start, end)    
+        self.axis.set_ylim(self.min_value * (SMALL_RELATIVE + 1), self.max_value * (SMALL_RELATIVE + 1))
         self.axis.set_xlim(start, end)
  
 class PlotDomains(TrackPlot):

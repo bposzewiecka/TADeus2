@@ -173,8 +173,7 @@ class TrackFile(models.Model):
 
         if self.file_type in (self.FILE_TYPE_BED_GRAPH, self.FILE_TYPE_HIC):
             attributes.append('transform')
-          
-        
+                  
         if self.file_type == self.FILE_TYPE_BED:
             attributes.append('labels')
             attributes.append('color')
@@ -207,7 +206,8 @@ class TrackFile(models.Model):
             attributes.append('bedgraph_type')
             attributes.append('bedgraph_style')
             attributes.append('style')
-            attributes.append('bin_size')            
+            attributes.append('bin_size')      
+            attributes.append('aggregate_function')        
      
         return attributes
 
@@ -418,19 +418,19 @@ class Track(models.Model):
     start_coordinate =  models.IntegerField(null = True, blank=True,  default = 0)
     end_coordinate =  models.IntegerField(null = True, blank=True,  default = 0)
 
-    AGGREGATE_FUNCTION_AVG = 0
-    AGGREGATE_FUNCTION_SUM = 1
-    AGGREGATE_FUNCTION_MIN = 2
-    AGGREGATE_FUNCTION_MAX = 3
+    AGGREGATE_FUNCTION_AVG = 'mean'
+    AGGREGATE_FUNCTION_SUM = 'sum'
+    AGGREGATE_FUNCTION_MIN = 'min'
+    AGGREGATE_FUNCTION_MAX = 'max'
 
     AGGREGATE_FUNCTIONS_OPTIONS = (
-        (AGGREGATE_FUNCTION_AVG, 'avg'),
+        (AGGREGATE_FUNCTION_AVG, 'mean'),
         (AGGREGATE_FUNCTION_SUM, 'sum'),
         (AGGREGATE_FUNCTION_MIN, 'min'),
         (AGGREGATE_FUNCTION_MAX, 'max'),
     )
 
-    aggregate_function = models.IntegerField(choices = AGGREGATE_FUNCTIONS_OPTIONS, default = AGGREGATE_FUNCTION_AVG)
+    aggregate_function = models.CharField(max_length = 4, choices = AGGREGATE_FUNCTIONS_OPTIONS, default = AGGREGATE_FUNCTION_AVG)
 
     HIC_DISPLAY_HIC = 0
     HIC_DISPLAY_VIRTUAL4C = 1
@@ -466,11 +466,15 @@ class Track(models.Model):
     bedgraph_type = models.IntegerField(choices = BEDGRAPH_TYPE_OPTIONS, default = BEDGRAPH_TYPE_LINECHART)  
 
     BEDGRAPH_STYLE_LINE = 0
-    BEDGRAPH_STYLE_AREA = 1
+    BEDGRAPH_STYLE_LINE_WITH_BORDER = 1
+    BEDGRAPH_STYLE_AREA = 2
+    BEDGRAPH_STYLE_AREA_WITH_BORDER = 3
 
     BEDGRAPH_STYLE_OPTIONS = (
         (BEDGRAPH_STYLE_LINE, 'Line'),
+        (BEDGRAPH_STYLE_LINE_WITH_BORDER, 'Line with border'),
         (BEDGRAPH_STYLE_AREA, 'Area'),
+        (BEDGRAPH_STYLE_AREA_WITH_BORDER, 'Area with border'),
     )
 
     bedgraph_style =  models.IntegerField(choices = BEDGRAPH_STYLE_OPTIONS, default = BEDGRAPH_STYLE_AREA)
@@ -550,7 +554,7 @@ class Track(models.Model):
 
                 entries_big_wig = []
 
-                for i, score in enumerate(f.fetch(chrom, bins_start, bins_end, bins = bins)):
+                for i, score in enumerate(f.fetch(chrom, bins_start, bins_end, bins = bins, summary = self.aggregate_function)):
                     
                     entry = BedFileEntry(FileEntry)
 
@@ -558,12 +562,13 @@ class Track(models.Model):
                     entry.start = bins_start + i * self.bin_size
                     entry.end = bins_start + (i + 1) * self.bin_size
                     entry.score = score if score else 0
+
                     entries_big_wig.append(entry)
 
                 return entries_big_wig 
 
-        bins_start = start // self.bin_size * self.bin_size
-        bins_end = end // self.bin_size * self.bin_size +  self.bin_size
+        bins_start = start // self.bin_size * self.bin_size - self.bin_size
+        bins_end = end // self.bin_size * self.bin_size + 2 *  self.bin_size
 
         bins = (bins_end - bins_start) // self.bin_size
        
@@ -580,10 +585,11 @@ class Track(models.Model):
 
 @receiver(pre_save, sender=Track)
 def add_defaults(sender, instance, **kwargs):
-    instance.bin_size = instance.track_file.bin_size
+    if instance.pk is None:
+        instance.bin_size = instance.track_file.bin_size
 
 @receiver(post_save, sender=Track)
-def add_default_subtracks(sender, instance, **kwargs):
+def add_default_subtracks(sender, instance, created = True,  **kwargs):
     default_subtracks = instance.track_file.subtracks.filter(default = True)
     instance.subtracks.set(default_subtracks)
 
