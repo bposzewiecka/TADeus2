@@ -8,7 +8,7 @@ In addition, TADeus can serve as a genomic browser that shows Hi-C matrices with
 
 ```
 python3 -m venv tadeus_venv
-source tadeus_venv/bin/actovate
+source tadeus_venv/bin/activate
 git clone https://github.com/bposzewiecka/TADeus2.git
 pip install -r requirements.txt
 ```
