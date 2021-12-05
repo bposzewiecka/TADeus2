@@ -28,7 +28,6 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-PROJECT_DATA_ROOT = '/home/basia/CNVBrowser/data'
 
 # Application definition
 
@@ -40,12 +39,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'tadeus.apps.TadeusConfig',
+
     'django.contrib.sites',
 
     'django_tables2',
     'django_filters',
     'bootstrap3',
+    'rest_framework',
+
+    'tadeus',
+    'evaluation',
+    'ontologies',
+    'datasources',
+    'help',
+
 
     'allauth',
     'allauth.account',
@@ -70,7 +77,7 @@ ROOT_URLCONF = 'tadeus_portal.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "tadeus_portal", "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -146,3 +153,8 @@ STATIC_URL = '/static/'
 
 SITE_ID = 1
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}

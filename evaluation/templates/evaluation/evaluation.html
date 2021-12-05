@@ -1,0 +1,110 @@
+{% extends 'tadeus_portal/base_card.html' %}
+{% load render_table from django_tables2 %}
+
+{% block begin %}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'evaluation:index' %}">Evaluations of SVs</a></li>
+
+        {% if p_id %}
+            <li class="breadcrumb-item">{{ eval_br }}</li>
+        {% else %}
+            <li class="breadcrumb-item">New evaluation of SVs</li>
+        {% endif %}
+    </ol>
+</nav>
+
+{% if p_type %}
+    <form action="{% url 'evaluation:create' p_type=p_type %}" method="post" enctype="multipart/form-data">
+{% else %}
+    <form action="{% url 'evaluation:edit' p_id=p_id %}" method="post" enctype="multipart/form-data">
+{% endif%}
+
+{% endblock %}
+
+{% block header %}
+
+<div class="float-right" role="group">
+    <a href="{% url 'evaluation:index'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+
+    {% if p_id %}
+
+        <a href="{% url 'evaluation:add_entry' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Add new breakpoint</a>
+
+        <a href="{% url 'evaluation:delete' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this evaluation of CNVs?')">Delete</a>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary btn-lg active" name="{{ p_type }}">{% if p_id %}Save{% else %}Create{% endif %}</button>
+
+</div>
+
+{% endblock %}
+
+{% block body %}
+
+{% csrf_token %}
+
+<div class="form-row">
+    <div class="form-group col-md-8">
+        <label for="{{ form.name.id_for_label }}">Name</label>
+        {{ form.name.errors }}
+        <input class="form-control" name="{{ form.name.html_name }}" id="{{ form.name.id_for_label }}" {% if form.name.value  %} value="{{ form.name.value}}" {% endif %} required >
+    </div>
+    <div class="form-group col-md-4">
+        <label for="{{ form.assembly.id_for_label }}">Assembly</label>
+        {{ form.assembly.errors }}
+
+        {% if not readonly and not p_id %}
+
+            <select id="{{ form.assembly.id_for_label }}" class="form-control" name="{{ form.assembly.html_name }}" required>
+            <!--{% for assembly in assemblies %}
+          <option value="{{ assembly.id }}" {% if form.assembly.value|add:0   == assembly.id %} selected{% endif %}>{{ assembly.name }}</option>    
+        {% endfor %}-->
+
+            {% for assembly in assemblies %}
+                {% if assembly.name == 'hg19' %}
+                    <option value="{{ assembly.id }}" {% if form.assembly.value|add:0   == assembly.id %} selected{% endif %}>{{ assembly.name }}</option>
+                {% endif %}
+            {% endfor %}
+            </select>
+
+        {% else %}
+
+            <input class="form-control" type="hidden" name="{{ form.assembly.html_name }}" id="{{ form.assembly.id_for_label }}" value="{{ form.assembly.value}}" >
+
+            <input class="form-control"  value="{{ assembly_name  }}" readonly>
+        {% endif %}
+    </div>
+</div>
+
+{% if p_type == 'text' %}
+    <div class="form-group">        
+        <label for="{{ form.text.id_for_label }}">Paste in data (<a href="https://genome.ucsc.edu/FAQ/FAQformat.html#format1" target="_blank">BED</a>)</label>
+        {{ form.text.errors }}
+        <textarea class="form-control" name="{{ form.text.html_name }}" id="{{ form.text.id_for_label }}" rows="5" required>{% if form.text.value %}{{ form.text.value }}{% endif %}</textarea>
+    </div>
+{% elif p_type == 'file' %}
+    <div class="form-group">
+        <label for="{{ form.file.id_for_label }}">Upload data from a file (<a href="https://genome.ucsc.edu/FAQ/FAQformat.html#format1" target="_blank">BED</a>)</label>
+        <input type="file" class="form-control-file" id="id_file" name="file" required>
+    </div>
+
+    <input type="hidden" name="{{ form.text.html_name }}" id="{{ form.text.id_for_label }}" value="non-empty-value">
+
+{% else %}
+    <input type="hidden" name="{{ form.text.html_name }}" id="{{ form.text.id_for_label }}" value="non-empty-value">
+{% endif %}
+
+
+{% if table %}
+    {% render_table table %}
+{% endif %}
+
+{% endblock %}
+
+{% block end %}
+</form>
+
+{% endblock %}

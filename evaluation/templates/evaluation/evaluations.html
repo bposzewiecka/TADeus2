@@ -1,0 +1,52 @@
+{% extends 'tadeus_portal/base_card.html' %}
+{% load render_table from django_tables2 %}
+
+
+{% block begin %}
+
+	<nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+	        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+	        <li class="breadcrumb-item">Evaluations of SVs</li>
+	    </ol>
+	</nav>
+
+{% endblock %}
+
+
+{% block header %}
+
+	<div class="float-right" role="group">
+
+		<a href="{% url 'index' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+
+		<a href="{% url 'evaluation:create' p_type='blank'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create</a>
+		<a href="{% url 'evaluation:create' p_type='text'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create by direct input</a>
+		<a href="{% url 'evaluation:create' p_type='file' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create by file upload</a>
+
+	</div>
+
+{% endblock %}
+
+{% block body %}
+
+	{% if filter %}
+
+		<div style="margin-bottom: 20px">
+			<form action="" method="get" class="form-inline">
+	
+				<label for="{{ filter.form.name.id_for_label }}" class="mr-sm-2">Name</label>
+			    <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.name.html_name }}" id="{{ filter.form.name.id_for_label }}">
+
+				<button class="btn btn-primary active" role="button" aria-pressed="true" >Filter</button>
+			</form>
+		</div>
+
+	{% endif %}
+
+	{% if table %}
+		{% render_table table %}
+	{% endif %}
+	
+{% endblock %}
+
