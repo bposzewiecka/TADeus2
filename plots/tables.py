@@ -1,5 +1,12 @@
+from .models import Plot
 
+import django_tables2 as tables
+import django_filters
 
+from django.urls import reverse
+
+from tadeus_portal.utils import getLink 
+from tadeus_portal.defaults import  DEFAULT_EDIT_ICON,DEFAULT_BROWSER_ICON
 
 
 class PlotTable(tables.Table):
@@ -8,12 +15,12 @@ class PlotTable(tables.Table):
     show_in_browser = tables.Column(empty_values=(), orderable=False)
 
     def render_edit_tracks(self, record):
-        link = reverse('edit_plot', kwargs = {'p_id': record.id})
+        link = reverse('plots:update', kwargs = {'p_id': record.id})
         return getLink(link, DEFAULT_EDIT_ICON)
 
     def render_show_in_browser(self, record):
 
-        link = reverse('browser', kwargs = {'p_id': record.id}) 
+        link = reverse('browser:browser', kwargs = {'p_id': record.id}) 
         return getLink(link, DEFAULT_BROWSER_ICON)
 
     class Meta:

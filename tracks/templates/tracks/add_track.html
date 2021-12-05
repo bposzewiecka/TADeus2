@@ -8,7 +8,7 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
         <li class="breadcrumb-item"><a href="{% url 'plots:index' %}">Plots</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'plots:edit' p_id=plot.id %}">{{ plot.name }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'plots:update' p_id=plot.id %}">{{ plot.name }}</a></li>
         <li class="breadcrumb-item">New track</li>
     </ol>
 </nav>
@@ -21,7 +21,7 @@
 {% block header %}
 
     <div class="float-right" role="group">
-        <a href="{% url 'plots:edit' p_id=p_plot_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+        <a href="{% url 'plots:update' p_id=p_plot_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
         <button type="submit" class="btn btn-primary btn-lg active">Create</button>
     </div>
 

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'bootstrap3',
     'rest_framework',
 
+    'tadeus',
     'tracks',
     'evaluation',
     'ontologies',

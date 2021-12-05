@@ -18,6 +18,8 @@ from django.contrib import admin
 
 
 urlpatterns = [
+
+    path('', include('tadeus.urls')),
     path('tracks/', include('tracks.urls')),
     path('help/', include('help.urls')),
     path('plots/', include('plots.urls')),

@@ -1,5 +1,8 @@
 from .models import Evaluation
 
+import django_tables2 as tables
+import django_filters
+
 class EvaluationTable(tables.Table):
 
     def render_id(self, record):

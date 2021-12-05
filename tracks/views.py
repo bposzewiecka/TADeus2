@@ -32,7 +32,10 @@ from django_tables2.views import SingleTableMixin
 
 from urllib.parse import urlencode, quote_plus
 
-from scipy import stats
+from datasources.models import TrackFile
+
+from tadeus_portal.utils import only_public_or_user, set_owner_or_cookie, is_object_readonly
+
 
 def update(request, p_id):
 
@@ -46,7 +49,6 @@ def update(request, p_id):
             messages.success(request, 'Track successfully saved.')
         else:
             messages.success(request, 'Track not saved.')
-            print(form.errors)
     else:
         
         form = TrackForm(instance = track)
@@ -57,9 +59,6 @@ def update(request, p_id):
 
     if track.get_file_type() == 'HI':
         domains_files = TrackFile.objects.filter(file_type = 'BE').filter(only_public_or_user(request),  Q(eval__isnull=True)).order_by('name', 'id')
-
-
-    print(track.track_file.subtracks.all())
 
     return render(request, 'tracks/track.html', {'form': form,
                    'p_id':  p_id, 
@@ -115,10 +114,3 @@ def create(request, p_plot_id):
     
     return render(request, 'tracks/add_track.html', {'form': form, 'p_plot_id': p_plot_id, 'track_files': track_files, 'plot': plot })
 
-
-def index(request):
-    #evals = Evaluation.objects.filter(owner__username = 'root') 
-    #table = EvalTable(evals)
-    #RequestConfig(request).configure(table)
-    table = None
-    return render(request, 'tracks/index.html', {'table': table })

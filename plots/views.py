@@ -1,5 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
+from .models import Plot
+from tadeus_portal.utils import only_public_or_user, set_owner_or_cookie, is_object_readonly
+from .tables import PlotFilter, PlotTable
+from .forms import PlotForm
+from datasources.models import Assembly
+from django.db.models import ProtectedError
+
+from tracks.tables import TrackTable
+
+from django_tables2 import RequestConfig
+
+from django.contrib import messages
 
 def setPlotCookie(request, p_id, p_chrom, p_start, p_end, p_interval_start, p_interval_end):
     request.session['plot_' + str(p_id)] = (p_chrom, p_start, p_end, p_interval_start, p_interval_end)
@@ -49,7 +61,7 @@ def create(request):
 
            p_id = plot.id
 
-           return redirect(edit_plot, p_id= p_id)
+           return redirect('plots:update', p_id= p_id)
 
     else:
         form = PlotForm()
@@ -57,7 +69,7 @@ def create(request):
     return render(request, 'plots/plot.html', {'form': form, 'assemblies': Assembly.objects.all() })
 
 
-def edit(request, p_id):
+def update(request, p_id):
 
     plot = Plot.objects.get(pk =p_id)
     tracks = plot.tracks.all().order_by('no','id')
@@ -71,7 +83,7 @@ def edit(request, p_id):
             plot = form.save()
 
             if 'add_track' in request.POST:
-                return redirect(create_track, p_plot_id = p_id)
+                return redirect('tracks:create', p_plot_id = p_id)
 
     else:
         form = PlotForm(instance = plot)
@@ -93,7 +105,6 @@ def delete(request, p_id):
         messages.success(request, f'Plot "{plot.name}" successfully deleted.')
     except  ProtectedError:
         messages.error(request, 'You cannot delete this plot. It belongs to evaluation.')
-        return redirect(edit_plot, p_id = p_id)
+        return redirect('plots:update', p_id = p_id)
 
-    return redirect(plots)
-
+    return redirect('plots:index')

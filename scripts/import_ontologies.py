@@ -1,7 +1,7 @@
 import csv
 from collections import Counter
 from ontologies.models import  Phenotype, GeneToPhenotype, Gene
-from tadeus.models import Assembly, TrackFile
+from datasources.models import Assembly, TrackFile
 from django.contrib.auth.models import User
 from django.db import transaction
 
@@ -115,49 +115,6 @@ def get_phenotypes(db):
     return { phenotype.pheno_id: phenotype for phenotype in Phenotype.objects.filter(db=db)}
 
 
-@transaction.atomic
-def get_hpo_terms_genes():
-
-    file_name = 'data/ontologies/hpo/genes_to_phenotype.txt'
-
-    gene_names = get_genes_names()
-    gene_ensembl_ids =  get_genes_ensembl_ids()
-    phenotypes = get_phenotypes()
-
-    genes_aliases = get_genes_aliases()
-
-    genes_bad =set()
-
-    with open(file_name, 'r') as f:
-        
-        f.readline()
-
-        for line in f:
-            _ , gene_name, _, pheno_id  = line.strip().split('\t')
-
-            gene = None
-            
-            if gene_name in gene_names:
-                gene = gene_names[gene_name]
-            elif gene_name in genes_aliases:
-                ensembl_gene_id  = genes_aliases[gene_name]
-
-                gene = gene_ensembl_ids.get(ensembl_gene_id, None)
-                
-            if not gene:
-                genes_bad.add(gene_name)
-
-            else:
-                phenotype = phenotypes[pheno_id]
-
-                g2p = GeneToPhenotype(gene = gene, phenotype=phenotype)
-                g2p.save()
-
-
-    for gene in sorted(genes_bad):
-        print(gene)
-
-
 def get_hpo_terms_genes():
 
     file_name = 'data/ontologies/HPO/genes_to_phenotype.txt'
@@ -171,8 +128,6 @@ def get_hpo_terms_genes():
         reader = csv.DictReader(f, delimiter='\t')
 
         for row in reader: 
-
-            print(row)
 
             entrezgene_id = row['entrez-gene-id']
             pheno_id = row['HPO-Term-ID']
@@ -260,10 +215,10 @@ def get_omim_phenotypes_to_genes():
 
 globals().update(locals())
 
-#del_all()
-#get_genes()
+del_all()
+get_genes()
 #print('get_genes')
-#get_hpo_terms()
+get_hpo_terms()
 #print('get_hpo_terms')
 get_hpo_terms_genes()
 #print('get_hpo_terms_genes')

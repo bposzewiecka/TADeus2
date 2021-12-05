@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from django.db.models import F
 
-from tadeus.defaults import DEFAULT_EDIT_ICON, DEFAULT_BROWSER_ICON
+from tadeus_portal.defaults import DEFAULT_EDIT_ICON, DEFAULT_BROWSER_ICON
 from django.db.models import Q
 import django_filters
 
