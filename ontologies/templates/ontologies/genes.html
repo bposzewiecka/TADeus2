@@ -25,7 +25,7 @@
 
         <div style="margin-bottom: 20px">
             <form action="" method="get" class="form-inline">
-  
+
                 <label for="{{ filter.form.name.id_for_label }}" class="mr-sm-2">Gene name</label>
                 <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.name.html_name }}" id="{{ filter.form.name.id_for_label }}" {% if filter.form.name.value  is not None %} value="{{ filter.form.name.value }}" {% endif %}>
 
@@ -41,7 +41,5 @@
     {% if table %}
         {% render_table table %}
     {% endif %}
-  
+
 {% endblock %}
-
-

@@ -49,7 +49,7 @@
                         </select>
                         <div class="input-group-append">
                             <button class="btn btn-secondary btn-lg" type="submit" value="Submit"><i class="fas fa-filter"></i></button>
-                        </div>   
+                        </div>
                     </div>
                 {% endif %}
 
@@ -89,16 +89,16 @@
                 <th width="8%">pLI</th>
                 <th width="8%">ClinGen</th>
                 <th width="8%">ClinGen score</th>
-                <th width="8%">Enhancer- promoter interactions number</th>     
-                <th width="8%">Enhancer- promoter interactions score</th> 
+                <th width="8%">Enhancer- promoter interactions number</th>
+                <th width="8%">Enhancer- promoter interactions score</th>
                 <th width="8%">Phenotype score</th>
                 <th width="8%">Distance from breakpoints</th>
-                <th width="8%">Distance from breakpoints score (distance below 1Mb)</th>    
-                <th width="8%">Rank</th>  
-                <th>Phenotype information</th>         
+                <th width="8%">Distance from breakpoints score (distance below 1Mb)</th>
+                <th width="8%">Rank</th>
+                <th>Phenotype information</th>
             </tr>
         </thead>
-    
+
         <tbody>
             {% for result in results  %}
                 <tr {% if result.1.rank >= 300 %} style="background-color: #f8d7da;"{% elif result.1.rank >= 200 %}  style="background-color: #fcedee;"{% endif %}>
@@ -115,7 +115,7 @@
                     <td>
 
                         {% if result.1.phenotypes.count != 0 %}
-                            <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapse-{{ result.1.gene.id }}" 
+                            <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapse-{{ result.1.gene.id }}"
                             aria-expanded="false" aria-controls="collapseExample">Show phenotypes</button>
 
                             <ul style="margin-top:1rem; margin-bottom: 1rem;" class="list-unstyled collapse" id="collapse-{{ result.1.gene.id }}">
@@ -138,5 +138,5 @@
 </div>
 {% endif %}
 
-  
+
 {% endblock %}

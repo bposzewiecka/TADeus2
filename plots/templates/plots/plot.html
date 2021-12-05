@@ -31,10 +31,10 @@
             <a href="{% url 'plots:delete' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this plot?')">Delete</a>
         {% endif %}
 
-        {% if not readonly %}   
+        {% if not readonly %}
             <input class="btn btn-primary btn-lg active" type="submit" value="Add track" name="add_track">
         {% endif %}
-        
+
         {% if not readonly %}
             <input class="btn btn-primary btn-lg active" type="submit" value="{%if p_id %}Save{%else%}Create{% endif %}" name="save_plot">
         {% endif %}
@@ -45,11 +45,11 @@
 
     </div>
 {% endblock %}
-    
 
-{% block body %}        
+
+{% block body %}
     {% csrf_token %}
-      
+
     <div class="form-group">
         <label for="{{ form.name.id_for_label }}">Name</label>
         {{ form.name.errors }}
@@ -70,13 +70,13 @@
           {% if not readonly and not has_tracks %}
               <select id="{{ form.assembly.id_for_label }}" class="form-control" name="{{ form.assembly.html_name }}">
                 {% for assembly in assemblies %}
-                    <option value="{{ assembly.id }}" {% if form.assembly.value|add:0   == assembly.id %} selected{% endif %}>{{ assembly.name }}</option>      
+                    <option value="{{ assembly.id }}" {% if form.assembly.value|add:0   == assembly.id %} selected{% endif %}>{{ assembly.name }}</option>
                 {% endfor %}
               </select>
           {% else %}
                 <input class="form-control" type="hidden" name="{{ form.assembly.html_name }}" id="{{ form.assembly.id_for_label }}" value="{{ form.assembly.value}}"  >
                 {% for assembly in assemblies %}
-                    {% if form.assembly.value|add:0   == assembly.id %} 
+                    {% if form.assembly.value|add:0   == assembly.id %}
                     <input class="form-control"  value="{{ assembly.name }}"  readonly>
                     {% endif %}
                 {% endfor %}
@@ -84,10 +84,10 @@
         </div>
     </div>
 
-    
+
     {% if table %}
         <label>Tracks</label>
         {% render_table table %}
     {% endif %}
-    
+
 {% endblock %}

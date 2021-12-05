@@ -5,7 +5,7 @@
 {% block content %}
 
 
-<h1>Plots</h1> 
+<h1>Plots</h1>
 
 <p>To add or customise plot select "Plots" menu option.</p>
 
@@ -15,13 +15,13 @@
     <li>Click <a href="#"><i class="fas fa-edit"></i></a> on plot list to edit the plot</li>
 </ul>
 
-{% include 'help/figure.html' with title='List of plots available for user' img_src='help/plot-list.png' no='1' %} 
+{% include 'help/figure.html' with title='List of plots available for user' img_src='help/plot-list.png' no='1' %}
 
 <h2>Adding new plot</h2>
 
 <p>To add a new plot click on "Create" button and complete the form with the name, the title and the assembly of the new plot.</p>
 
-{% include 'help/figure.html' with title='"Create plot" form' img_src='help/plot-new.png' no='2' %} 
+{% include 'help/figure.html' with title='"Create plot" form' img_src='help/plot-new.png' no='2' %}
 
 <p>After clicking "Create" modified form will be displayed.</p>
 
@@ -32,13 +32,13 @@
     <li>Click <a href="#"><i class="fas fa-sliders-h"></i></a> to show the plot in the genome browser</li>
 </ul>
 
-{% include 'help/figure.html' with title='"Plot" form' img_src='help/plot-form.png' no='3' %} 
+{% include 'help/figure.html' with title='"Plot" form' img_src='help/plot-form.png' no='3' %}
 
 <h2>Adding new track</h2>
 
 <p>Each datasource can be displayed in browser as a separate track. To add new track to the plot click on "Add track" button.</p>
 
-{% include 'help/figure.html' with title='"Create track" form' img_src='help/track-new.png' no='4' %} 
+{% include 'help/figure.html' with title='"Create track" form' img_src='help/track-new.png' no='4' %}
 
 <p>Then choose the datasource from the select list of available datasources. You have to complete other fields of the form including:</p>
 
@@ -51,7 +51,7 @@
 
 <p>After filling the form click "Create". Then form complemented with fields specific for type of datasource (BED3, BED6, BED9, BED12, BEDGraph or Hi-C) will be shown. Detail description of each field is presented in the table below.</p>
 
-{% include 'help/figure.html' with title='"Create plot" form' img_src='help/track-form.png' no='5' %} 
+{% include 'help/figure.html' with title='"Create plot" form' img_src='help/track-form.png' no='5' %}
 
 <h2>List of track properties</h2>
 
@@ -101,7 +101,7 @@
             <td>Color of feature</td>
         </tr>
 
-        
+
         <tr>
             <td>Border color</td>
             <td>All BED, BEDGraph</td>
@@ -115,7 +115,7 @@
             <td>List of Python Matplotlib Colormaps</td>
             <td>Colormap used to display values from 'score' column of BED datasource entry, or to display frequencies of Hi-C map</td>
         </tr>
- 
+
         <tr>
             <td>Minimum value of colormap</td>
             <td>BED6, BED9, BED12, Hi-C</td>
@@ -141,7 +141,7 @@
                     <li>Line with borders — data will be displayed as line chart with borders</li>
                     <li>Area — data will be displayed as area chart</li>
                     <li>Area with border — data will be displayed as area chart with borders</li>
-                </ul> 
+                </ul>
             </td>
         </tr>
 
@@ -171,7 +171,7 @@
                     <li>Stacked — tiles will be displayed  stacked </li>
                     <li>Collapsed — tiles will be displayed  collapsed (all shown in one line)</li>
                     <li>Interlaced — tiles will be displayed interlaced (shown in two lines alternately)</li>
-                </ul> 
+                </ul>
             </td>
         </tr>
 
@@ -195,14 +195,14 @@
             <td>All BED</td>
             <td>Yes, No</td>
             <td>If value is set to 'Yes' labels for each feature will be printed using  'name' column value of BED</td>
-        </tr> 
+        </tr>
 
         <tr>
             <td>Name filter</td>
             <td>BED6, BED9, BED12</td>
             <td>Yes, No</td>
             <td>If set to 'Yes' user can filter entries from BED datasource by 'name' column value</td>
-        </tr>  
+        </tr>
 
         <tr>
             <td>Transform</td>
@@ -218,23 +218,23 @@
                 </ul>
 
             </td>
-        </tr>  
+        </tr>
 
         <tr>
             <td>Domains datasource</td>
             <td>Hi-C</td>
             <td>List of data in BED format (public and private for user)</td>
             <td>Coordinates of the entries from the chosen BED datasource will be used to draw domians on Hi-C track</td>
-        </tr>  
+        </tr>
 
-   
+
 
         <tr>
             <td>Inverted</td>
             <td>Hi-C</td>
             <td>Yes, No</td>
             <td>If set to 'Yes' Hi-C matrix will be displayed inverted</td>
-        </tr> 
+        </tr>
 
     </tbody>
 </table>
@@ -243,6 +243,6 @@
 
 <p>To customize plot click <a href="#"><i class="fas fa-edit"></i></a> on plot list to edit the plot. Then click <a href="#"><i class="fas fa-edit"></i></a> to customize specific track.</p>
 
-{% include 'help/figure.html' with title='"Create plot" form' img_src='help/edit-track.png' no='6' %} 
+{% include 'help/figure.html' with title='"Create plot" form' img_src='help/edit-track.png' no='6' %}
 
 {% endblock %}

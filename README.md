@@ -2,7 +2,7 @@
 
 TADeus is an easy-to-use open-source web application dedicated for clinical evaluation of variants in genes whose expression may be affected by chromosomal rearrangements. The main functionality of TADeus provides a view of regulatory landscape of regions surrounding breakpoints of the rearrangements by combing chromatin interaction data \textcolor{red}{(Hi-C)} with other omics data from different sources. TADeus prioritizes genes using haploinsufficiency score, number of interrupted enhancer-promoter interactions, the distance from the breakpoints, and the phenotypic data.
 
-In addition, TADeus can serve as a genomic browser that shows Hi-C matrices with one-dimensional genomic data and allows users to compare Hi-C data from different tissues. 
+In addition, TADeus can serve as a genomic browser that shows Hi-C matrices with one-dimensional genomic data and allows users to compare Hi-C data from different tissues.
 
 # Installation
 

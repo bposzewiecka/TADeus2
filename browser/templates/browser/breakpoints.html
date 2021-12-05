@@ -39,14 +39,14 @@
             <label for="{{ filter.form.chrom.id_for_label }}" class="mr-sm-2">Chromosome</label>
             <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.chrom.html_name }}" id="{{ filter.form.chrom.id_for_label }}"
            {% if filter.form.chrom.value  is not None %} value="{{ filter.form.chrom.value }}" {% endif %}>
-           
+
             <label for="{{ filter.form.min_range.id_for_label }}" class="mr-sm-2">Min. range</label>
             <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.min_range.html_name }}" id="{{ filter.form.min_range.id_for_label }}"
             {% if filter.form.min_range.value  is not None %} value="{{ filter.form.min_range.value }}" {% endif %}>
 
             <label for="{{ filter.form.max_range.id_for_label }}" class="mr-sm-2">Max. range</label>
             <input class="form-control mb-2 mr-sm-2 mb-sm-0"  name="{{ filter.form.max_range.html_name }}" id="{{ filter.form.max_range.id_for_label }}" {% if filter.form.max_range.value  is not None %} value="{{ filter.form.max_range.value }}" {% endif %}>
-           
+
             <button class="btn btn-primary active" role="button" aria-pressed="true" >Filter</button>
         </form>
     </div>
@@ -56,7 +56,5 @@
     {% if table %}
         {% render_table table %}
     {% endif %}
-  
+
 {% endblock %}
-
-

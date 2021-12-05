@@ -60,7 +60,7 @@
 
             <select id="{{ form.assembly.id_for_label }}" class="form-control" name="{{ form.assembly.html_name }}" required>
             <!--{% for assembly in assemblies %}
-          <option value="{{ assembly.id }}" {% if form.assembly.value|add:0   == assembly.id %} selected{% endif %}>{{ assembly.name }}</option>    
+          <option value="{{ assembly.id }}" {% if form.assembly.value|add:0   == assembly.id %} selected{% endif %}>{{ assembly.name }}</option>
         {% endfor %}-->
 
             {% for assembly in assemblies %}
@@ -80,7 +80,7 @@
 </div>
 
 {% if p_type == 'text' %}
-    <div class="form-group">        
+    <div class="form-group">
         <label for="{{ form.text.id_for_label }}">Paste in data (<a href="https://genome.ucsc.edu/FAQ/FAQformat.html#format1" target="_blank">BED</a>)</label>
         {{ form.text.errors }}
         <textarea class="form-control" name="{{ form.text.html_name }}" id="{{ form.text.id_for_label }}" rows="5" required>{% if form.text.value %}{{ form.text.value }}{% endif %}</textarea>

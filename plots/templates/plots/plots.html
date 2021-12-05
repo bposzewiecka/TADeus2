@@ -20,9 +20,9 @@
 
     <a href="{% url 'index' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
 
-    
+
     <a href="{% url 'plots:create' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create</a>
-    
+
     </div>
 
 {% endblock %}
@@ -44,7 +44,7 @@
 
             <label for="{{ filter.form.assembly.id_for_label }}" class="mr-sm-2">Assembly</label>
             <select id="{{ filter.form.assembly.id_for_label }}" class="form-control mb-2 mr-sm-2 mb-sm-0"   name="{{ filter.form.assembly.html_name }}">
-            
+
             {% for value, text in filter.form.assembly.field.choices %}
                     {% if value != '' %}
                         <option value="{{ value }}" {% if filter.form.assembly.value|add:0   == value %} selected{% endif %}>{{ text }}</option>
@@ -64,5 +64,3 @@
 {% render_table table %}
 
 {% endblock %}
-
-   

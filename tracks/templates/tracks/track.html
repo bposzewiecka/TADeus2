@@ -46,7 +46,7 @@
 
         {% if file_type == 'HI' %}
         <div class="form-group col-md-2">
-            <label>Track type</label>      
+            <label>Track type</label>
             <input class="form-control"  value="{{ hic_display_name }}" readonly>
         </div>
         {% endif %}
@@ -83,7 +83,7 @@
         <input class="form-control" type="hidden" name="{{ form.column.html_name }}" id="{{ form.column.id_for_label }}" value="{{ form.column.value}}" >
     </div>
 
-    
+
     {% if form.chromosome or form.start_coordinate or form.end_coordinate or form.aggregate_function %}
 
         <div class="form-row">
@@ -114,7 +114,7 @@
                     <input class="form-control" type="number" name="{{ form.start_coordinate.html_name }}" id="{{ form.start_coordinate.id_for_label }}" value="{{ form.start_coordinate.value}}" {% if readonly %}readonly{% endif %} required>
                 </div>
 
-            {% endif %}         
+            {% endif %}
 
             {% if form.start_coordinate %}
 
@@ -127,7 +127,7 @@
 
                 </div>
 
-            {% endif %} 
+            {% endif %}
 
             {% if form.aggregate_function %}
 
@@ -143,11 +143,11 @@
                     </select>
                 </div>
 
-            {% endif %} 
+            {% endif %}
         </div>
 
-    {% endif %} 
- 
+    {% endif %}
+
     {% if form.color or form.edgecolor or form.colormap or form.min_value or form.max_value or form.bed_style or form.bed_display or form.transform or form.domains_file or form.inverted %}
 
         <div class="form-row">
@@ -183,7 +183,7 @@
                     {{ form.colormap.errors }}
 
                     <label for="{{ form.colormap.id_for_label }}">Colormap</label>
-                  
+
                     <select id="{{ form.colormap.id_for_label }}" class="form-control" name="{{ form.colormap.html_name }}"  {% if readonly %}disabled{% endif %}>
 
                     {% for x,y in form.fields.colormap.choices %}
@@ -193,10 +193,10 @@
                     </select>
                 </div>
 
-            {% endif %}        
-            
-            {% if form.min_value %}        
-               
+            {% endif %}
+
+            {% if form.min_value %}
+
                 <div class="form-group col-md-3">
 
                     {{ form.min_value.errors }}
@@ -207,9 +207,9 @@
 
                 </div>
 
-            {% endif %}         
-            
-            {% if form.max_value %}       
+            {% endif %}
+
+            {% if form.max_value %}
 
                 <div class="form-group col-md-3">
 
@@ -217,7 +217,7 @@
                     <label for="{{ form.max_value.id_for_label }}">Maximum value</label>
                     <input  class="form-control"  name="{{ form.max_value.html_name }}" id="{{ form.max_value.id_for_label }}" {% if form.max_value.value is not None %} value="{{ form.max_value.value}}" {% endif %}  {% if readonly %}readonly{% endif %}>
 
-                </div>  
+                </div>
 
             {% endif %}
 
@@ -228,7 +228,7 @@
                     {{ form.bed_style.errors }}
 
                     <label for="{{ form.bed_style.id_for_label }}">BED Style</label>
-              
+
                     <select id="{{ form.bed_style.id_for_label }}" class="form-control" name="{{ form.bed_style.html_name }}"  {% if readonly %}disabled{% endif %}>
 
                     {% for x,y in style_choices %}
@@ -267,7 +267,7 @@
                     {{ form.transform.errors }}
 
                     <label for="{{ form.transform.id_for_label }}">Transform</label>
-              
+
                     <select id="{{ form.transform.id_for_label }}" class="form-control" name="{{ form.transform.html_name }}"  {% if readonly %}disabled{% endif %}>
 
                         {% for x,y in form.fields.transform.choices %}
@@ -286,7 +286,7 @@
                     {{ form.domains_file.errors }}
 
                     <label for="{{ form.domains_file.id_for_label }}">Domains datasource</label>
-                  
+
                     <select id="{{ form.domains_file.id_for_label }}" class="form-control" name="{{ form.domains_file.html_name }}"  {% if readonly %}disabled{% endif %}>
 
                         <option value="">None</option>
@@ -303,7 +303,7 @@
             {% if form.inverted %}
 
                 <div class="col-md-2">
-                    
+
                     <div class="form-check">
                         <input type="checkbox" name="{{ form.inverted.html_name }}" id="{{ form.inverted.id_for_label }}" {% if form.inverted.value %}checked{% endif %} {% if readonly %}disabled{% endif %}/>
                         <label class="form-check-label" for="{{ form.inverted.id_for_label }}">Inverted</label>
@@ -320,7 +320,7 @@
     {% if form.labels or form.name_filter %}
 
     <div class="form-group row">
-  
+
         {% if form.labels %}
 
             <div class="col-md-2">
@@ -350,10 +350,10 @@
 
         <div class="form-row">
 
-            {% if form.bedgraph_display %}  
+            {% if form.bedgraph_display %}
 
-                <div class="form-group col-3">     
-                    <label for="{{ form.bedgraph_display.id_for_label }}">Display</label>       
+                <div class="form-group col-3">
+                    <label for="{{ form.bedgraph_display.id_for_label }}">Display</label>
                     <select id="{{ form.bedgraph_display.id_for_label }}" class="form-control" name="{{ form.bedgraph_display.html_name }}"  {% if readonly %}disabled{% endif %}>
 
                         {% for x,y in form.fields.bedgraph_display.choices %}
@@ -365,10 +365,10 @@
 
             {% endif %}
 
-            {% if form.bedgraph_type %}  
+            {% if form.bedgraph_type %}
 
-                <div class="form-group col-3">     
-                    <label for="{{ form.bedgraph_type.id_for_label }}">Type</label>       
+                <div class="form-group col-3">
+                    <label for="{{ form.bedgraph_type.id_for_label }}">Type</label>
                     <select id="{{ form.bedgraph_type.id_for_label }}" class="form-control" name="{{ form.bedgraph_type.html_name }}"  {% if readonly %}disabled{% endif %}>
 
                         {% for x,y in form.fields.bedgraph_type.choices %}
@@ -399,7 +399,7 @@
 
             {% endif %}
 
-            {% if form.bin_size %} 
+            {% if form.bin_size %}
 
                 <div class="form-group col-3">
                     <label for="{{ form.bin_size.id_for_label }}">Bin size</label>
@@ -413,7 +413,7 @@
 
     {% endif %}
 
-    {% if form.subtracks %}     
+    {% if form.subtracks %}
 
         <div class="form-row">
 
@@ -435,7 +435,7 @@
                     <tr>
                         <td>
                             <div class="checkbox">
-                                <input  type="checkbox" id="id_subtracks_{{ forloop.counter0 }}" value="{{ subtrack.id }}" name="subtracks" {% for subtrack_checked in track.subtracks.all %}{% if subtrack.id == subtrack_checked.id %}checked="checked"{% endif %}{% endfor %} /> 
+                                <input  type="checkbox" id="id_subtracks_{{ forloop.counter0 }}" value="{{ subtrack.id }}" name="subtracks" {% for subtrack_checked in track.subtracks.all %}{% if subtrack.id == subtrack_checked.id %}checked="checked"{% endif %}{% endfor %} />
                             </div>
                         </td>
 
@@ -443,10 +443,10 @@
                             <div style="width: 30px; height:30px; background-color: {{subtrack.rgb}}; border: black 2px solid; padding: 4px"></div>
                         </td>
                         <td>{{subtrack.saple}}</td>
-                        <td>{{subtrack.name}}</td>    
+                        <td>{{subtrack.name}}</td>
                     </tr>
-              
-                {% endfor %}    
+
+                {% endfor %}
 
                 </table>
             </div>

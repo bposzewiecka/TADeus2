@@ -17,7 +17,7 @@
                     <a href="{% url 'browser:breakpoint_browser' p_id=p_id p_breakpoint_id=p_breakpoint.id %}?{{zoom_out|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom out"><i class="fas fa-search-minus"></i></a>
                 </div>
 
-   
+
                 <div class="btn-group mr-2" role="group" aria-label="">
                     <a href="{% url 'browser:breakpoint_browser' p_id=p_id p_breakpoint_id=p_breakpoint.id %}?{{move.0.0|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.0.1 }} % the left"><i class="fas fa-angle-double-left"></i></a>
                     <a href="{% url 'browser:breakpoint_browser' p_id=p_id p_breakpoint_id=p_breakpoint.id %}?{{move.1.0|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.1.1 }} % the left"><i class="fas fa-angle-left"></i></a>
@@ -27,7 +27,7 @@
 
                 <div class="input-group mr-2">
                     <div class="input-group-prepend">
-                        <button class="btn btn-danger btn-lg"><i class="fas fa-{% if p_breakpoint.left.inverse  %}backward{% else %}forward{% endif %}"></i></button>           
+                        <button class="btn btn-danger btn-lg"><i class="fas fa-{% if p_breakpoint.left.inverse  %}backward{% else %}forward{% endif %}"></i></button>
                     </div>
 
                     <div class="input-group-append">
@@ -62,7 +62,7 @@
                         </select>
                         <div class="input-group-append">
                             <button class="btn btn-secondary btn-lg" type="submit" value="Submit"><i class="fas fa-filter"></i></button>
-                        </div>   
+                        </div>
                     </div>
 
                 {% endif %}
@@ -103,9 +103,9 @@
                     {% if p_breakpoint.left_start %}
 
                         <td  {% if p_breakpoint.right_start %}style="border-right: 4px solid #dc3545;"{% endif %}>
-                
+
                             <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=p_breakpoint.left_chrom.name p_start=p_breakpoint.left_start  p_end=p_breakpoint.left_end  p_breakpoint_id=p_breakpoint.id  p_left_side=1  p_width_prop=p_breakpoint.left_width_prop %}{{ get_url|safe }}" alt="Track">
-                 
+
                         </td>
 
                     {% endif %}
@@ -125,5 +125,5 @@
     {% endfor %}
 
  </div>
-  
-{% endblock %}                        
+
+{% endblock %}
