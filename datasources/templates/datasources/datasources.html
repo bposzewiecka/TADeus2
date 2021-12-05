@@ -19,8 +19,8 @@
 <div class="float-right" role="group">
 
     <a href="{% url 'index' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
-    <a href="{% url 'datasources:add_datasource' p_type='text'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create from text input</a>
-    <a href="{% url 'datasources:add_datasource' p_type='file' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create from file</a>
+    <a href="{% url 'datasources:create' p_type='text'  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create from text input</a>
+    <a href="{% url 'datasources:create' p_type='file' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Create from file</a>
 
 </div>
 

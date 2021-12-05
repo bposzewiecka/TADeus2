@@ -32,7 +32,7 @@ def  get_file_handle(p_type, form):
     else:
         return None
 
-def datasources(request):
+def index(request):
 
     track_files = TrackFile.objects.filter( ~Q(file_type= 'XA'),
                                             only_public_or_user(request),
@@ -61,7 +61,7 @@ def save_datasource(track_file, file_handle, eval = False):
             bed_entry.save()
 
 
-def update_datasource(request, p_id):
+def update(request, p_id):
     
     track_file = TrackFile.objects.get(pk = p_id)
 
@@ -84,7 +84,7 @@ def update_datasource(request, p_id):
                                                          'readonly': is_object_readonly(request, track_file )})
 
 
-def create_datasource(request, p_type):
+def create(request, p_type):
     
     if request.method == 'POST':
         form = TrackFileForm(request.POST, request.FILES)
@@ -111,7 +111,7 @@ def create_datasource(request, p_type):
     return render(request, 'datasources/datasource.html', {'form': form,  'assemblies': Assembly.objects.all(), 'p_type': p_type, 'p_id': None })
 
 
-def delete_datasource(request, p_id):
+def delete(request, p_id):
 
     try: 
         track_file = TrackFile.objects.get(pk =p_id)
