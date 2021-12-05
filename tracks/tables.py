@@ -1,15 +1,9 @@
 import django_tables2 as tables
-from .models import Plot,  Track, Sample
-
 from django.urls import reverse
 
-from django.db.models import F
+from tadeus_portal.defaults import DEFAULT_EDIT_ICON, getLink
 
-from tadeus_portal.defaults import DEFAULT_EDIT_ICON, DEFAULT_BROWSER_ICON
-from django.db.models import Q
-import django_filters
-
-from urllib.parse import urlencode, quote_plus
+from .models import Track
 
 
 class TrackTable(tables.Table):
@@ -20,12 +14,12 @@ class TrackTable(tables.Table):
         return record.track_file.name
 
     def render_id(self, record):
-        link = reverse('track', kwargs = {'p_id': record.id})
-        return getLink(link, DEFAULT_EDIT_ICON) 
+        link = reverse("track", kwargs={"p_id": record.id})
+        return getLink(link, DEFAULT_EDIT_ICON)
 
     class Meta:
         model = Track
 
-        template_name = 'django_tables2/bootstrap.html'
-        sequence = ('id', 'title',  'file_name', 'no', 'height')
+        template_name = "django_tables2/bootstrap.html"
+        sequence = ("id", "title", "file_name", "no", "height")
         fields = sequence
