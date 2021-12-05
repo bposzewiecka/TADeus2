@@ -1,0 +1,81 @@
+default_language_version:
+  # default language version for each language
+  python: python3.8
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      # See https://pre-commit.com/hooks.html for more hooks
+      - id: check-ast
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: name-tests-test
+        args: [ "--django" ]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.0
+    hooks:
+      - id: bandit
+        args: ['-iii', '-ll']
+
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+        additional_dependencies: [
+            "flake8-bugbear",
+            "flake8-comprehensions",
+            "flake8-mutable",
+            "flake8-print",
+            "flake8-simplify",
+        ]
+
+#  - repo: https://github.com/pycqa/pylint
+#    rev: "v2.9.3"
+#    hooks:
+#      - id: pylint
+#        exclude: "[a-zA-Z]*/(migrations)/(.)*"
+#        args: [ "--load-plugins=pylint_django", "--django-settings-module=portal.settings" ]
+#        additional_dependencies: [
+#            # pylint dependency
+#            pylint_django,
+#            # runtime dependencies
+#            django,
+#            django_tables2,
+#            django_filter,
+#            django_bootstrap3,
+#            django_rest_framework,
+#            django_allauth,
+#            numpy,
+#            matplotlib,
+#            scipy,
+#            intervaltree,
+#            cooler,
+#            pyBigWig,
+#            pybbi,
+#        ]
+
+
+  - repo: https://github.com/psf/black
+    rev: 21.6b0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/asottile/seed-isort-config
+    rev: v2.2.0
+    hooks:
+      - id: seed-isort-config
+  - repo: https://github.com/pycqa/isort
+    rev: 5.9.1
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.20.0
+    hooks:
+      - id: pyupgrade
+        args: [ "--py36-plus", "--py37-plus", "--py38-plus", "--py39-plus" ]

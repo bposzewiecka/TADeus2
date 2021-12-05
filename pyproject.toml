@@ -1,0 +1,31 @@
+[tool.pylint.MESSAGE_CONTROL]
+disable = """
+    line-too-long,
+    abstract-method,
+    no-member,
+    import-outside-toplevel,
+"""
+enable = "useless-suppression"
+
+[tool.pylint.REPORTS]
+reports="no"
+
+[tool.pylint.FORMAT]
+max-line-length="150"
+
+[tool.pylint.BASIC]
+good-names = "_,i,e,setUp,tearDown,maxDiff"
+
+[tool.black]
+line-length = 150
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 150
+default_section = "THIRDPARTY"
+known_first_party = []
+
+
+known_third_party = ["Track", "bbi", "cooler", "django", "django_filters", "django_tables2", "intervaltree", "matplotlib", "mpl_toolkits", "numpy", "nupy", "rest_framework", "scipy"]

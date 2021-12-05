@@ -1,5 +1,6 @@
 import random
 import string
+from itertools import zip_longest
 
 from django.db.models import Q
 from django.utils.html import format_html
@@ -48,3 +49,8 @@ def set_owner_or_cookie(request, p_obj):
 
 def getLink(link, icon):
     return format_html('<a href="{link}"><i class="fas ' + icon + '"></i></a>', link=link)
+
+
+def split_seq(seq, n):
+    s = [seq[i::n] for i in range(n)]
+    return [[i for i in row if i is not None] for row in zip_longest(*s)]
