@@ -16,7 +16,7 @@ class TrackFileTable(tables.Table):
     number_of_entries = tables.Column(empty_values=())
 
     def render_id(self, record):
-        link = reverse("datasources:update_datasource", kwargs={"p_id": record.id})
+        link = reverse("datasources:update", kwargs={"p_id": record.id})
         return getLink(link, DEFAULT_EDIT_ICON)
 
     def render_number_of_entries(self, record):

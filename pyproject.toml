@@ -28,4 +28,4 @@ default_section = "THIRDPARTY"
 known_first_party = []
 
 
-known_third_party = ["Track", "bbi", "cooler", "django", "django_filters", "django_tables2", "intervaltree", "matplotlib", "mpl_toolkits", "numpy", "nupy", "rest_framework", "scipy"]
+known_third_party = ["bbi", "cooler", "django", "django_filters", "django_tables2", "intervaltree", "matplotlib", "mpl_toolkits", "numpy", "rest_framework", "scipy"]

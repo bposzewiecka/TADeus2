@@ -2,9 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models, transaction
 from django.db.models import Q
 
-from evaluation.statistics import statistics
-
-from .readBed import BedOrBedGraphReader
+from evaluation import statistics
 
 
 class Species(models.Model):
@@ -147,6 +145,8 @@ class TrackFile(models.Model):
 
         if self.file_type not in (FILE_TYPE_BED, FILE_TYPE_BED_GRAPH):
             return
+
+        from .readBed import BedOrBedGraphReader
 
         with open(self.subtracks[0].file_path) as handler:
             bed_entries = BedOrBedGraphReader(handler, self)

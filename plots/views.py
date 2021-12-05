@@ -3,7 +3,7 @@ from django.db.models import ProtectedError
 from django.shortcuts import redirect, render
 from django_tables2 import RequestConfig
 
-from browser.view import deletePlotCookie
+from browser.views import deletePlotCookie
 from datasources.models import Assembly
 from tadeus_portal.utils import is_object_readonly, only_public_or_user, set_owner_or_cookie
 from tracks.tables import TrackTable

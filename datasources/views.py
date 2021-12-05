@@ -103,7 +103,7 @@ def create(request, p_type):
 
                 messages.success(request, f"Data source '{track_file.name}' successfully created.")
 
-                return redirect("datasources:update_datasource", p_id=track_file.id)
+                return redirect("datasources:update", p_id=track_file.id)
 
             except ReadBedOrBedGraphException as exp:
                 messages.error(request, exp)
@@ -123,6 +123,6 @@ def delete(request, p_id):
         messages.success(request, "Data source successfully deleted.")
     except ProtectedError:
         messages.error(request, "You cannot delete this data source. It is used in a plot.")
-        return redirect("datasources:update_datasource", p_id=p_id)
+        return redirect("datasources:update", p_id=p_id)
 
     return redirect("datasources:datasources")

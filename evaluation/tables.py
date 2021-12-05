@@ -13,7 +13,7 @@ from .models import Evaluation
 
 class EvaluationTable(tables.Table):
     def render_id(self, record):
-        link = reverse("edit_eval", kwargs={"p_id": record.id})
+        link = reverse("evaluation:update", kwargs={"p_id": record.id})
         return getLink(link, DEFAULT_EDIT_ICON)
 
     class Meta:

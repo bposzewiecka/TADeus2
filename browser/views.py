@@ -9,12 +9,12 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django_tables2 import RequestConfig
-from Track.models import Track
 
 from datasources.models import Sample
-from evaluation.view import ranking
+from evaluation.views import ranking
 from plots.models import Plot
 from tracks.defaults import DEFAULT_WIDTH_PROP
+from tracks.models import Track
 
 from .models import Breakpoint
 from .tables import BreakpointFilter, BreakpointTable

@@ -8,16 +8,15 @@ from django_tables2 import RequestConfig
 from datasources.forms import TrackFileForm
 from datasources.models import Assembly, TrackFile
 from datasources.readBed import ReadBedOrBedGraphException
-from datasources.view import get_file_handle, save_datasource
-from ontologies import Gene
+from datasources.views import get_file_handle, save_datasource
+from ontologies.models import Gene
 from plots.models import Plot
-from tadeus_portal import set_owner_or_cookie
-from tadeus_portal.utils import get_auth_cookie, split_seq
+from tadeus_portal.utils import get_auth_cookie, set_owner_or_cookie, split_seq
 from tracks.models import Track
 
-from .forms import EvaluationForm
+from .forms import EvaluationAddEntryForm, EvaluationForm
 from .models import Evaluation
-from .tables import EvaluationAddEntryForm, EvaluationEntryTable, EvaluationFilter, EvaluationTable
+from .tables import EvaluationEntryTable, EvaluationFilter, EvaluationTable
 
 
 def index(request):
@@ -83,7 +82,6 @@ def create_eval_atomic(request, form, p_type):
 
             if j == 0:
                 track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10)
-
             if j == 1:
                 track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, domains_file=TrackFile.objects.get(pk=10101))
             if j == 2:
@@ -123,7 +121,7 @@ def create(request, p_type):
     return render(request, "evaluation/evaluation.html", {"form": form, "assemblies": Assembly.objects.all(), "p_type": p_type, "p_id": None})
 
 
-def edit(request, p_id):
+def update(request, p_id):
 
     eval = Evaluation.objects.get(pk=p_id)
 
@@ -176,7 +174,7 @@ def show(request, p_id):
     return render(request, "evaluation/eval_show.html", {"p_id": p_id, "tracks": tracks, "file_entries": file_entries})
 
 
-def add_entry_eval(request, p_id):
+def add_entry(request, p_id):
 
     eval = Evaluation.objects.get(pk=p_id)
 

@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "datasources",
     "help",
     "plots",
+    "browser",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",

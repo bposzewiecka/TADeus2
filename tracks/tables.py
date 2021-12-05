@@ -1,7 +1,8 @@
 import django_tables2 as tables
 from django.urls import reverse
 
-from tadeus_portal.defaults import DEFAULT_EDIT_ICON, getLink
+from tadeus_portal.defaults import DEFAULT_EDIT_ICON
+from tadeus_portal.utils import getLink
 
 from .models import Track
 
