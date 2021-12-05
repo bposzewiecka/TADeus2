@@ -3,6 +3,7 @@ from django.db.models import ProtectedError
 from django.shortcuts import redirect, render
 from django_tables2 import RequestConfig
 
+from browser.view import deletePlotCookie
 from datasources.models import Assembly
 from tadeus_portal.utils import is_object_readonly, only_public_or_user, set_owner_or_cookie
 from tracks.tables import TrackTable
@@ -10,34 +11,6 @@ from tracks.tables import TrackTable
 from .forms import PlotForm
 from .models import Plot
 from .tables import PlotFilter, PlotTable
-
-
-def setPlotCookie(request, p_id, p_chrom, p_start, p_end, p_interval_start, p_interval_end):
-    request.session["plot_" + str(p_id)] = (p_chrom, p_start, p_end, p_interval_start, p_interval_end)
-    request.session["plot"] = (p_id, p_chrom, p_start, p_end, p_interval_start, p_interval_end)
-
-
-def getPlotCookie(request, p_id):
-    if "plot_" + str(p_id) in request.session:
-        return request.session["plot_" + str(p_id)]
-    return "chr1", 30 * 1000 * 1000, 33 * 1000 * 1000, None, None
-
-
-def deletePlotCookie(request, p_id):
-    if "plot_" + str(p_id) in request.session:
-        del request.session["plot_" + str(p_id)]
-
-    if "plot" in request.session and request.session["plot"][0] == str(p_id):
-        del request.session["plot"]
-
-
-"""
-def printPlotCookie(request, p_id):
-    if "plot_" + str(p_id) in request.session:
-        print(request.session["plot_" + str(p_id)])
-    else:
-        "Plot " + str(p_id) + "does not have cookie."
-"""
 
 
 def index(request):
