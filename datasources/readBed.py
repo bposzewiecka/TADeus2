@@ -1,14 +1,14 @@
-import sys
-import collections
+from datasources.models import BedFileEntry
+
 
 class ReadBedOrBedGraphException(Exception):
-    def __init__(self, message, line_number = None):
+    def __init__(self, message, line_number=None):
         if line_number:
-            message  = 'Error reading line: #{}. {}'.format(line_number, message)
-        super(ReadBedOrBedGraphException, self).__init__(message)
-  
-class BedOrBedGraphReader(object):
+            message = f"Error reading line: #{line_number}. {message}"
+        super().__init__(message)
 
+
+class BedOrBedGraphReader:
     def __init__(self, file_handle, track_file):
 
         self.track_file = track_file
@@ -16,7 +16,7 @@ class BedOrBedGraphReader(object):
         self.file_handle = file_handle
         self.line_number = 0
         # guess file type
-        fields = self.get_no_comment_line().split('\t')
+        fields = self.get_no_comment_line().split("\t")
 
         self.guess_file_sub_type(fields)
 
@@ -26,11 +26,20 @@ class BedOrBedGraphReader(object):
         self.file_handle.seek(0)
 
         # list of bed fields
-        self.fields = ['chrom', 'chromStart', 'chromEnd', 
-                       'name', 'score', 'strand',
-                       'thickStart', 'thickEnd',
-                       'itemRGB', 'blockCount',
-                       'blockSizes', 'blockStarts']
+        self.fields = [
+            "chrom",
+            "chromStart",
+            "chromEnd",
+            "name",
+            "score",
+            "strand",
+            "thickStart",
+            "thickEnd",
+            "itemRGB",
+            "blockCount",
+            "blockSizes",
+            "blockStarts",
+        ]
 
     def __iter__(self):
         return self
@@ -38,62 +47,58 @@ class BedOrBedGraphReader(object):
     def get_no_comment_line(self):
 
         line = self.file_handle.readline()
-        if line.startswith("#") or line.startswith("track") or \
-           line.startswith("browser") or line.startswith("chrom"):
+        if line.startswith("#") or line.startswith("track") or line.startswith("browser") or line.startswith("chrom"):
             line = self.get_no_comment_line()
-        
+
         return line
 
     def guess_file_sub_type(self, line_values):
         if len(line_values) == 3:
-            self.file_sub_type = 'Bed3'
+            self.file_sub_type = "Bed3"
         if len(line_values) == 4:
-            self.file_sub_type = 'BedGraph'
+            self.file_sub_type = "BedGraph"
         if len(line_values) == 6:
-            self.file_sub_type = 'Bed6'
+            self.file_sub_type = "Bed6"
         if len(line_values) == 9:
-            self.file_sub_type = 'Bed9'
+            self.file_sub_type = "Bed9"
         if len(line_values) == 12:
-            self.file_sub_type = 'Bed12'
+            self.file_sub_type = "Bed12"
 
-        if self.file_sub_type == 'BedGraph':
-            self.track_file.file_type = 'BG'
+        if self.file_sub_type == "BedGraph":
+            self.track_file.file_type = "BG"
         else:
-            self.track_file.file_type = 'BE'
-            self.track_file.file_sub_type = self.file_sub_type       
-
+            self.track_file.file_type = "BE"
+            self.track_file.file_sub_type = self.file_sub_type
 
     def num_of_fields(self):
-        if self.file_sub_type == 'Bed3':
+        if self.file_sub_type == "Bed3":
             return 3
-        if self.file_sub_type == 'BedGraph':
+        if self.file_sub_type == "BedGraph":
             return 4
-        if self.file_sub_type == 'Bed6':
+        if self.file_sub_type == "Bed6":
             return 6
-        if self.file_sub_type == 'Bed9':
+        if self.file_sub_type == "Bed9":
             return 9
-        if self.file_sub_type == 'Bed12':
+        if self.file_sub_type == "Bed12":
             return 12
 
     def __next__(self):
         line = self.get_no_comment_line()
 
-        if (line == ''):
+        if line == "":
             raise StopIteration
 
         bed = self.get_bed_interval(line)
 
         return bed
 
-    def get_bed_interval(self, bed_line):
-
+    def get_bed_interval(self, bed_line):  # noqa: C901
 
         line_data = bed_line.strip().split("\t")
         self.line_number += 1
 
         if len(line_data) != self.num_of_fields():
-            error_text = 'Detected file type is {} but line does ' \
-                         'not have {} fields'.format(self.file_sub_type, self.num_of_fields())
+            error_text = "Detected file type is {} but line does " "not have {} fields".format(self.file_sub_type, self.num_of_fields())
             raise ReadBedOrBedGraphException(error_text, self.line_number)
 
         line_values = []
@@ -105,15 +110,15 @@ class BedOrBedGraphReader(object):
                 line_values.append(r)
             # check field strand
             elif idx == 5:
-                if r not in ['+', '-', '.']:
-                    if r == '1':
-                        r = '+'
-                    elif r == '-1':
-                        r = '-'
+                if r not in ["+", "-", "."]:
+                    if r == "1":
+                        r = "+"
+                    elif r == "-1":
+                        r = "-"
                     else:
-                        error_text = 'Invalid strand value "{}"'.format(r)
+                        error_text = f'Invalid strand value "{r}"'
                         raise ReadBedOrBedGraphException(error_text, self.line_number)
-                
+
                 line_values.append(r)
 
             elif idx in [1, 2, 6, 7, 9]:
@@ -126,22 +131,22 @@ class BedOrBedGraphReader(object):
                         block_count = line_values[-1]
 
                 except ValueError:
-                    error_text = 'Value "{}" in field "{}" is not an integer'.format(r, self.fields[idx])
+                    error_text = f'Value "{r}" in field "{self.fields[idx]}" is not an integer'
                     raise ReadBedOrBedGraphException(error_text, self.line_number)
             # check item rgb
             elif idx == 8:
-                rgb = r.split(',')
+                rgb = r.split(",")
                 if len(rgb) == 3:
                     try:
                         rgb = list(map(int, rgb))
                         rgb = list(filter(lambda x: 0 <= x <= 255, rgb))
                         if len(rgb) != 3:
-                             raise ValueError
+                            raise ValueError
 
-                        rgb = list(map(lambda x: format(x, 'x'), rgb))
-                        rgb = ''.join(map(lambda x: x if len(x) == 2 else '0'+ x, rgb)).lower()
+                        rgb = list(map(lambda x: format(x, "x"), rgb))
+                        rgb = "".join(map(lambda x: x if len(x) == 2 else "0" + x, rgb)).lower()
                     except ValueError:
-                        error_text = 'The itemRGB field "{}" is not valid'.format(r)
+                        error_text = f'The itemRGB field "{r}" is not valid'
                         raise ReadBedOrBedGraphException(error_text, self.line_number)
                     line_values.append(rgb)
                 else:
@@ -149,57 +154,67 @@ class BedOrBedGraphReader(object):
 
             elif idx in [10, 11]:
                 # this are the block sizes and block start positions
-                r_parts = r.split(',')
+                r_parts = r.split(",")
                 try:
-                    r_parts = [int(x) for x in r_parts if x != '']
+                    r_parts = [int(x) for x in r_parts if x != ""]
                 except ValueError:
-                    error_text = 'The block field "{}" is not valid'.format(r)
+                    error_text = f'The block field "{r}" is not valid'
                     raise ReadBedOrBedGraphException(error_text, self.line_number)
 
                 if len(r_parts) != block_count:
-                    error_text = 'The block field "{}" does not have {} values'.format(r, block_count)
+                    error_text = f'The block field "{r}" does not have {block_count} values'
                     raise ReadBedOrBedGraphException(error_text, self.line_number)
 
-                line_values.append(r.strip(','))
+                line_values.append(r.strip(","))
             else:
                 try:
                     tmp = float(r)
-                except:
+                except Exception:
                     tmp = None
                 line_values.append(tmp)
 
-        if  line_values[2] < line_values[1]:
-            raise ReadBedOrBedGraphException('ChromStart position greater  than chromEnd position', self.line_number)  
+        if line_values[2] < line_values[1]:
+            raise ReadBedOrBedGraphException("ChromStart position greater  than chromEnd position", self.line_number)
 
         if len(line_values) >= 9 and line_values[7] < line_values[6]:
-            raise ReadBedOrBedGraphException('ThickStart position greater than thickEnd position', self.line_number)  
+            raise ReadBedOrBedGraphException("ThickStart position greater than thickEnd position", self.line_number)
 
         chrom = line_values[0]
         start = line_values[1]
         end = line_values[2]
 
-        name = score = strand = thick_start = thick_end = itemRGB = block_count =  block_sizes = block_starts  = None
+        name = score = strand = thick_start = thick_end = itemRGB = block_count = block_sizes = block_starts = None
 
-        if self.file_sub_type in ('BedGraph'):
+        if self.file_sub_type in ("BedGraph"):
             score = line_values[3]
 
-        if self.file_sub_type in ('Bed6', 'Bed9', 'Bed12'):
+        if self.file_sub_type in ("Bed6", "Bed9", "Bed12"):
             name = line_values[3]
             score = line_values[4]
-            strand =  line_values[5]
+            strand = line_values[5]
 
-        if self.file_sub_type  in ('Bed9', 'Bed12'):
+        if self.file_sub_type in ("Bed9", "Bed12"):
             thick_start = line_values[6]
             thick_end = line_values[7]
-            itemRGB = line_values[8]                
+            itemRGB = line_values[8]
 
-        if self.file_sub_type in ('Bed12'):
+        if self.file_sub_type in ("Bed12"):
             block_count = line_values[9]
             block_sizes = line_values[10]
-            block_starts  = line_values[11]
+            block_starts = line_values[11]
 
-        from tadeus.models import BedFileEntry
-
-        return BedFileEntry(track_file = self.track_file, chrom = chrom, start = start, end = end, 
-                            name = name, score = score, strand = strand, thick_start = thick_start, thick_end = thick_end, 
-                            itemRGB = itemRGB, block_count = block_count, block_sizes = block_sizes , block_starts = block_starts)
+        return BedFileEntry(
+            track_file=self.track_file,
+            chrom=chrom,
+            start=start,
+            end=end,
+            name=name,
+            score=score,
+            strand=strand,
+            thick_start=thick_start,
+            thick_end=thick_end,
+            itemRGB=itemRGB,
+            block_count=block_count,
+            block_sizes=block_sizes,
+            block_starts=block_starts,
+        )
