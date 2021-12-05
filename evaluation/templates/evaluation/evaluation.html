@@ -19,7 +19,7 @@
 {% if p_type %}
     <form action="{% url 'evaluation:create' p_type=p_type %}" method="post" enctype="multipart/form-data">
 {% else %}
-    <form action="{% url 'evaluation:edit' p_id=p_id %}" method="post" enctype="multipart/form-data">
+    <form action="{% url 'evaluation:update' p_id=p_id %}" method="post" enctype="multipart/form-data">
 {% endif%}
 
 {% endblock %}

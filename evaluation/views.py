@@ -118,7 +118,7 @@ def create(request, p_type):
 
 def edit(request, p_id):
     
-    eval = Eval.objects.get(pk = p_id)
+    eval = Evaluation.objects.get(pk = p_id)
 
     table = EvalEntryTable( eval.track_file.file_entries.all(), eval.plot.id)
 
@@ -146,7 +146,7 @@ def edit(request, p_id):
 @transaction.atomic
 def delete(request, p_id):
 
-    eval = Eval.objects.get(pk =p_id)
+    eval = Evaluation.objects.get(pk =p_id)
 
     eval.delete()
 

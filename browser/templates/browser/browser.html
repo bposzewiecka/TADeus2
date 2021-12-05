@@ -55,7 +55,7 @@
 
                 <input type="hidden" name="interval_start" value="{{ interval_start }}">
                 <input type="hidden" name="interval_end" value="{{ interval_end }}">
-                <a href="{% url 'edit_plot' p_id=p_id %}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="edit"><i class="fas fa-edit"></i></a>
+                <a href="{% url 'plots:update' p_id=p_id %}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="edit"><i class="fas fa-edit"></i></a>
             </div>
           </form>
     </div>
@@ -72,7 +72,7 @@
     <div style="float:left">
         {% for p_track in  p_plot.tracks.all %}
         <div>
-            <img src="{% url 'image' p_id=p_track.id p_cols=p_cols p_chrom=p_chrom p_start=p_start p_end=p_end %}{{ get_url|safe }}" alt="">
+            <img src="{% url 'browser:image' p_id=p_track.id p_cols=p_cols p_chrom=p_chrom p_start=p_start p_end=p_end %}{{ get_url|safe }}" alt="">
         </div>
         {% endfor %}
     </div>

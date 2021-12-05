@@ -7,7 +7,7 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'evals' %}">Evaluations of SVs</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'evaluations:index' %}">Evaluations of SVs</a></li>
     </ol>
 </nav>
 
@@ -17,7 +17,7 @@
 
 <form method="post">
     <div class="float-right" role="group">
-        <a href="{% url 'edit_eval' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+        <a href="{% url 'evaluations:update' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
         <button type="submit" class="btn btn-primary btn-lg active">Add</button>
     </div>
 
