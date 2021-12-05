@@ -6,29 +6,29 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'plots' %}">Plots</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'edit_plot' p_id=plot_id%}">{{ plot_br }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'plots:index' %}">Plots</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'plots:update' p_id=plot_id%}">{{ plot_br }}</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{ track_br }} </li>
     </ol>
 </nav>
 
 
-<form action="{% url 'track' p_id=p_id %}" method="post">
+<form action="{% url 'tracks:update' p_id=p_id %}" method="post">
 {% endblock %}
 
 {% block header %}
 
     <div class="float-right" role="group">
 
-        <a href="{% url 'edit_plot' p_id=plot_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+        <a href="{% url 'plots:update' p_id=plot_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
 
         {% if not readonly and p_id %}
-            <a href="{% url 'delete_track' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this track?')">Delete</a>
+            <a href="{% url 'tracks:delete' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this track?')">Delete</a>
             <button type="submit" class="btn btn-primary btn-lg active">Save</button>
         {% endif%}
 
         {% if p_id %}
-            <a href="{% url 'browser' p_id=plot_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" ><i class="fas fa-sliders-h"></i></a>
+            <a href="{% url 'browser:browser' p_id=plot_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" ><i class="fas fa-sliders-h"></i></a>
         {% endif %}
     </div>
 

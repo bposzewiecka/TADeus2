@@ -34,12 +34,3 @@ class CreateTrackForm(forms.ModelForm):
         model = Track
         fields = ('no',  'title', 'height', 'track_file', 'hic_display')
 
-
-class PlotForm(forms.ModelForm):
-
-     class Meta:
-        model = Plot
-        fields = ('title', 'name', 'assembly')
-
-
-

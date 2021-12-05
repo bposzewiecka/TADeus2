@@ -20,12 +20,15 @@ from django.contrib import admin
 urlpatterns = [
     path('', include('tadeus.urls')),
     path('help/', include('help.urls')),
+    path('plots/', include('plots.urls')),
     path('browser/', include('browser.urls')),
     path('ontologies/', include('ontologies.urls')),
     path('datasources/', include('datasources.urls')),
     path('evaluation/', include('evaluation.urls')),
+    
     path('api/ontologies/', include('ontologies.api.urls')),
     path('api/plots/', include('tadeus.api.urls')),
+
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
 ]

@@ -1,0 +1,93 @@
+{% extends 'tadeus_portal/base_card.html' %}
+{% load render_table from django_tables2 %}
+
+
+{% block begin %}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'plots:index' %}">Plots</a></li>
+
+        {% if p_id%}
+            <li class="breadcrumb-item">{{ plot.name }}</li>
+        {% else %}
+            <li class="breadcrumb-item">New plot</li>
+        {% endif %}
+  </ol>
+</nav>
+
+{{ request.GET.urlencode }}
+
+<form action="{%if p_id %}{% url 'plots:update' p_id=p_id %}{%else%}{% url 'plots:create' %}{% endif %}" method="post">
+    {% endblock %}
+
+    {% block header %}
+        <div class="float-right" role="group">
+
+        <a href="{% url 'plots:index' %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+
+        {% if not readonly  and p_id %}
+            <a href="{% url 'plots:delete' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this plot?')">Delete</a>
+        {% endif %}
+
+        {% if not readonly %}   
+            <input class="btn btn-primary btn-lg active" type="submit" value="Add track" name="add_track">
+        {% endif %}
+        
+        {% if not readonly %}
+            <input class="btn btn-primary btn-lg active" type="submit" value="{%if p_id %}Save{%else%}Create{% endif %}" name="save_plot">
+        {% endif %}
+
+        {% if p_id %}
+            <a href="{% url 'browser:browser' p_id=p_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" ><i class="fas fa-sliders-h"></i></a>
+        {% endif %}
+
+    </div>
+{% endblock %}
+    
+
+{% block body %}        
+    {% csrf_token %}
+      
+    <div class="form-group">
+        <label for="{{ form.name.id_for_label }}">Name</label>
+        {{ form.name.errors }}
+        <input class="form-control" name="{{ form.name.html_name }}" id="{{ form.name.id_for_label }}" {% if form.name.value  %} value="{{ form.name.value}}" {% endif %} {% if readonly %}readonly{% endif %} required>
+    </div>
+
+    <div class="form-group">
+        <label for="{{ form.title.id_for_label }}">Title</label>
+        {{ form.title.errors }}
+        <input class="form-control" name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}" {% if form.title.value  %} value="{{ form.title.value}}" {% endif %} {% if readonly %}readonly{% endif %} required>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="{{ form.assembly.id_for_label }}">Assembly</label>
+          {{ form.assembly.errors }}
+
+          {% if not readonly and not has_tracks %}
+              <select id="{{ form.assembly.id_for_label }}" class="form-control" name="{{ form.assembly.html_name }}">
+                {% for assembly in assemblies %}
+                    <option value="{{ assembly.id }}" {% if form.assembly.value|add:0   == assembly.id %} selected{% endif %}>{{ assembly.name }}</option>      
+                {% endfor %}
+              </select>
+          {% else %}
+                <input class="form-control" type="hidden" name="{{ form.assembly.html_name }}" id="{{ form.assembly.id_for_label }}" value="{{ form.assembly.value}}"  >
+                {% for assembly in assemblies %}
+                    {% if form.assembly.value|add:0   == assembly.id %} 
+                    <input class="form-control"  value="{{ assembly.name }}"  readonly>
+                    {% endif %}
+                {% endfor %}
+          {% endif %}
+        </div>
+    </div>
+
+    
+    {% if table %}
+        <label>Tracks</label>
+        {% render_table table %}
+    {% endif %}
+    
+{% endblock %}

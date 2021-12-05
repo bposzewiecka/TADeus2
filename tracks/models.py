@@ -5,11 +5,12 @@ from django.db.models import Q
 import matplotlib.pyplot as plt
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.html import format_html
-import tadeus.statistics as  statistics 
+import evaluation.statistics as  statistics 
 import pyBigWig
 import bbi
 
 from tadeus.defaults import DEFAULT_WIDTH_PROP, DEFAULT_PLOT_COLOR, DEFAULT_PLOT_EDGE_COLOR, DEFAULT_PLOT_COLOR_MAP_OPTIONS
+from plots.models import Plot
 
 from datasources.models import Sample, Chromosome, Assembly, Species, TrackFile, BedFileEntry
 
@@ -19,43 +20,6 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from concurrent.futures import ThreadPoolExecutor
-
-class Plot(models.Model):
-    assembly = models.ForeignKey(Assembly, on_delete = models.PROTECT)
-    owner = models.ForeignKey(User, on_delete = models.PROTECT, null = True) 
-    public = models.BooleanField(default = False)
-    approved = models.BooleanField(default = False)
-    title = models.CharField(max_length = 400)
-    name =  models.CharField(max_length = 400)
-    auth_cookie = models.CharField(max_length = 60, null = True)
-
-    def getTracks(self):
-        return self.tracks.order_by('no', 'id').all()
-
-    def getTracksToPlot(self):
-        tracks = self.getTracks()
-
-        return [track for track in tracks if not track.draw_vlines_only()]
-
-    def getNameFilters(self, chrom ,start, end):
-        tracks = self.getTracks()
-
-        tracks = [track for track in tracks if track.name_filter]
-
-        names = set(entry.name for track in tracks for entry in track.get_entries(chrom, start, end))
-
-        return names
-
-    def getVLineEntries(self, chrom ,start, end):
-        tracks = self.getTracks()
-
-        tracks = [track for track in tracks if track.draw_vlines_only()]
-
-        return [ entry.start for track in tracks for entry in track.get_entries(chrom, start, end)]
-
-    def hasEval(self):
-        return  hasattr(self, 'eval') 
-
 
 class Subtrack(models.Model):
     track_file =  models.ForeignKey(TrackFile, on_delete = models.CASCADE, related_name='subtracks') 
