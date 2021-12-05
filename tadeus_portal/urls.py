@@ -13,25 +13,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import include, path, re_path
 from django.contrib import admin
-
+from django.urls import include, path
 
 urlpatterns = [
-
-    path('', include('tadeus.urls')),
-    path('tracks/', include('tracks.urls')),
-    path('help/', include('help.urls')),
-    path('plots/', include('plots.urls')),
-    path('browser/', include('browser.urls')),
-    path('ontologies/', include('ontologies.urls')),
-    path('datasources/', include('datasources.urls')),
-    path('evaluation/', include('evaluation.urls')),
-    
-    path('api/ontologies/', include('ontologies.api.urls')),
-    #path('api/plots/', include('tadeus.api.urls')),
-
-    path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),
+    path("", include("tadeus.urls")),
+    path("tracks/", include("tracks.urls")),
+    path("help/", include("help.urls")),
+    path("plots/", include("plots.urls")),
+    path("browser/", include("browser.urls")),
+    path("ontologies/", include("ontologies.urls")),
+    path("datasources/", include("datasources.urls")),
+    path("evaluation/", include("evaluation.urls")),
+    path("api/ontologies/", include("ontologies.api.urls")),
+    # path('api/plots/', include('tadeus.api.urls')),
+    path("admin/", admin.site.urls),
+    path("accounts/", include("allauth.urls")),
 ]
-
