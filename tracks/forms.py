@@ -1,6 +1,6 @@
 from django import forms
 from django.forms.widgets import CheckboxSelectMultiple
-from tadeus.models import Track, Plot
+from .models import Track
   
 class TrackForm(forms.ModelForm):
 

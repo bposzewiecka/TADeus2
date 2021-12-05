@@ -9,9 +9,9 @@ from scipy.sparse import vstack as sparse_vstack
 from scipy.sparse import hstack as sparse_hstack
 #import tables
 from intervaltree import IntervalTree, Interval
-from tadeus.utilities import toBytes
-from tadeus.utilities import toString
-from tadeus.utilities import check_chrom_str_bytes
+from tracks.utils import toBytes
+from tracks.utils import toString
+from tracks.utils import check_chrom_str_bytes
 
 import gzip
 

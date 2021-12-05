@@ -18,7 +18,7 @@ from django.contrib import admin
 
 
 urlpatterns = [
-    path('', include('tadeus.urls')),
+    path('tracks/', include('tracks.urls')),
     path('help/', include('help.urls')),
     path('plots/', include('plots.urls')),
     path('browser/', include('browser.urls')),
@@ -27,7 +27,7 @@ urlpatterns = [
     path('evaluation/', include('evaluation.urls')),
     
     path('api/ontologies/', include('ontologies.api.urls')),
-    path('api/plots/', include('tadeus.api.urls')),
+    #path('api/plots/', include('tadeus.api.urls')),
 
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),

@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from tadeus.models import TrackFile, Plot, Assembly
+from tracks.models import TrackFile
+from plots.models import Plot
+from datasources.models import Assembly
 
 
 class Evaluation(models.Model):

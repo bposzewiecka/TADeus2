@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from tadeus.trackPlot import PlotBed, PlotXAxis, PlotBedGraph, PlotDomains, PlotArcs, PlotHiCMatrix, PlotVirtualHIC
+from tracks.trackPlot import PlotBed, PlotXAxis, PlotBedGraph, PlotDomains, PlotArcs, PlotHiCMatrix, PlotVirtualHIC
 from django.db.models import Q
 import matplotlib.pyplot as plt
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -9,7 +9,8 @@ import evaluation.statistics as  statistics
 import pyBigWig
 import bbi
 
-from tadeus.defaults import DEFAULT_WIDTH_PROP, DEFAULT_PLOT_COLOR, DEFAULT_PLOT_EDGE_COLOR, DEFAULT_PLOT_COLOR_MAP_OPTIONS
+from tracks.defaults import DEFAULT_WIDTH_PROP, DEFAULT_PLOT_COLOR, DEFAULT_PLOT_EDGE_COLOR, DEFAULT_PLOT_COLOR_MAP_OPTIONS
+
 from plots.models import Plot
 
 from datasources.models import Sample, Chromosome, Assembly, Species, TrackFile, BedFileEntry

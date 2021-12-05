@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from django.conf import settings
 
 import sys
@@ -23,15 +21,14 @@ warnings.filterwarnings("ignore", message="numpy.ndarray size changed")
 
 import scipy.sparse
 
-import tadeus.HiCMatrix as HiCMatrix
-import tadeus.utilities
+import tracks.HiCMatrix as HiCMatrix
+import tracks.utils
 
 from intervaltree import IntervalTree, Interval
 from importlib import reload
 
 import textwrap
 import copy
-
 
 reload(sys)
 
@@ -61,7 +58,7 @@ DEFAULT_VLINE_LINE_STYLE =  'dashed'
 VSMALL_RELATIVE = 0.005
 SMALL_RELATIVE  = 0.02
 
-from tadeus.defaults import DEFAULT_WIDTH_PROP
+from tracks.defaults import DEFAULT_WIDTH_PROP
 
 def cm2inch(*tupl):
     inch = 2.54

@@ -6,7 +6,7 @@ app_name = 'tracks'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('<int:p_id>', views.edit, name='edit'),
+    path('<int:p_id>', views.update, name='update'),
     path('delete/<int:p_id>', views.delete, name='delete'),
 ]
 

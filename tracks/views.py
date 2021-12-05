@@ -8,11 +8,9 @@ from django.shortcuts import redirect
 from django.core.exceptions import ObjectDoesNotExist
 
 
-from tadeus.models import Plot, Track
+from plots.models import Plot
+from .models import  Track
 
-from evaluation.models import Evaluation
-
-from ontologies.models import Phenotype, Gene
 from tadeus.misc import split_seq
 
 from django.contrib import messages
@@ -21,15 +19,11 @@ from django.db.models import Q, ProtectedError
 
 from django.db.models.functions import Lower
 
-
 from django.db import transaction
 
-from .forms import CreateTrackForm, PlotForm, TrackForm
+from .forms import CreateTrackForm, TrackForm
 
 from django_tables2 import RequestConfig
-
-from .tables import PlotTable
-from .tables import PlotFilter
 
 from evaluation.models import Evaluation
 
@@ -38,13 +32,9 @@ from django_tables2.views import SingleTableMixin
 
 from urllib.parse import urlencode, quote_plus
 
-from collections import Counter
 from scipy import stats
 
-from tadeus.defaults import DEFAULT_WIDTH_PROP
-
-
-def edit_track(request, p_id):
+def update(request, p_id):
 
     track = Track.objects.get(pk = p_id)
 
@@ -89,7 +79,7 @@ def edit_track(request, p_id):
                    'subtracks': track.track_file.subtracks.all()})
 
 
-def delete_track(request, p_id):
+def delete(request, p_id):
 
     track = Track.objects.get(pk =p_id)
     plot_id = track.plot.id
@@ -98,7 +88,7 @@ def delete_track(request, p_id):
     messages.success(request, 'Track successfully deleted.')
     return redirect(edit_plot, p_id = plot_id)
 
-def create_track(request, p_plot_id):
+def create(request, p_plot_id):
 
     plot = Plot.objects.get(pk = p_plot_id)
     tracks = plot.tracks.all()
