@@ -15,6 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework import routers
+
+from datasources.api.urls import router as datasources_router
+from ontologies.api.urls import router as ontologies_router
+from plots.api.urls import router as plots_router
 
 urlpatterns = [
     path("", include("tadeus.urls")),
@@ -25,8 +30,21 @@ urlpatterns = [
     path("ontologies/", include("ontologies.urls")),
     path("datasources/", include("datasources.urls")),
     path("evaluation/", include("evaluation.urls")),
-    path("api/ontologies/", include("ontologies.api.urls")),
-    # path('api/plots/', include('tadeus.api.urls')),
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
 ]
+
+router = routers.DefaultRouter()
+
+
+def add_router(subrouter):
+    router.registry.extend(subrouter.registry)
+
+
+add_router(plots_router)
+add_router(ontologies_router)
+add_router(datasources_router)
+
+api_urlpatterns = [path("api/", include(router.urls))]
+
+urlpatterns += api_urlpatterns

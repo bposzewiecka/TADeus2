@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from tadeus.models import Assembly, Chromosome, Plot, Sample, Species, TrackFile
+from datasources.models import Assembly, Chromosome, Sample, Species, TrackFile
 
 
 class SpeciesSerializer(serializers.ModelSerializer):
@@ -36,12 +36,6 @@ class SampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = ["id", "name", "tissue", "description", "species"]
-
-
-class PlotSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Plot
-        fields = ["id", "assembly", "name", "title", "public"]
 
 
 class TrackFileSerializer(serializers.ModelSerializer):

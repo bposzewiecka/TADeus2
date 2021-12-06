@@ -1,7 +1,8 @@
 from rest_framework import viewsets
 
-from tadeus.api.serializers import AssemblySerializer, PlotSerializer, SampleSerializer, SpeciesSerializer, TrackFileSerializer
-from tadeus.models import Assembly, Plot, Sample, Species, TrackFile
+from datasources.models import Assembly, Sample, Species, TrackFile
+
+from .serializers import AssemblySerializer, SampleSerializer, SpeciesSerializer, TrackFileSerializer
 
 
 class SpeciesViewSet(viewsets.ModelViewSet):
@@ -20,11 +21,6 @@ class SampleViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.all().order_by("name")
     serializer_class = SampleSerializer
     # http_method_names = ['get']
-
-
-class PlotViewSet(viewsets.ModelViewSet):
-    queryset = Plot.objects.all().order_by("name")
-    serializer_class = PlotSerializer
 
 
 class TrackFileViewSet(viewsets.ModelViewSet):
