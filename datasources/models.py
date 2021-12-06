@@ -207,6 +207,9 @@ class TrackFile(models.Model):
 
         return attributes
 
+    def __str__(self):
+        return f"Track file id: {self.id}, {self.name} ({self.assembly}, {self.file_type})."
+
 
 class FileEntry(models.Model):
 

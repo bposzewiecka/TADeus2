@@ -39,3 +39,6 @@ class Plot(models.Model):
 
     def hasEval(self):
         return hasattr(self, "eval")
+
+    def __str__(self):
+        return f"Plot id: {self.id}, {self.name} ({self.title})."

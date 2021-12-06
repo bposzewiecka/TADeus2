@@ -111,7 +111,7 @@ BEDGRAPH_STYLE_OPTIONS = (
     (BEDGRAPH_STYLE_AREA_WITH_BORDER, "Area with border"),
 )
 
-COLOR_MAP_OPTIONS = ((color_map, color_map) for color_map in plt.colormaps())
+COLOR_MAP_OPTIONS = [(color_map, color_map) for color_map in plt.colormaps()]
 
 
 class Track(models.Model):
@@ -279,6 +279,9 @@ class Track(models.Model):
     @property
     def file_name(self):
         return self.track_file.name
+
+    def __str__(self):
+        return f"Track id: {self.id}, {self.name} ({self.title}) in plot {self.plot.id}."
 
 
 @receiver(pre_save, sender=Track)
