@@ -20,6 +20,7 @@ from rest_framework import routers
 from datasources.api.urls import router as datasources_router
 from ontologies.api.urls import router as ontologies_router
 from plots.api.urls import router as plots_router
+from tracks.api.urls import router as tracks_router
 
 urlpatterns = [
     path("", include("tadeus.urls")),
@@ -44,6 +45,7 @@ def add_router(subrouter):
 add_router(plots_router)
 add_router(ontologies_router)
 add_router(datasources_router)
+add_router(tracks_router)
 
 api_urlpatterns = [path("api/", include(router.urls))]
 

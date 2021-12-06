@@ -61,6 +61,58 @@ BED_STYLE_OPTIONS = (
     (BED_STYLE_INTERLACED, "Interlaced"),
 )
 
+AGGREGATE_FUNCTION_AVG = "mean"
+AGGREGATE_FUNCTION_SUM = "sum"
+AGGREGATE_FUNCTION_MIN = "min"
+AGGREGATE_FUNCTION_MAX = "max"
+
+AGGREGATE_FUNCTIONS_OPTIONS = (
+    (AGGREGATE_FUNCTION_AVG, "mean"),
+    (AGGREGATE_FUNCTION_SUM, "sum"),
+    (AGGREGATE_FUNCTION_MIN, "min"),
+    (AGGREGATE_FUNCTION_MAX, "max"),
+)
+
+HIC_DISPLAY_HIC = 0
+HIC_DISPLAY_VIRTUAL4C = 1
+
+HIC_DISPLAY_OPTIONS = (
+    (HIC_DISPLAY_HIC, "HIC"),
+    (HIC_DISPLAY_VIRTUAL4C, "Virtual 4C"),
+)
+
+
+BEDGRAPH_DISPLAY_NONE = 0
+BEDGRAPH_DISPLAY_TRANSPARENT = 1
+BEDGRAPH_DISPLAY_SOLID = 2
+BEDGRAPH_DISPLAY_STACKED = 3
+
+BEDGRAPH_DISPLAY_OPTIONS = (
+    (BEDGRAPH_DISPLAY_TRANSPARENT, "Transparent"),
+    (BEDGRAPH_DISPLAY_SOLID, "Solid"),
+    (BEDGRAPH_DISPLAY_STACKED, "Stacked"),
+)
+
+
+BEDGRAPH_TYPE_HISTOGRAM = 0
+BEDGRAPH_TYPE_LINECHART = 1
+
+BEDGRAPH_TYPE_OPTIONS = ((BEDGRAPH_TYPE_HISTOGRAM, "Histogram"), (BEDGRAPH_TYPE_LINECHART, "Linechart"))
+
+BEDGRAPH_STYLE_LINE = 0
+BEDGRAPH_STYLE_LINE_WITH_BORDER = 1
+BEDGRAPH_STYLE_AREA = 2
+BEDGRAPH_STYLE_AREA_WITH_BORDER = 3
+
+BEDGRAPH_STYLE_OPTIONS = (
+    (BEDGRAPH_STYLE_LINE, "Line"),
+    (BEDGRAPH_STYLE_LINE_WITH_BORDER, "Line with border"),
+    (BEDGRAPH_STYLE_AREA, "Area"),
+    (BEDGRAPH_STYLE_AREA_WITH_BORDER, "Area with border"),
+)
+
+COLOR_MAP_OPTIONS = ((color_map, color_map) for color_map in plt.colormaps())
+
 
 class Track(models.Model):
 
@@ -79,8 +131,6 @@ class Track(models.Model):
 
     color = models.CharField(max_length=6, default=DEFAULT_PLOT_COLOR)
     edgecolor = models.CharField(max_length=6, default=DEFAULT_PLOT_EDGE_COLOR)
-
-    COLOR_MAP_OPTIONS = ((color_map, color_map) for color_map in plt.colormaps())
 
     colormap = models.CharField(max_length=18, choices=COLOR_MAP_OPTIONS, default=DEFAULT_PLOT_COLOR_MAP_OPTIONS, null=True, blank=True)
 
@@ -101,61 +151,12 @@ class Track(models.Model):
     start_coordinate = models.IntegerField(null=True, blank=True, default=0)
     end_coordinate = models.IntegerField(null=True, blank=True, default=0)
 
-    AGGREGATE_FUNCTION_AVG = "mean"
-    AGGREGATE_FUNCTION_SUM = "sum"
-    AGGREGATE_FUNCTION_MIN = "min"
-    AGGREGATE_FUNCTION_MAX = "max"
-
-    AGGREGATE_FUNCTIONS_OPTIONS = (
-        (AGGREGATE_FUNCTION_AVG, "mean"),
-        (AGGREGATE_FUNCTION_SUM, "sum"),
-        (AGGREGATE_FUNCTION_MIN, "min"),
-        (AGGREGATE_FUNCTION_MAX, "max"),
-    )
-
     aggregate_function = models.CharField(max_length=4, choices=AGGREGATE_FUNCTIONS_OPTIONS, default=AGGREGATE_FUNCTION_AVG)
-
-    HIC_DISPLAY_HIC = 0
-    HIC_DISPLAY_VIRTUAL4C = 1
-
-    HIC_DISPLAY_OPTIONS = (
-        (HIC_DISPLAY_HIC, "HIC"),
-        (HIC_DISPLAY_VIRTUAL4C, "Virtual 4C"),
-    )
 
     hic_display = models.IntegerField(choices=HIC_DISPLAY_OPTIONS, default=HIC_DISPLAY_HIC)
 
-    BEDGRAPH_DISPLAY_NONE = 0
-    BEDGRAPH_DISPLAY_TRANSPARENT = 1
-    BEDGRAPH_DISPLAY_SOLID = 2
-    BEDGRAPH_DISPLAY_STACKED = 3
-
-    BEDGRAPH_DISPLAY_OPTIONS = (
-        (BEDGRAPH_DISPLAY_TRANSPARENT, "Transparent"),
-        (BEDGRAPH_DISPLAY_SOLID, "Solid"),
-        (BEDGRAPH_DISPLAY_STACKED, "Stacked"),
-    )
-
     bedgraph_display = models.IntegerField(choices=BEDGRAPH_DISPLAY_OPTIONS, default=BEDGRAPH_DISPLAY_TRANSPARENT)
-
-    BEDGRAPH_TYPE_HISTOGRAM = 0
-    BEDGRAPH_TYPE_LINECHART = 1
-
-    BEDGRAPH_TYPE_OPTIONS = ((BEDGRAPH_TYPE_HISTOGRAM, "Histogram"), (BEDGRAPH_TYPE_LINECHART, "Linechart"))
-
     bedgraph_type = models.IntegerField(choices=BEDGRAPH_TYPE_OPTIONS, default=BEDGRAPH_TYPE_LINECHART)
-
-    BEDGRAPH_STYLE_LINE = 0
-    BEDGRAPH_STYLE_LINE_WITH_BORDER = 1
-    BEDGRAPH_STYLE_AREA = 2
-    BEDGRAPH_STYLE_AREA_WITH_BORDER = 3
-
-    BEDGRAPH_STYLE_OPTIONS = (
-        (BEDGRAPH_STYLE_LINE, "Line"),
-        (BEDGRAPH_STYLE_LINE_WITH_BORDER, "Line with border"),
-        (BEDGRAPH_STYLE_AREA, "Area"),
-        (BEDGRAPH_STYLE_AREA_WITH_BORDER, "Area with border"),
-    )
 
     bedgraph_style = models.IntegerField(choices=BEDGRAPH_STYLE_OPTIONS, default=BEDGRAPH_STYLE_AREA)
 
