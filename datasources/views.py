@@ -1,31 +1,14 @@
-from io import StringIO, TextIOWrapper
-
 from django.contrib import messages
-from django.db import transaction
 from django.db.models import ProtectedError, Q
 from django.shortcuts import redirect, render
 from django_tables2 import RequestConfig
 
-from tadeus_portal.utils import is_object_readonly, only_public_or_user, set_owner_or_cookie
+from datasources.readBed import ReadBedOrBedGraphException
+from tadeus_portal.utils import get_file_handle, is_object_readonly, only_public_or_user, save_datasource, set_owner_or_cookie
 
 from .forms import TrackFileForm
 from .models import Assembly, TrackFile
-from .readBed import BedOrBedGraphReader, ReadBedOrBedGraphException
 from .tables import TrackFileFilter, TrackFileTable
-
-
-def get_file_handle(p_type, form):
-
-    if p_type == "file":
-        f = form.files["file"]
-        return TextIOWrapper(f.file)
-    elif p_type == "text":
-        text = form.data["text"]
-        if len(text) == 0:
-            raise ReadBedOrBedGraphException("Paste in data in BED or BEDGraph format.")
-        return StringIO(text)
-    else:
-        return None
 
 
 def index(request):
@@ -39,23 +22,6 @@ def index(request):
 
     RequestConfig(request).configure(table)
     return render(request, "datasources/datasources.html", {"table": table, "filter": f})
-
-
-@transaction.atomic
-def save_datasource(track_file, file_handle, eval=False):
-
-    if file_handle:
-        reader = BedOrBedGraphReader(file_handle=file_handle, track_file=track_file)
-
-    track_file.save()
-
-    if file_handle:
-        for bed_entry in reader:
-
-            if eval:
-                bed_entry.set_eval_pvalue()
-
-            bed_entry.save()
 
 
 def update(request, p_id):

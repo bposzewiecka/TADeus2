@@ -217,7 +217,7 @@ def browser(request, p_id, p_chrom=None, p_start=None, p_end=None):
 
     return TemplateResponse(
         request,
-        "tadeus/browser.html",
+        "browser/browser.html",
         {
             "p_id": p_id,
             "p_plot": p_plot,
@@ -331,7 +331,7 @@ def breakpoint_browser(request, p_id, p_breakpoint_id):
 
     return TemplateResponse(
         request,
-        "tadeus/browser_breakpoint.html",
+        "browser/browser_breakpoint.html",
         {
             "p_id": p_id,
             "p_plot": p_plot,
@@ -380,4 +380,4 @@ def breakpoints(request):
 
     samples = Sample.objects.all().order_by("name", "id")
 
-    return render(request, "tadeus/breakpoints.html", {"table": table, "filter": f, "samples": samples})
+    return render(request, "browser/breakpoints.html", {"table": table, "filter": f, "samples": samples})

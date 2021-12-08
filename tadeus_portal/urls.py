@@ -17,7 +17,9 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
 
+from browser.api.urls import router as browser_router
 from datasources.api.urls import router as datasources_router
+from evaluation.api.urls import router as evaluation_router
 from ontologies.api.urls import router as ontologies_router
 from plots.api.urls import router as plots_router
 from tracks.api.urls import router as tracks_router
@@ -42,6 +44,8 @@ def add_router(subrouter):
     router.registry.extend(subrouter.registry)
 
 
+add_router(evaluation_router)
+add_router(browser_router)
 add_router(plots_router)
 add_router(ontologies_router)
 add_router(datasources_router)

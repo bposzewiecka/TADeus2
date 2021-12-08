@@ -36,7 +36,7 @@ class GeneTable(tables.Table):
     class Meta:
         model = Gene
         template_name = "django_tables2/bootstrap.html"
-        sequence = ("id", "name", "ensembl_gene_id", "entrezgene_id", "chrom", "start", "end", "strand", "gene_biotype")
+        sequence = ("id", "name", "ensembl_gene_id", "entrez_gene_id", "chrom", "start", "end", "strand", "gene_biotype")
         fields = sequence
 
 

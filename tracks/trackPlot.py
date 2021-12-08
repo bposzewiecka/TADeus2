@@ -15,6 +15,8 @@ from intervaltree import Interval, IntervalTree
 from matplotlib.patches import Rectangle
 
 import tracks.HiCMatrix as HiCMatrix
+from datasources.defaults import BED12, FILE_TYPE_HIC
+from plots.models import Plot
 from tracks.defaults import DEFAULT_WIDTH_PROP
 
 matplotlib.use("Agg")
@@ -87,7 +89,7 @@ class TrackPlot:
             self.bin_sizes = [int(bin_size) for bin_size in self.bin_sizes.split()]
 
         if model.title:
-            if self.track_file.file_type == self.track_file.FILE_TYPE_HIC:
+            if self.track_file.file_type == FILE_TYPE_HIC:
                 self.title = textwrap.fill(model.title, 35)
             else:
                 self.title = textwrap.fill(model.title, 25)
@@ -127,8 +129,6 @@ class TrackPlot:
 
         self.alpha = 0.8
         self.fontsize = 8
-
-        from tadeus.models import Plot
 
         try:
             self.plot = model.plot
@@ -304,21 +304,21 @@ class PlotBed(TrackPlot):
         if self.height is not None:
             return self.height
 
-        if self.display == "stacked":
+        if self.bed_style == "stacked":
             if self.max_num_row == 0:
                 return DEFAULT_BED_ENTRY_HEIGHT
             return 2 * DEFAULT_BED_ENTRY_HEIGHT * self.max_num_row - DEFAULT_BED_ENTRY_HEIGHT
-        elif self.display == "interlaced":
+        elif self.bed_style == "interlaced":
             return 5 * DEFAULT_BED_ENTRY_HEIGHT
         else:
             return 3 * DEFAULT_BED_ENTRY_HEIGHT
 
     def get_y_pos(self, free_row):
 
-        if self.display == "interlaced":
+        if self.bed_style == "interlaced":
             ypos = self.interval_height if self.counter % 2 == 0 else self.interval_height + self.row_scale
 
-        elif self.display == "collapsed":
+        elif self.bed_style == "collapsed":
             ypos = self.interval_height
 
         else:
@@ -328,9 +328,9 @@ class PlotBed(TrackPlot):
 
     def get_max_y_pos(self):
 
-        if self.display == "interlaced":
+        if self.bed_style == "interlaced":
             ypos = self.interval_height + 2 * self.row_scale
-        elif self.display == "collapsed":
+        elif self.bed_style == "collapsed":
             ypos = self.interval_height * 3
         else:
             ypos = self.max_num_row * self.row_scale + self.interval_height
@@ -473,9 +473,9 @@ class PlotBed(TrackPlot):
 
             ypos = self.get_y_pos(free_row)
 
-            if self.track_file.bed_sub_type == self.track_file.BED12 and self.bed_display == self.BED_DISPLAY_FLYBASE:
+            if self.track_file.bed_sub_type == BED12 and self.bed_display == self.BED_DISPLAY_FLYBASE:
                 self.draw_gene_with_introns_flybase_style(entry, ypos, rgb=rgb, edgecolor=edgecolor)
-            elif self.track_file.bed_sub_type == self.track_file.BED12 and self.bed_display == self.BED_DISPLAY_INTRONS:
+            elif self.track_file.bed_sub_type == BED12 and self.bed_display == self.BED_DISPLAY_INTRONS:
                 self.draw_gene_with_introns(entry, ypos, rgb=rgb, edgecolor=edgecolor)
             else:
                 self.draw_gene_simple(entry, ypos, rgb=rgb, edgecolor=edgecolor)
@@ -1265,7 +1265,7 @@ class PlotHiCMatrix(TrackPlot):
         return im
 
 
-class PlotVirtualHIC(TrackPlot):
+class PlotVirtual4C(TrackPlot):
     def __init__(self, *args, **kwarg):
         super().__init__(*args, **kwarg)
         self.hic_ma = HiCMatrix.hiCMatrix("/home/basia/CNVBrowser/tadeus/4DNFIQI8SFNE.mcool::resolutions/50000")

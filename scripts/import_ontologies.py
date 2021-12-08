@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 
 from datasources.models import Assembly, TrackFile
+from evaluation.defaults import BIOMART_GENES_FILE_ID
 from ontologies.models import Gene, GeneToPhenotype, Phenotype
 
 
@@ -15,13 +16,22 @@ def del_all():
 @transaction.atomic
 def get_genes():
 
-    hg19 = Assembly.objects.get(name="hg19")
+    hg38 = Assembly.objects.get(name="hg38")
     admin = User.objects.get(username="admin")
 
-    file_name = "data/ontologies/GENES/biomart_genes_hg19_20211204.txt"
+    file_name = "data/hg38/genes/biomart_genes_hg38_20211207.txt"
 
     trackFile = TrackFile(
-        id=2, assembly=hg19, name="", source_name="", source_url="", file_type="BE", bed_sub_type="Bed6", owner=admin, public=True, approved=True
+        id=BIOMART_GENES_FILE_ID,
+        assembly=hg38,
+        name="",
+        source_name="",
+        source_url="",
+        file_type="BE",
+        bed_sub_type="Bed6",
+        owner=admin,
+        public=True,
+        approved=True,
     )
 
     trackFile.save()
@@ -35,7 +45,7 @@ def get_genes():
             name = row["hgnc_symbol"].upper()
             ensembl_gene_id = row["ensembl_gene_id"] if row["ensembl_gene_id"] else None
             gene_biotype = row["gene_biotype"]
-            entrezgene_id = row["entrezgene_id"] if row["entrezgene_id"] else None
+            entrez_gene_id = row["entrezgene_id"] if row["entrezgene_id"] else None
 
             chrom = row["chromosome_name"]
             start = row["start_position"]
@@ -55,7 +65,7 @@ def get_genes():
                 strand=strand,
                 gene_biotype=gene_biotype,
                 ensembl_gene_id=ensembl_gene_id,
-                entrezgene_id=entrezgene_id,
+                entrez_gene_id=entrez_gene_id,
                 track_file=trackFile,
             )
             gene.save()
@@ -136,7 +146,7 @@ def get_hpo_terms_genes():
             entrezgene_id = row["entrez-gene-id"]
             pheno_id = row["HPO-Term-ID"]
 
-            genes = Gene.objects.all().filter(entrezgene_id=entrezgene_id)
+            genes = Gene.objects.all().filter(entrez_gene_id=entrezgene_id)
             phenotype = phenotypes[pheno_id]
 
             for gene in genes:

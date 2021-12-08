@@ -15,7 +15,7 @@ class TrackTable(tables.Table):
         return record.track_file.name
 
     def render_id(self, record):
-        link = reverse("track", kwargs={"p_id": record.id})
+        link = reverse("tracks:update", kwargs={"p_id": record.id})
         return getLink(link, DEFAULT_EDIT_ICON)
 
     class Meta:

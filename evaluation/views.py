@@ -14,8 +14,10 @@ from plots.models import Plot
 from tadeus_portal.utils import get_auth_cookie, set_owner_or_cookie, split_seq
 from tracks.models import Track
 
+from .defaults import BIOMART_GENES_FILE_ID, CLINGEN_FILE_ID, ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, PLI_SCORE_FILE_ID
 from .forms import EvaluationAddEntryForm, EvaluationForm
 from .models import Evaluation
+from .statistics import get_TADeus_pvalue
 from .tables import EvaluationEntryTable, EvaluationFilter, EvaluationTable
 
 
@@ -60,13 +62,11 @@ def create_eval_atomic(request, form, p_type):
 
     eval.track_file = track_file
 
-    columns = (
-        (
-            1,
-            10001,
-            40,
-            6,
-        ),
+    tracks = (
+        # 1,
+        # 10001,
+        ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
+        PLI_SCORE_FILE_ID,
     )
 
     plot = Plot(assembly=assembly)
@@ -77,20 +77,18 @@ def create_eval_atomic(request, form, p_type):
     plot.name = "Plot for evaluation '" + form.cleaned_data["name"] + "'"
     plot.save()
 
-    for _, column in enumerate(columns):
-        for j, track_id in enumerate(column):
+    for j, track_id in enumerate(tracks):
 
-            if j == 0:
-                track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10)
-            if j == 1:
-                track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, domains_file=TrackFile.objects.get(pk=10101))
-            if j == 2:
-                track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), name_filter=True, no=(j + 1) * 10, style="arcs")
+        if j == 0:
+            track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10)
+        if j == 1:
+            track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, domains_file=TrackFile.objects.get(pk=10101))
+        if j == 2:
+            track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), name_filter=True, no=(j + 1) * 10, style="arcs")
+        if j == 3:
+            track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, style="tiles", min_value=0, max_value=1)
 
-            if j == 3:
-                track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, style="tiles", min_value=0, max_value=1)
-
-            track.save()
+        track.save()
 
     eval.plot = plot
     save_datasource(track_file, file_handle, eval=True)
@@ -187,7 +185,7 @@ def add_entry(request, p_id):
             bed_file_entry = form.save(commit=False)
             bed_file_entry.track_file = eval.track_file
 
-            bed_file_entry.set_eval_pvalue()
+            # bed_file_entry.set_eval_pvalue()
             bed_file_entry.save()
             messages.success(request, f"Breakpoint '{bed_file_entry.name}' added to evaluation.")
 
@@ -198,28 +196,29 @@ def add_entry(request, p_id):
     else:
         form = EvaluationAddEntryForm()
 
-    return render(request, "evaluation/eval_add_entry.html", {"p_id": p_id, "chroms": chroms, "form": form})
+    return render(request, "evaluation/evaluation_add_entry.html", {"p_id": p_id, "chroms": chroms, "form": form})
 
 
 def ranking(eval, p_chrom, p_interval_start, p_interval_end):
+
     p_interval_start, p_interval_end = int(p_interval_start), int(p_interval_end)
 
     region_start = max(p_interval_start - 3 * 1000 * 1000, 0)
     region_end = p_interval_end + 3 * 1000 * 1000
 
-    gene_file = TrackFile.objects.get(pk=2)
+    gene_file = TrackFile.objects.get(pk=BIOMART_GENES_FILE_ID)
 
     genes = gene_file.get_entries(p_chrom, region_start, region_end)
 
     genes = {gene.name: {"gene": Gene.objects.get(pk=gene.id)} for gene in genes}
 
-    pLI_file = TrackFile.objects.get(pk=6)
+    pLI_file = TrackFile.objects.get(pk=PLI_SCORE_FILE_ID)
     pLI = {gene.name.upper(): gene.score for gene in pLI_file.get_entries(p_chrom, region_start, region_end)}
 
-    clingen_file = TrackFile.objects.get(pk=7)
+    clingen_file = TrackFile.objects.get(pk=CLINGEN_FILE_ID)
     clingen = {gene.name: gene.score for gene in clingen_file.get_entries(p_chrom, region_start, region_end)}
 
-    enh_prom_file = TrackFile.objects.get(pk=40)
+    enh_prom_file = TrackFile.objects.get(pk=ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID)
     enh_proms = [enh_prom.name.upper() for enh_prom in enh_prom_file.get_entries(p_chrom, p_interval_start, p_interval_end)]
     enh_proms = Counter(enh_proms)
 
@@ -264,3 +263,11 @@ def ranking(eval, p_chrom, p_interval_start, p_interval_end):
     results.sort(key=lambda x: (-x[1]["rank"], -x[1]["enh_prom"], x[1]["distance"], x[1]["gene_name"]))
 
     return results
+
+    def set_TADeus_pvalue(self):
+
+        enh_prom_file = TrackFile.objects.get(pk=ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID)
+        n1 = len([enh_prom.name.upper() for enh_prom in enh_prom_file.get_entries(self.chrom, self.start, self.start)])
+        n2 = len([enh_prom.name.upper() for enh_prom in enh_prom_file.get_entries(self.chrom, self.end, self.end)])
+
+        self.score = get_TADeus_pvalue(max(n1, n2))

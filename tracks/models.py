@@ -8,20 +8,11 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from datasources.models import BedFileEntry, Chromosome, FileEntry, Sample, TrackFile
+from datasources.defaults import BED12, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPE_XAXIS
+from datasources.models import BedFileEntry, Chromosome, FileEntry, Subtrack, TrackFile
 from plots.models import Plot
 from tracks.defaults import DEFAULT_PLOT_COLOR, DEFAULT_PLOT_COLOR_MAP_OPTIONS, DEFAULT_PLOT_EDGE_COLOR, DEFAULT_WIDTH_PROP
-from tracks.trackPlot import PlotArcs, PlotBed, PlotBedGraph, PlotDomains, PlotHiCMatrix, PlotVirtualHIC, PlotXAxis
-
-
-class Subtrack(models.Model):
-    track_file = models.ForeignKey(TrackFile, on_delete=models.CASCADE, related_name="subtracks")
-    file_path = models.CharField(max_length=500, null=True)
-    rgb = models.CharField(max_length=7, null=True)
-    sample = models.ForeignKey(Sample, on_delete=models.PROTECT, related_name="subtracks", null=True)
-    name = models.CharField(max_length=500, null=True)
-    default = models.BooleanField(default=False)
-
+from tracks.trackPlot import PlotArcs, PlotBed, PlotBedGraph, PlotDomains, PlotHiCMatrix, PlotVirtual4C, PlotXAxis
 
 TRANSFORM_NONE = 0
 TRANSFORM_LOG1P = 1
@@ -170,15 +161,15 @@ class Track(models.Model):
 
     def get_style_choices(self):
 
-        if self.get_file_type() == self.track_file.FILE_TYPE_BED:
-            if self.get_bed_sub_type() == self.track_file.BED12:
+        if self.get_file_type() == FILE_TYPE_BED:
+            if self.get_bed_sub_type() == BED12:
                 return BED_DISPLAY_OPTIONS
             else:
                 return (BED_DISPLAY_TILES, "Tiles"), (BED_DISPLAY_DOMAINS, "Domains"), (BED_DISPLAY_ARCS, "Arcs")
         return None
 
     def draw_vlines_only(self):
-        return self.bed_display == self.BED_DISPLAY_VERTICAL_LINES and self.track_file.file_type == self.track_file.FILE_TYPE_BED
+        return self.bed_display == BED_DISPLAY_VERTICAL_LINES and self.track_file.file_type == FILE_TYPE_BED
 
     def draw_track(
         self,
@@ -202,23 +193,23 @@ class Track(models.Model):
 
         file_type = self.get_file_type()
 
-        if file_type == self.track_file.FILE_TYPE_BED and self.bed_display in (
-            self.BED_DISPLAY_TILES,
-            self.track_file.BED_DISPLAY_INTRONS,
-            self.track_file.BED_DISPLAY_FLYBASE,
+        if file_type == FILE_TYPE_BED and self.bed_display in (
+            BED_DISPLAY_TILES,
+            BED_DISPLAY_WITH_INTORNS,
+            BED_DISPLAY_FLYBASE,
         ):
             trackPlot = PlotBed(model=self)
-        elif file_type == self.track_file.FILE_TYPE_BED and self.bed_display == self.BED_DISPLAY_ARCS:
+        elif file_type == FILE_TYPE_BED and self.bed_display == BED_DISPLAY_ARCS:
             trackPlot = PlotArcs(model=self)
-        elif file_type == self.track_file.FILE_TYPE_BED and self.bed_display == self.BED_DISPLAY_DOMAINS:
+        elif file_type == FILE_TYPE_BED and self.bed_display == BED_DISPLAY_DOMAINS:
             trackPlot = PlotDomains(model=self)
-        elif file_type == self.track_file.FILE_TYPE_BED_GRAPH:
+        elif file_type == FILE_TYPE_BED_GRAPH:
             trackPlot = PlotBedGraph(model=self)
-        elif file_type == self.track_file.FILE_TYPE_HIC and self.hic_display == self.HIC_DISPLAY_HIC:
+        elif file_type == FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_HIC:
             trackPlot = PlotHiCMatrix(model=self)
-        elif file_type == self.track_file.FILE_TYPE_HIC and self.hic_display == self.HIC_DISPLAY_VIRTUAL4C:
-            trackPlot = PlotVirtualHIC(model=self)
-        elif file_type == self.track_file.FILE_TYPE_XAXIS:
+        elif file_type == FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_VIRTUAL4C:
+            trackPlot = PlotVirtual4C(model=self)
+        elif file_type == FILE_TYPE_XAXIS:
             trackPlot = PlotXAxis(model=self)
 
         return trackPlot.draw_track(
@@ -226,20 +217,20 @@ class Track(models.Model):
         )
 
     def get_aggregate_function(self):
-        if self.aggregate_function == self.AGGREGATE_FUNCTION_AVG:
+        if self.aggregate_function == AGGREGATE_FUNCTION_AVG:
             return sum
-        if self.aggregate_function == self.AGGREGATE_FUNCTION_AVG:
+        if self.aggregate_function == AGGREGATE_FUNCTION_AVG:
             return np.mean
-        if self.aggregate_function == self.AGGREGATE_FUNCTION_MIN:
+        if self.aggregate_function == AGGREGATE_FUNCTION_MIN:
             return min
-        if self.aggregate_function == self.AGGREGATE_FUNCTION_MAX:
+        if self.aggregate_function == AGGREGATE_FUNCTION_MAX:
             return max
 
     def get_entries(self, chrom, start, end, name_filter=None):
 
-        if self.track_file.big and self.track_file.file_type == self.track_file.FILE_TYPE_BED_GRAPH:
+        if self.track_file.big and self.track_file.file_type == FILE_TYPE_BED_GRAPH:
             return self.get_entries_big_wig(chrom, start, end, name_filter)
-        elif self.track_file.big and self.track_file.file_type == self.track_file.FILE_TYPE_BED:
+        elif self.track_file.big and self.track_file.file_type == FILE_TYPE_BED:
             return self.track_file.get_entries_big_bed(chrom, start, end, name_filter)
         else:
             return self.track_file.get_entries_db(chrom, start, end, name_filter)

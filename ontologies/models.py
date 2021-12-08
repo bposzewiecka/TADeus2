@@ -7,7 +7,7 @@ from datasources.models import BedFileEntry
 class Gene(BedFileEntry):
     ensembl_gene_id = models.CharField(max_length=20, null=True, blank=True)
     gene_biotype = models.CharField(max_length=20, null=True, blank=True)
-    entrezgene_id = models.CharField(max_length=20, null=True, blank=True)
+    entrez_gene_id = models.CharField(max_length=20, null=True, blank=True)
 
 
 class Phenotype(models.Model):

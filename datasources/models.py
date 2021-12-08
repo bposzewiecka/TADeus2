@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models, transaction
 from django.db.models import Q
 
-from evaluation import statistics
+from .defaults import BED6, BED9, BED12, FILE_SUB_TYPES, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPES
 
 
 class Species(models.Model):
@@ -47,26 +47,6 @@ class Sample(models.Model):
 
     def __str__(self):
         return self.name
-
-
-FILE_TYPE_BED = "BE"
-FILE_TYPE_BED_GRAPH = "BG"
-FILE_TYPE_HIC = "HI"
-FILE_TYPE_XAXIS = "XA"
-
-FILE_TYPES = (
-    (FILE_TYPE_BED, "Bed"),
-    (FILE_TYPE_BED_GRAPH, "BedGraph"),
-    (FILE_TYPE_HIC, "HiCMatrix"),
-    (FILE_TYPE_XAXIS, "XAxis"),
-)
-
-BED3 = "Bed3"
-BED6 = "Bed6"
-BED9 = "Bed9"
-BED12 = "Bed12"
-
-FILE_SUB_TYPES = ((BED3, BED3), (BED6, BED6), (BED9, BED9), (BED12, BED12))
 
 
 class TrackFile(models.Model):
@@ -141,14 +121,19 @@ class TrackFile(models.Model):
     def organism(self):
         return self.assembly.organism
 
-    def read_bed(self):
+    # TOFIX
+    def add_subtrack(self, file_path):
 
         if self.file_type not in (FILE_TYPE_BED, FILE_TYPE_BED_GRAPH):
             return
 
         from .readBed import BedOrBedGraphReader
 
-        with open(self.subtracks[0].file_path) as handler:
+        # subtrack =
+
+        Subtrack(track_file=self, file_path=file_path)
+
+        with open(file_path) as handler:
             bed_entries = BedOrBedGraphReader(handler, self)
 
             @transaction.atomic
@@ -167,28 +152,28 @@ class TrackFile(models.Model):
         attributes.append("height")
         attributes.append("edgecolor")
 
-        if self.file_type in (self.FILE_TYPE_BED_GRAPH, self.FILE_TYPE_HIC):
+        if self.file_type in (FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC):
             attributes.append("transform")
 
-        if self.file_type == self.FILE_TYPE_BED:
+        if self.file_type == FILE_TYPE_BED:
             attributes.append("labels")
             attributes.append("color")
             attributes.append("bed_display")
 
-        bed_with_name_and_color = self.file_type == self.FILE_TYPE_BED and (self.track.bed_sub_type in (BED6, BED9, BED12))
+        bed_with_name_and_color = self.file_type == FILE_TYPE_BED and (self.bed_sub_type in (BED6, BED9, BED12))
 
         if bed_with_name_and_color:
             attributes.append("labels")
             attributes.append("name_filter")
 
-        if self.file_type in self.FILE_TYPE_HIC or bed_with_name_and_color:
+        if self.file_type in FILE_TYPE_HIC or bed_with_name_and_color:
             attributes.append("colormap")
 
-        if self.file_type in (self.FILE_TYPE_BED_GRAPH, self.FILE_TYPE_HIC) or bed_with_name_and_color:
+        if self.file_type in (FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC) or bed_with_name_and_color:
             attributes.append("min_value")
             attributes.append("max_value")
 
-        if self.file_type == self.FILE_TYPE_HIC:
+        if self.file_type == FILE_TYPE_HIC:
             attributes.append("domains_file")
             attributes.append("inverted")
             attributes.append("hic_display")
@@ -196,7 +181,7 @@ class TrackFile(models.Model):
             attributes.append("start_coordinate")
             attributes.append("end_coordinate")
 
-        if self.file_type == self.FILE_TYPE_BED_GRAPH:
+        if self.file_type == FILE_TYPE_BED_GRAPH:
             attributes.append("subtracks")
             attributes.append("bedgraph_display")
             attributes.append("bedgraph_type")
@@ -239,6 +224,7 @@ class FileEntry(models.Model):
 
 
 class BedFileEntry(FileEntry):
+
     name = models.CharField(max_length=100, null=True)
     score = models.FloatField(null=True)
 
@@ -261,9 +247,22 @@ class BedFileEntry(FileEntry):
     def get_adj_right(self, n=1000000):
         return self.end + n
 
-    def set_eval_pvalue(self):
-        enh_prom_file = TrackFile.objects.get(pk=40)
-        n1 = len([enh_prom.name.upper() for enh_prom in enh_prom_file.get_entries(self.chrom, self.start, self.start)])
-        n2 = len([enh_prom.name.upper() for enh_prom in enh_prom_file.get_entries(self.chrom, self.end, self.end)])
 
-        self.score = statistics.get_eval_pvalue(max(n1, n2))
+class FileEntryPropertyType(models.Model):
+    name = models.CharField(max_length=50)
+
+
+class FileEntryProperty(models.Model):
+
+    file_entry = models.ForeignKey(BedFileEntry, on_delete=models.CASCADE, related_name="properties")
+    file_entry_property_type = models.ForeignKey(FileEntryPropertyType, on_delete=models.CASCADE, related_name="properties")
+    value = models.CharField(max_length=50)
+
+
+class Subtrack(models.Model):
+    track_file = models.ForeignKey(TrackFile, on_delete=models.CASCADE, related_name="subtracks")
+    file_path = models.CharField(max_length=500, null=True)
+    rgb = models.CharField(max_length=7, null=True)
+    sample = models.ForeignKey(Sample, on_delete=models.PROTECT, related_name="subtracks", null=True)
+    name = models.CharField(max_length=500, null=True)
+    default = models.BooleanField(default=False)
