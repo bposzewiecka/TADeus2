@@ -12,7 +12,7 @@ from datasources.views import get_file_handle, save_datasource
 from ontologies.models import Gene
 from plots.models import Plot
 from tadeus_portal.utils import get_auth_cookie, set_owner_or_cookie, split_seq
-from tracks import Track
+from tracks.models import Track
 
 from .ClassifyCNV import annotate_cnvs_ClassifyCNV
 from .defaults import BIOMART_GENES_FILE_ID, CLINGEN_FILE_ID, ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, PLI_SCORE_FILE_ID
@@ -65,10 +65,11 @@ def create_eval_atomic(request, form, p_type):
     eval.track_file = track_file
 
     tracks = (
-        1,
-        10001,
-        ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
-        PLI_SCORE_FILE_ID,
+        (1, {}),
+        (10001, {"domains_file": TrackFile.objects.get(pk=10101)}),
+        (ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, {"style": "arcs", "name_filter": True})(
+            PLI_SCORE_FILE_ID, {"style": "tiles", "min_value": 0, "max_value": 1}
+        ),
     )
 
     plot = Plot(assembly=assembly)
@@ -79,18 +80,8 @@ def create_eval_atomic(request, form, p_type):
     plot.name = "Plot for evaluation '" + form.cleaned_data["name"] + "'"
     plot.save()
 
-    for j, track_id in enumerate(tracks):
-
-        # if j == 0:
-        # track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10)
-        # if j == 1:
-        # track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, domains_file=TrackFile.objects.get(pk=10101))
-
-        if j == 2:
-            track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), name_filter=True, no=(j + 1) * 10, style="arcs")
-        if j == 3:
-            track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, style="tiles", min_value=0, max_value=1)
-
+    for j, track_id, params in enumerate(tracks):
+        track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, **params)
         track.save()
 
     eval.plot = plot
