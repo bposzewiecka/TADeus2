@@ -64,7 +64,7 @@
         {% endfor %}-->
 
             {% for assembly in assemblies %}
-                {% if assembly.name == 'hg19' %}
+                {% if assembly.name == 'hg38' %}
                     <option value="{{ assembly.id }}" {% if form.assembly.value|add:0   == assembly.id %} selected{% endif %}>{{ assembly.name }}</option>
                 {% endif %}
             {% endfor %}

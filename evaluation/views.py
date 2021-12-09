@@ -5,6 +5,7 @@ from django.db import transaction
 from django.shortcuts import redirect, render
 from django_tables2 import RequestConfig
 
+from datasources.default import FILE_TYPE_XAXIS
 from datasources.forms import TrackFileForm
 from datasources.models import Assembly, TrackFile
 from datasources.readBed import ReadBedOrBedGraphException
@@ -15,7 +16,14 @@ from tadeus_portal.utils import get_auth_cookie, set_owner_or_cookie, split_seq
 from tracks.models import Track
 
 from .ClassifyCNV import annotate_cnvs_ClassifyCNV
-from .defaults import BIOMART_GENES_FILE_ID, CLINGEN_FILE_ID, ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, PLI_SCORE_FILE_ID
+from .defaults import (
+    BIOMART_GENES_FILE_ID,
+    CLINGEN_FILE_ID,
+    ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
+    HIC_NA12787_FILE_ID,
+    HIC_NA12787_TADS_FILE_ID,
+    PLI_SCORE_FILE_ID,
+)
 from .forms import EvaluationAddEntryForm, EvaluationForm
 from .models import Evaluation
 from .statistics import get_TADeus_pvalue
@@ -65,8 +73,8 @@ def create_eval_atomic(request, form, p_type):
     eval.track_file = track_file
 
     tracks = (
-        (1, {}),
-        (10001, {"domains_file": TrackFile.objects.get(pk=10101)}),
+        (TrackFile.objects.get(assembly=Assembly.objects.get(name="hg38"), file_type=FILE_TYPE_XAXIS), {}),
+        (HIC_NA12787_FILE_ID, {"domains_file": TrackFile.objects.get(pk=HIC_NA12787_TADS_FILE_ID)}),
         (ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, {"style": "arcs", "name_filter": True}),
         (PLI_SCORE_FILE_ID, {"style": "tiles", "min_value": 0, "max_value": 1}),
     )
