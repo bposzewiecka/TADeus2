@@ -67,9 +67,8 @@ def create_eval_atomic(request, form, p_type):
     tracks = (
         (1, {}),
         (10001, {"domains_file": TrackFile.objects.get(pk=10101)}),
-        (ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, {"style": "arcs", "name_filter": True})(
-            PLI_SCORE_FILE_ID, {"style": "tiles", "min_value": 0, "max_value": 1}
-        ),
+        (ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, {"style": "arcs", "name_filter": True}),
+        (PLI_SCORE_FILE_ID, {"style": "tiles", "min_value": 0, "max_value": 1}),
     )
 
     plot = Plot(assembly=assembly)
