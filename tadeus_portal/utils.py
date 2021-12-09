@@ -7,7 +7,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils.html import format_html
 
-from .readBed import BedOrBedGraphReader, ReadBedOrBedGraphException
+from datasources.readBed import BedOrBedGraphReader, ReadBedOrBedGraphException
 
 
 def generateRandomString(n):

@@ -12,13 +12,15 @@ from datasources.views import get_file_handle, save_datasource
 from ontologies.models import Gene
 from plots.models import Plot
 from tadeus_portal.utils import get_auth_cookie, set_owner_or_cookie, split_seq
-from tracks.models import Track
+from tracks import Track
 
+from .ClassifyCNV import annotate_cnvs_ClassifyCNV
 from .defaults import BIOMART_GENES_FILE_ID, CLINGEN_FILE_ID, ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, PLI_SCORE_FILE_ID
 from .forms import EvaluationAddEntryForm, EvaluationForm
 from .models import Evaluation
 from .statistics import get_TADeus_pvalue
 from .tables import EvaluationEntryTable, EvaluationFilter, EvaluationTable
+from .TADA import annotate_cnvs_TADA
 
 
 def index(request):
@@ -63,8 +65,8 @@ def create_eval_atomic(request, form, p_type):
     eval.track_file = track_file
 
     tracks = (
-        # 1,
-        # 10001,
+        1,
+        10001,
         ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
         PLI_SCORE_FILE_ID,
     )
@@ -79,10 +81,11 @@ def create_eval_atomic(request, form, p_type):
 
     for j, track_id in enumerate(tracks):
 
-        if j == 0:
-            track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10)
-        if j == 1:
-            track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, domains_file=TrackFile.objects.get(pk=10101))
+        # if j == 0:
+        # track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10)
+        # if j == 1:
+        # track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, domains_file=TrackFile.objects.get(pk=10101))
+
         if j == 2:
             track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), name_filter=True, no=(j + 1) * 10, style="arcs")
         if j == 3:
@@ -123,7 +126,7 @@ def update(request, p_id):
 
     eval = Evaluation.objects.get(pk=p_id)
 
-    table = EvaluationEntryTable(eval.track_file.file_entries.all(), eval.plot.id)
+    table = EvaluationEntryTable(eval.track_file.evaluation_sventry_file_entries.all(), eval.plot.id)
 
     RequestConfig(request).configure(table)
 
@@ -182,12 +185,16 @@ def add_entry(request, p_id):
         form = EvaluationAddEntryForm(request.POST)
 
         if form.is_valid():
-            bed_file_entry = form.save(commit=False)
-            bed_file_entry.track_file = eval.track_file
+            sv_file_entry = form.save(commit=False)
+            sv_file_entry.track_file = eval.track_file
 
             # bed_file_entry.set_eval_pvalue()
-            bed_file_entry.save()
-            messages.success(request, f"Breakpoint '{bed_file_entry.name}' added to evaluation.")
+            sv_file_entry.save()
+
+            annotate_cnvs_TADA([sv_file_entry], p_id)
+            annotate_cnvs_ClassifyCNV([sv_file_entry], p_id)
+
+            messages.success(request, f"Breakpoint '{sv_file_entry.name}' added to evaluation.")
 
             return redirect("evaluation:update", p_id=eval.id)
 
@@ -200,7 +207,7 @@ def add_entry(request, p_id):
 
 
 def ranking(eval, p_chrom, p_interval_start, p_interval_end):
-
+    return []
     p_interval_start, p_interval_end = int(p_interval_start), int(p_interval_end)
 
     region_start = max(p_interval_start - 3 * 1000 * 1000, 0)

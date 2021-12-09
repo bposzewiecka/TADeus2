@@ -1,8 +1,6 @@
 from django import forms
 
-from datasources.models import BedFileEntry
-
-from .models import Evaluation
+from .models import Evaluation, SVEntry
 
 
 class EvaluationForm(forms.ModelForm):
@@ -18,8 +16,8 @@ class EvaluationForm(forms.ModelForm):
 
 class EvaluationAddEntryForm(forms.ModelForm):
     class Meta:
-        model = BedFileEntry
-        fields = ("name", "chrom", "start", "end")
+        model = SVEntry
+        fields = ("name", "sv_type", "chrom", "start", "end")
 
     def clean(self):
         cleaned_data = super().clean()

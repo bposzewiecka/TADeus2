@@ -70,7 +70,7 @@ class TrackFile(models.Model):
 
     bin_size = models.IntegerField(default=25)
 
-    def get_entries_db(self, chrom, start, end, name_filter=None):
+    def get_entries(self, chrom, start, end, name_filter=None):
 
         q = self.file_entries.filter(chrom=chrom)
 
@@ -198,7 +198,7 @@ class TrackFile(models.Model):
 
 class FileEntry(models.Model):
 
-    track_file = models.ForeignKey(TrackFile, on_delete=models.CASCADE, related_name="file_entries")
+    track_file = models.ForeignKey(TrackFile, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_file_entries")
 
     chrom = models.CharField(max_length=50)
     start = models.IntegerField()
@@ -246,17 +246,6 @@ class BedFileEntry(FileEntry):
 
     def get_adj_right(self, n=1000000):
         return self.end + n
-
-
-class FileEntryPropertyType(models.Model):
-    name = models.CharField(max_length=50)
-
-
-class FileEntryProperty(models.Model):
-
-    file_entry = models.ForeignKey(BedFileEntry, on_delete=models.CASCADE, related_name="properties")
-    file_entry_property_type = models.ForeignKey(FileEntryPropertyType, on_delete=models.CASCADE, related_name="properties")
-    value = models.CharField(max_length=50)
 
 
 class Subtrack(models.Model):

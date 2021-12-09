@@ -1,0 +1,25 @@
+Minimum ratio of bases that must remap:
+
+BED 4 to BED 6 Options
+Allow multiple output regions:
+  Minimum hit size in query:
+  Minimum chain size in target:
+
+BED 12 Options
+Min ratio of alignment blocks or exons that must map:
+If thickStart/thickEnd is not mapped, use the closest mapped base:
+
+ Paste in data below, one position per line. You can use the BED format (e.g. "chr4 100000 100001", 0-based) or the format of the position box ("chr4:100,001-100,001", 1-based). See the documentation.
+
+
+ Or upload data from a file (BED or chrN:start-end in plain text format):
+
+
+Results
+
+
+Successfully converted 1630672 records: View Conversions
+
+Conversion failed on 42286 records.    Display failure file    Explain failure messages
+
+Failed input regions:

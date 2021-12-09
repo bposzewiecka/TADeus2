@@ -58,7 +58,7 @@ class EvaluationEntryTable(tables.Table):
         end = int(record.end + add_space)
 
         link = reverse(
-            "browser",
+            "browser:browser",
             kwargs={
                 "p_id": self.multi_plot_id,
                 "p_chrom": record.chrom,
@@ -77,6 +77,7 @@ class EvaluationEntryTable(tables.Table):
         sequence = (
             "show_in_browser",
             "name",
+            "sv_type",
             "chrom",
             "start",
             "end",

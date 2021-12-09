@@ -1,0 +1,18 @@
+FILE_TYPE_BED = "BE"
+FILE_TYPE_BED_GRAPH = "BG"
+FILE_TYPE_HIC = "HI"
+FILE_TYPE_XAXIS = "XA"
+
+FILE_TYPES = (
+    (FILE_TYPE_BED, "Bed"),
+    (FILE_TYPE_BED_GRAPH, "BedGraph"),
+    (FILE_TYPE_HIC, "HiCMatrix"),
+    (FILE_TYPE_XAXIS, "XAxis"),
+)
+
+BED3 = "Bed3"
+BED6 = "Bed6"
+BED9 = "Bed9"
+BED12 = "Bed12"
+
+FILE_SUB_TYPES = ((BED3, BED3), (BED6, BED6), (BED9, BED9), (BED12, BED12))

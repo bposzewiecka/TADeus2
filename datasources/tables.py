@@ -20,7 +20,7 @@ class TrackFileTable(tables.Table):
         return getLink(link, DEFAULT_EDIT_ICON)
 
     def render_number_of_entries(self, record):
-        return TrackFile.objects.get(pk=record.id).file_entries.count()
+        return TrackFile.objects.get(pk=record.id).datasources_bedfileentry_file_entries.count()
 
     def render_source(self, record):
         if record.source_url is None:
