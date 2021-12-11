@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.db.models.functions import Lower
 from django.shortcuts import redirect, render
 
+from datasources.defaults import FILE_TYPE_BED, FILE_TYPE_HIC
 from datasources.models import TrackFile
 from plots.models import Plot
 from tadeus_portal.utils import is_object_readonly, only_public_or_user
@@ -22,7 +23,7 @@ def update(request, p_id):
             track = form.save()
             messages.success(request, "Track successfully saved.")
         else:
-            messages.success(request, "Track not saved.")
+            messages.error(request, "Track not saved.")
     else:
 
         form = TrackForm(instance=track)
@@ -31,8 +32,10 @@ def update(request, p_id):
     readonly = is_object_readonly(request, track.plot)
     chroms = track.plot.assembly.chromosomes.all()
 
-    if track.get_file_type() == "HI":
-        domains_files = TrackFile.objects.filter(file_type="BE").filter(only_public_or_user(request), Q(eval__isnull=True)).order_by("name", "id")
+    if track.get_file_type() == FILE_TYPE_HIC:
+        domains_files = (
+            TrackFile.objects.filter(file_type=FILE_TYPE_BED).filter(only_public_or_user(request), Q(eval__isnull=True)).order_by("name", "id")
+        )
 
     return render(
         request,
@@ -41,13 +44,9 @@ def update(request, p_id):
             "form": form,
             "p_id": p_id,
             "track": track,
-            "plot_id": track.plot.id,
             "file_type": track.get_file_type(),
             "file_sub_type": track.get_bed_sub_type(),
             "readonly": readonly,
-            "plot_br": track.plot.name,
-            "track_br": track.track_file.name,
-            "track_name": track.track_file.name,
             "style_choices": track.get_style_choices(),
             "domains_files": domains_files,
             "hic_display": track.hic_display,
@@ -65,7 +64,7 @@ def delete(request, p_id):
     track.delete()
 
     messages.success(request, "Track successfully deleted.")
-    return redirect("plots:edit", p_id=plot_id)
+    return redirect("plots:update", p_id=plot_id)
 
 
 def create(request, p_plot_id):
@@ -85,7 +84,7 @@ def create(request, p_plot_id):
             track.save()
 
             messages.success(request, "Track successfully created.")
-            return redirect("tracks:edit", p_id=track.id)
+            return redirect("tracks:update", p_id=track.id)
 
     else:
         form = CreateTrackForm(initial={"no": track_number})

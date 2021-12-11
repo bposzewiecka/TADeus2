@@ -6,7 +6,6 @@ from evaluation.utils import save_as_bed
 from tadeus_portal.settings import CLASSIFYCNV_SCRIPT, CLASSIFYCNV_TEMP_FILES_DIR
 
 from .defaults import DELETION, DUPLICATION
-from .models import SVProperty
 
 
 def get_cnv_scores(file_entries, output_directory, path_to_variants, path_to_results):
@@ -23,8 +22,11 @@ def get_cnv_scores(file_entries, output_directory, path_to_variants, path_to_res
 
         for file_entry, sv_data in zip(file_entries, svs_data):
 
-            p = SVProperty(file_entry=file_entry, value=sv_data["Classification"], file_entry_property_type_id=15)
-            p.save()
+            # p = SVProperty(file_entry=file_entry, value=sv_data["Classification"], file_entry_property_type_id=15)
+            # p.save()
+
+            file_entry.ClassifyCNV = sv_data["Classification"]
+            file_entry.save()
 
 
 def annotate_cnvs_ClassifyCNV(file_entries, evaluation_id):

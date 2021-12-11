@@ -20,6 +20,9 @@ class Evaluation(models.Model):
 class SVEntry(FileEntry):
     name = models.CharField(max_length=100, null=True)
     sv_type = models.IntegerField(choices=SV_TYPES)
+    TADA_score = models.FloatField(null=True)
+    ClassifyCNV = models.CharField(max_length=20, null=True)
+    TADeus_score = models.FloatField(null=True)
 
 
 class SVPropertyType(models.Model):

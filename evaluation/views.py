@@ -5,15 +5,15 @@ from django.db import transaction
 from django.shortcuts import redirect, render
 from django_tables2 import RequestConfig
 
-from datasources.default import FILE_TYPE_XAXIS
+from datasources.defaults import FILE_TYPE_XAXIS
 from datasources.forms import TrackFileForm
 from datasources.models import Assembly, TrackFile
 from datasources.readBed import ReadBedOrBedGraphException
-from datasources.views import get_file_handle, save_datasource
+from datasources.views import get_file_handle
 from ontologies.models import Gene
 from plots.models import Plot
 from tadeus_portal.utils import get_auth_cookie, set_owner_or_cookie, split_seq
-from tracks.models import Track
+from tracks.models import BED_DISPLAY_ARCS, BED_DISPLAY_TILES, HIC_DISPLAY_HIC, Track
 
 from .ClassifyCNV import annotate_cnvs_ClassifyCNV
 from .defaults import (
@@ -73,10 +73,16 @@ def create_eval_atomic(request, form, p_type):
     eval.track_file = track_file
 
     tracks = (
-        (TrackFile.objects.get(assembly=Assembly.objects.get(name="hg38"), file_type=FILE_TYPE_XAXIS), {}),
-        (HIC_NA12787_FILE_ID, {"domains_file": TrackFile.objects.get(pk=HIC_NA12787_TADS_FILE_ID)}),
-        (ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, {"style": "arcs", "name_filter": True}),
-        (PLI_SCORE_FILE_ID, {"style": "tiles", "min_value": 0, "max_value": 1}),
+        (TrackFile.objects.get(assembly=Assembly.objects.get(name="hg38"), file_type=FILE_TYPE_XAXIS).id, {"title": "XAxis"}),
+        (
+            HIC_NA12787_FILE_ID,
+            {"domains_file": TrackFile.objects.get(pk=HIC_NA12787_TADS_FILE_ID), "title": "HiC Track", "hic_display": HIC_DISPLAY_HIC},
+        ),
+        (
+            ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
+            {"bed_display": BED_DISPLAY_ARCS, "name_filter": True, "title": "Enhancers-promoters interactions"},
+        ),
+        (PLI_SCORE_FILE_ID, {"bed_display": BED_DISPLAY_TILES, "min_value": 0, "max_value": 1, "title": "Genes coloured by pLI score"}),
     )
 
     plot = Plot(assembly=assembly)
@@ -87,12 +93,12 @@ def create_eval_atomic(request, form, p_type):
     plot.name = "Plot for evaluation '" + form.cleaned_data["name"] + "'"
     plot.save()
 
-    for j, track_id, params in enumerate(tracks):
+    for j, (track_id, params) in enumerate(tracks):
         track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, **params)
         track.save()
 
     eval.plot = plot
-    save_datasource(track_file, file_handle, eval=True)
+    track_file.read_bed(file_handle)
     eval.save()
 
     return eval
@@ -124,7 +130,7 @@ def update(request, p_id):
 
     eval = Evaluation.objects.get(pk=p_id)
 
-    table = EvaluationEntryTable(eval.track_file.evaluation_sventry_file_entries.all(), eval.plot.id)
+    table = EvaluationEntryTable(eval.track_file.subtracks.all()[0].evaluation_sventry_file_entries.all(), eval.plot.id)
 
     RequestConfig(request).configure(table)
 
@@ -184,9 +190,8 @@ def add_entry(request, p_id):
 
         if form.is_valid():
             sv_file_entry = form.save(commit=False)
-            sv_file_entry.track_file = eval.track_file
+            sv_file_entry.subtrack = eval.track_file.subtracks.all()[0]
 
-            # bed_file_entry.set_eval_pvalue()
             sv_file_entry.save()
 
             annotate_cnvs_TADA([sv_file_entry], p_id)

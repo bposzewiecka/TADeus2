@@ -46,6 +46,9 @@ class EvaluationEntryTable(tables.Table):
     length = tables.Column(empty_values=(), orderable=False)
     start = tables.Column(accessor="start")
     end = tables.Column(accessor="end")
+    TADA_score = tables.Column(accessor="TADA_score")
+    TADeus_score = tables.Column(accessor="TADeus_score")
+    ClassifyCNV = tables.Column(accessor="ClassifyCNV")
 
     def render_length(self, record):
         return f"{record.end - record.start:,}"
@@ -81,8 +84,10 @@ class EvaluationEntryTable(tables.Table):
             "chrom",
             "start",
             "end",
+            "TADA_score",
+            "ClassifyCNV",
+            "TADeus_score",
             "length",
-            "score",
         )
         fields = sequence
         localize = (

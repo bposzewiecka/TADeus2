@@ -70,3 +70,10 @@ class hiCMatrix:
 
     def get_chromosome_size(self, chrom_name):
         return self.cooler_file.chromsizes[chrom_name]
+
+
+def get_cooler_bin_sizes(mcooler_fn):
+
+    coolers = cooler.fileops.list_coolers(mcooler_fn)
+
+    return [int(cooler.split("/")[-1]) for cooler in coolers]

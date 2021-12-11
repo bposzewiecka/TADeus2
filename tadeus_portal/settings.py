@@ -23,15 +23,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = "q%-ye4$fd@mqk^h-=&g(5aw4*ndye-x&o%&h28j(5!qdf3s@13"
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 TADA_TEMP_FILES_DIR = os.path.join(BASE_DIR, "data", "TADA")
 CLASSIFYCNV_TEMP_FILES_DIR = os.path.join(BASE_DIR, "data", "ClassifyCNV")
 CLASSIFYCNV_SCRIPT = os.path.join(BASE_DIR, "scripts", "ClassifyCNV", "ClassifyCNV.py")
+
+# TADEUS_DATA_DIR = os.path.join(BASE_DIR, "data")
+TADEUS_DATA_DIR = os.path.join(BASE_DIR)
 
 # Application definition
 

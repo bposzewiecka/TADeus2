@@ -14,10 +14,23 @@ import numpy as np
 from intervaltree import Interval, IntervalTree
 from matplotlib.patches import Rectangle
 
-import tracks.HiCMatrix as HiCMatrix
 from datasources.defaults import BED12, FILE_TYPE_HIC
 from plots.models import Plot
-from tracks.defaults import DEFAULT_WIDTH_PROP
+
+from .defaults import (
+    BEDGRAPH_DISPLAY_STACKED,
+    BEDGRAPH_DISPLAY_TRANSPARENT,
+    BEDGRAPH_STYLE_AREA,
+    BEDGRAPH_STYLE_AREA_WITH_BORDER,
+    BEDGRAPH_STYLE_LINE,
+    BEDGRAPH_STYLE_LINE_WITH_BORDER,
+    BEDGRAPH_TYPE_LINECHART,
+    DEFAULT_WIDTH_PROP,
+    TRANSFORM_LOG,
+    TRANSFORM_LOG1P,
+    TRANSFORM_MINUS_LOG,
+)
+from .HiCMatrix import get_cooler_bin_sizes, hiCMatrix
 
 matplotlib.use("Agg")
 
@@ -39,7 +52,7 @@ DEFAULT_VIRTUAL4C_HEIGHT = 2
 DEFAULT_TRACK_HEIGHT = 4  # in centimeters
 DEFAULT_FIGURE_WIDTH = 35  # in centimeters
 # proportion of width dedicated to (figure, legends)
-DEFAULT_WIDTH_RATIOS = (0.82, 0.18)
+DEFAULT_WIDTH_RATIOS = (0.99, 0.01)
 
 DEFAULT_MARGINS = {"left": 0, "right": 1, "bottom": 0, "top": 1}
 
@@ -311,7 +324,7 @@ class PlotBed(TrackPlot):
         elif self.bed_style == "interlaced":
             return 5 * DEFAULT_BED_ENTRY_HEIGHT
         else:
-            return 3 * DEFAULT_BED_ENTRY_HEIGHT
+            return 1.5 * DEFAULT_BED_ENTRY_HEIGHT * self.max_num_row
 
     def get_y_pos(self, free_row):
 
@@ -756,13 +769,13 @@ class PlotBedGraph(TrackPlot):
 
         self.entries_list = self.model.get_entries(chrom, start, end)
 
-        if self.bedgraph_display == self.model.BEDGRAPH_DISPLAY_STACKED:
+        if self.bedgraph_display == BEDGRAPH_DISPLAY_STACKED:
             self.stack_entries()
 
         interpolate = True
         alpha = 1
 
-        if self.bedgraph_display == self.model.BEDGRAPH_DISPLAY_TRANSPARENT:
+        if self.bedgraph_display == BEDGRAPH_DISPLAY_TRANSPARENT:
             interpolate = False
             alpha = 0.4
 
@@ -777,7 +790,7 @@ class PlotBedGraph(TrackPlot):
             for entry in entries:
                 if entry.score is not None:
 
-                    if self.bedgraph_type == self.model.BEDGRAPH_TYPE_LINECHART:
+                    if self.bedgraph_type == BEDGRAPH_TYPE_LINECHART:
                         score_list.append(entry.score)
                         pos_list.append(entry.start + (entry.end - entry.start) / 2)
                     else:
@@ -793,19 +806,19 @@ class PlotBedGraph(TrackPlot):
             color = subtrack.rgb
             edgecolor = self.edgecolor
 
-            if DEFAULT_BEDGRAPH_WITH_BORDERS_STYLE_MAX_NUMBER_OF_ENTRIES < len(entries) and self.model.BEDGRAPH_STYLE_LINE_WITH_BORDER:
-                self.bedgraph_style = self.model.BEDGRAPH_STYLE_LINE
+            if DEFAULT_BEDGRAPH_WITH_BORDERS_STYLE_MAX_NUMBER_OF_ENTRIES < len(entries) and BEDGRAPH_STYLE_LINE_WITH_BORDER:
+                self.bedgraph_style = BEDGRAPH_STYLE_LINE
 
-            if DEFAULT_BEDGRAPH_WITH_BORDERS_STYLE_MAX_NUMBER_OF_ENTRIES < len(entries) and self.model.BEDGRAPH_STYLE_AREA_WITH_BORDER:
-                self.bedgraph_style = self.model.BEDGRAPH_STYLE_AREA
+            if DEFAULT_BEDGRAPH_WITH_BORDERS_STYLE_MAX_NUMBER_OF_ENTRIES < len(entries) and BEDGRAPH_STYLE_AREA_WITH_BORDER:
+                self.bedgraph_style = BEDGRAPH_STYLE_AREA
 
-            if self.bedgraph_style in (self.model.BEDGRAPH_STYLE_LINE, self.model.BEDGRAPH_STYLE_LINE_WITH_BORDER):
+            if self.bedgraph_style in (BEDGRAPH_STYLE_LINE, BEDGRAPH_STYLE_LINE_WITH_BORDER):
                 self.axis.plot(pos_list, score_list, "-", color=color, linewidth=0.7)
-            if self.bedgraph_style == self.model.BEDGRAPH_STYLE_LINE_WITH_BORDER:
+            if self.bedgraph_style == BEDGRAPH_STYLE_LINE_WITH_BORDER:
                 self.axis.vlines(pos_list, [0], score_list, color=color, linewidth=0.5)
-            if self.bedgraph_style in (self.model.BEDGRAPH_STYLE_AREA, self.model.BEDGRAPH_STYLE_AREA_WITH_BORDER):
+            if self.bedgraph_style in (BEDGRAPH_STYLE_AREA, BEDGRAPH_STYLE_AREA_WITH_BORDER):
                 self.axis.fill_between(pos_list, score_list, interpolate=interpolate, alpha=alpha, facecolor=color, edgecolor="none")
-            if self.bedgraph_style == self.model.BEDGRAPH_STYLE_AREA_WITH_BORDER:
+            if self.bedgraph_style == BEDGRAPH_STYLE_AREA_WITH_BORDER:
                 self.axis.vlines(pos_list, [0], score_list, color=edgecolor, linewidth=0.5)
                 self.axis.plot(pos_list, score_list, "-", color=edgecolor, linewidth=0.7)
 
@@ -960,105 +973,9 @@ class PlotHiCMatrix(TrackPlot):
     def get_height(self):
         return self.height if self.height is not None else DEFAULT_HICMATRIX_HEIGHT
 
-    """
-    def draw(self, chrom, start, end, width):
-
-        self.chrom_size = self.track_file.assembly.chromosomes.get(name=chrom).size
-
-        plot_width = width * DEFAULT_WIDTH_RATIOS[0]
-        region_len = end - start
-        bp_in_cm = region_len // plot_width
-
-        stat = [(abs(15 - bp_in_cm / bin_size / 1000), bin_size) for bin_size in self.bin_sizes]
-        stat.sort(key=lambda x: x[0])
-
-        self.resolution = 10  # stat[0][1]
-        self.bin_size = self.resolution * 1000
-
-        self.hic_ma = HiCMatrix.hiCMatrix(
-            settings.PROJECT_DATA_ROOT.format(resolution=self.resolution) + "/" + self.file_path.format(resolution=self.resolution)
-        )
-
-        depth = self.height / width * region_len / 0.51
-
-        depth_in_bins = int(region_len / self.bin_size)
-
-        matrix_start = max(start - depth, 0)
-        matrix_end = min(end + depth, self.chrom_size - self.bin_size)
-
-        matrix = self.hic_ma.get_sub_matrix(chrom, matrix_start, matrix_end)
-        start_pos = self.hic_ma.get_start_pos(chrom, matrix_start, matrix_end + self.bin_size)
-
-        if self.transform:
-            if self.transform == "log1p":
-                matrix += 1
-                self.norm = matplotlib.colors.LogNorm()
-
-            elif self.transform == "-log":
-                mask = matrix == 0
-                matrix[mask] = matrix[mask is False].min()
-                matrix = -1 * np.log(matrix)
-
-            elif self.transform == "log":
-                mask = matrix == 0
-                matrix[mask] = matrix[mask is False].min()
-                matrix = np.log(matrix)
-
-        if not self.max_value is None:
-            vmax = self.max_value
-            # print("vmax:", vmax)
-        else:
-            # try to use a 'aesthetically pleasant' max value
-            vmax = np.nanpercentile(matrix.diagonal(1), 80)  # nanpercentile
-
-        if not self.min_value is None:
-            vmin = self.min_value
-            # print("vmin", vmin)
-        else:
-            # if the region length is large with respect to the chromosome length, the diagonal may have
-            # very few values or none. Thus, the following lines reduce the number of bins until the
-            # diagonal is at least length 5
-            distant_diagonal_values = [1]
-            num_bins_from_diagonal = depth_in_bins
-
-            for num_bins in reversed(range(num_bins_from_diagonal)):
-                distant_diagonal_values = matrix.diagonal(num_bins)
-                if len(distant_diagonal_values) > 5:
-                    break
-
-            vmin = np.nanmedian(distant_diagonal_values)
-
-        # img = self.pcolormesh_45deg(matrix, start_pos, vmax=vmax, vmin= vmin)
-
-        img = self.pcolormesh_45deg(matrix, start_pos, vmax=vmax, vmin=vmin)
-        img.set_rasterized(True)
-
-        if self.inverted:
-            self.axis.set_ylim(depth, 0)
-        else:
-            self.axis.set_ylim(0, depth)
-
-        if self.domains_file:
-            from tadeus.models import Track
-
-            track = Track(track_file=self.domains_file)
-            track.color = "FF0000"
-            trackPlot = PlotDomains(model=track)
-            trackPlot.axis = self.axis
-            trackPlot.label_axis = None
-            trackPlot.draw(chrom, start, end, width)
-
-        self.axis.set_xlim(start, end)
-
-        self.draw_colorbar(img=img)
-    """
-
     def bin_adjust(self, n, bin_size):
 
         return n // bin_size * bin_size
-
-    ##########################################################################################################
-    ##########################################################################################################
 
     def get_chromosome_size(self, chrom_name):
         return self.hic_ma.get_chromosome_size(chrom_name)
@@ -1194,48 +1111,95 @@ class PlotHiCMatrix(TrackPlot):
 
         return matrix, start_matrix
 
+    def get_transformed_matrix(self, matrix):
+
+        if self.transform:
+            if self.transform == TRANSFORM_LOG1P:
+
+                matrix += 1
+                self.norm = matplotlib.colors.LogNorm()
+
+            elif self.transform == TRANSFORM_MINUS_LOG:
+
+                mask = matrix == 0
+                matrix[mask] = matrix[mask is False].min()
+                matrix = -1 * np.log(matrix)
+
+            elif self.transform == TRANSFORM_LOG:
+
+                mask = matrix == 0
+                matrix[mask] = matrix[mask is False].min()
+                matrix = np.log(matrix)
+        return matrix
+
+    def add_domains(self, chrom, start, end, width):
+
+        if self.domains_file:
+            from tracks.models import Track
+
+            track = Track(track_file=self.domains_file)
+            track.color = "FF0000"
+            trackPlot = PlotDomains(model=track)
+            trackPlot.axis = self.axis
+            trackPlot.label_axis = None
+            trackPlot.draw(chrom, start, end, width)
+
+    def get_bin_size(self, start, end, width, file_path):
+
+        bin_sizes = get_cooler_bin_sizes(file_path)
+
+        size = end - start
+
+        bin_sizes.sort(key=lambda x: abs(size / x - 10 * width))
+
+        return bin_sizes[0]
+
     def draw(self, chrom, start, end, width):
 
-        self.resolution = 1
+        file_path = self.track_file.get_file_paths()[0]
 
-        self.hic_ma = HiCMatrix.hiCMatrix("/home/basia/CNVBrowser/tadeus2/4DNFI18UHVRO.mcool::resolutions/50000")
+        bin_size = self.get_bin_size(start, end, width, file_path)
 
-        bin_size = 50 * 1000
-        depth = 2000 * 1000
+        depth = int((end - start) * self.height / width)
+
+        self.hic_ma = hiCMatrix(f"{file_path}::resolutions/{bin_size}")
 
         adj_depth = self.bin_adjust(depth, bin_size)
 
         if self.visualize_breakpoint:
-
             matrix, start_matrix = self.get_breakpoint_matrix(bin_size, adj_depth)
             no_bins = np.shape(matrix)[0]
-
         else:
 
             adj_start = self.bin_adjust(start, bin_size)
             adj_end = self.bin_adjust(end, bin_size)
             adj_size = adj_end - adj_start
-
+            adj_depth = self.bin_adjust(depth, bin_size)
             no_bins = int((adj_size + 2 * adj_depth) // bin_size)
+
             start_matrix = adj_start - adj_depth
             end_matrix = adj_start + adj_depth + adj_size
 
-            matrix = self.get_sub_matrix(chrom, start_matrix, end_matrix, bin_size)
+            matrix = self.get_sub_matrix(bin_size, chrom, start_matrix, end_matrix)
+
+        matrix = self.get_transformed_matrix(matrix)
 
         start_pos = list(range(start_matrix, start_matrix + bin_size * (no_bins + 1), bin_size))
 
-        matrix += 1
-        self.norm = matplotlib.colors.LogNorm()
+        img = self.pcolormesh_45deg(matrix, start_pos, vmax=None, vmin=None)
 
-        img = self.pcolormesh_45deg(matrix, start_pos, vmax=50, vmin=1)
         img.set_rasterized(True)
 
-        # print(start, end)
         self.axis.set_xlim(start, end)
-        # self.axis.set_xlim(start_pos[0], start_pos[-1])
-        self.axis.set_ylim(-adj_depth, adj_depth)
+
+        if self.inverted:
+            self.axis.set_ylim(2 * adj_depth, 0)
+        else:
+            self.axis.set_ylim(0, 2 * adj_depth)
 
         self.draw_colorbar(img=img)
+
+        self.add_domains(chrom, start, end, width)
 
     def pcolormesh_45deg(self, matrix_c, start_pos_vector, vmin=None, vmax=None):
         """
@@ -1256,11 +1220,6 @@ class PlotHiCMatrix(TrackPlot):
         x = matrix_a[:, 1].reshape(n + 1, n + 1)
         y = matrix_a[:, 0].reshape(n + 1, n + 1)
 
-        # print(x)
-        # print(y)
-
-        # plot
-
         im = self.axis.pcolormesh(x, y, np.flipud(matrix_c), vmin=vmin, vmax=vmax, cmap=self.cmap, norm=self.norm)
         return im
 
@@ -1268,7 +1227,7 @@ class PlotHiCMatrix(TrackPlot):
 class PlotVirtual4C(TrackPlot):
     def __init__(self, *args, **kwarg):
         super().__init__(*args, **kwarg)
-        self.hic_ma = HiCMatrix.hiCMatrix("/home/basia/CNVBrowser/tadeus/4DNFIQI8SFNE.mcool::resolutions/50000")
+        self.hic_ma = hiCMatrix("/home/basia/CNVBrowser/tadeus/4DNFIQI8SFNE.mcool::resolutions/50000")
         self.bin_size = 50 * 1000
 
     def aggregate_and_transform(self, columns):

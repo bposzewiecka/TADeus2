@@ -2,21 +2,27 @@ from django.contrib.auth.models import User
 from django.db import transaction
 
 from datasources.models import Assembly, TrackFile
-from evaluation.defaults import CLINGEN_FILE_ID, DECIPHER_HAPLOINSUFFICENCY_FILE_ID, ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID, PLI_SCORE_FILE_ID
+from evaluation.defaults import (
+    CLINGEN_FILE_ID,
+    DECIPHER_HAPLOINSUFFICENCY_FILE_ID,
+    ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
+    HIC_NA12787_FILE_ID,
+    HIC_NA12787_TADS_FILE_ID,
+    PLI_SCORE_FILE_ID,
+)
 from evaluation.models import SVPropertyType
 
-hg19 = Assembly.objects.get(name="hg19")
+hg38 = Assembly.objects.get(name="hg38")
 admin = User.objects.get(username="admin")
 
 
 def save_xaxis():
 
-    xa = TrackFile(id=1, assembly=hg19, name="XAxis", source_name="XAxis", file_type="XA", bed_sub_type=None, owner=admin, public=True, approved=True)
+    xa = TrackFile(id=1, assembly=hg38, name="XAxis", source_name="XAxis", file_type="XA", bed_sub_type=None, owner=admin, public=True, approved=True)
 
     xa.save()
 
 
-@transaction.atomic
 def save_genes():
 
     """
@@ -57,7 +63,7 @@ def save_genes():
 
     haploinsufficient_genes = TrackFile(
         id=DECIPHER_HAPLOINSUFFICENCY_FILE_ID,
-        assembly=hg19,
+        assembly=hg38,
         name="DECIPHER Haploinsufficiency Predictions Version 3",
         source_name="DECIPHER project",
         source_url="https://decipher.sanger.ac.uk/about#downloads/data",
@@ -69,11 +75,11 @@ def save_genes():
     )
 
     haploinsufficient_genes.save()
-    haploinsufficient_genes.add_subtrack("data/hg38/genes/HI_Predictions_Version3.bed6")
+    haploinsufficient_genes.add_subtrack("data/hg19/genes/HI_Predictions_Version3.bed6")
 
     pli_genes = TrackFile(
         id=PLI_SCORE_FILE_ID,
-        assembly=hg19,
+        assembly=hg38,
         name="pLI score",
         source_name="http://exac.broadinstitute.org/",
         source_url="ftp://ftp.broadinstitute.org/pub/ExAC_release/release1/manuscript_data/",
@@ -89,7 +95,7 @@ def save_genes():
 
     clingen_genes = TrackFile(
         id=CLINGEN_FILE_ID,
-        assembly=hg19,
+        assembly=hg38,
         name="ClinGen Haploinsufficency Genes",
         source_name="ClinGen Dosage Sensitivity Map",
         source_url="https://ftp.clinicalgenome.org/ClinGen_haploinsufficiency_gene_GRCh38.bed",
@@ -104,12 +110,11 @@ def save_genes():
     clingen_genes.add_subtrack("data/hg38/genes/ClinGen_haploinsufficiency_gene_GRCh38.bed6")
 
 
-@transaction.atomic
 def save_enh_prom():
 
     refseq_genes = TrackFile(
         id=ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
-        assembly=hg19,
+        assembly=hg38,
         name="ENCODE distal DHS/enhancer-promoter connections",
         source_name="The accessible chromatin landscape of the human genome",
         source_url="",
@@ -121,27 +126,41 @@ def save_enh_prom():
     )
 
     refseq_genes.save()
-    refseq_genes.add_subtrack("data/hg19/enhancers/hi_score_enh_promoter.bed")
+    refseq_genes.add_subtrack("data/hg38/enhancers/hi_score_enh_promoter.bed")
 
 
-@transaction.atomic
 def save_hic():
 
-    pass
-    # hi = TrackFile(
-    #    id=no + 1,
-    #    assembly=hg19,
-    #    name=name.format(tissue=tissue),
-    #    source_name=source_name.format(tissue=tissue, resolution="{resolution}"),
-    #    source_url=source_url,
-    #    reference=reference,
-    #    file_type="HI",
-    #    file_sub_type=None,
-    #    owner=admin,
-    #    public=True,
-    #    approved=True,
-    #    file_path=file_path.format(tissue=tissue, resolution="{resolution}"),
-    # )
+    hi = TrackFile(
+        id=HIC_NA12787_FILE_ID,
+        assembly=hg38,
+        name="In situ Hi-C on gm12878 with MboI and bio-dCTP (Tethered HiC)",
+        source_name="Rao SS et al. (2014) PMID:25497547",
+        source_url="https://data.4dnucleome.org/files-processed/4DNFITRVKRPA/",
+        file_type="HI",
+        owner=admin,
+        public=True,
+        approved=True,
+    )
+
+    hi.save()
+    hi.add_subtrack("data/hg38/HIC/NA12878/4DNFITRVKRPA.cool")
+
+    tads = TrackFile(
+        id=HIC_NA12787_TADS_FILE_ID,
+        assembly=hg38,
+        name="In situ Hi-C on gm12878 with MboI and bio-dCTP (Tethered HiC) - Boundaries calls on Hi-C contact matrices",
+        source_name="Rao SS et al. (2014) PMID:25497547",
+        source_url="https://data.4dnucleome.org/files-processed/4DNFITRVKRPA/",
+        file_type="BED",
+        bed_sub_type="BED3",
+        owner=admin,
+        public=True,
+        approved=True,
+    )
+
+    tads.save()
+    tads.add_subtrack("data/hg38/HIC/NA12878/4DNFIVAZEUBG.bed")
 
 
 TADA_NUMBER_OF_AFFECTED_GENES_ID = 1
@@ -206,8 +225,14 @@ def add_file_entry_property_types():
 
 globals().update(locals())
 
-# save_xaxis()
-# save_genes()
-add_file_entry_property_types()
-# save_enh_prom()
-# ave_hic()
+
+@transaction.atomic
+def save_data():
+    save_xaxis()
+    # save_genes()
+    # save_enh_prom()
+    # save_hic()
+    add_file_entry_property_types()
+
+
+save_data()

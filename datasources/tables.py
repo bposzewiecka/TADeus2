@@ -19,9 +19,6 @@ class TrackFileTable(tables.Table):
         link = reverse("datasources:update", kwargs={"p_id": record.id})
         return getLink(link, DEFAULT_EDIT_ICON)
 
-    def render_number_of_entries(self, record):
-        return TrackFile.objects.get(pk=record.id).datasources_bedfileentry_file_entries.count()
-
     def render_source(self, record):
         if record.source_url is None:
             return record.source_name if record.source_name else ""
@@ -31,7 +28,7 @@ class TrackFileTable(tables.Table):
     class Meta:
         model = TrackFile
         template_name = "django_tables2/bootstrap.html"
-        sequence = ("id", "organism", "assembly", "file_type", "name", "source", "reference", "number_of_entries", "owner", "public")
+        sequence = ("id", "organism", "assembly", "file_type", "name", "source", "reference", "owner", "public")
         fields = sequence
 
 

@@ -9,18 +9,18 @@ class ReadBedOrBedGraphException(Exception):
 
 
 class BedOrBedGraphReader:
-    def __init__(self, file_handle, track_file):
+    def __init__(self, file_handle, subtrack):
 
-        self.track_file = track_file
-        self.file_sub_type = None
+        self.subtrack = subtrack
+        self.bed_sub_type = None
         self.file_handle = file_handle
         self.line_number = 0
         # guess file type
         fields = self.get_no_comment_line().split("\t")
 
-        self.guess_file_sub_type(fields)
+        self.guess_bed_sub_type(fields)
 
-        if not self.file_sub_type:
+        if not self.bed_sub_type:
             raise ReadBedOrBedGraphException("Cannot guess file type. Data should be in BED or BEDGraph format.")
 
         self.file_handle.seek(0)
@@ -52,34 +52,34 @@ class BedOrBedGraphReader:
 
         return line
 
-    def guess_file_sub_type(self, line_values):
+    def guess_bed_sub_type(self, line_values):
         if len(line_values) == 3:
-            self.file_sub_type = "Bed3"
+            self.bed_sub_type = "Bed3"
         if len(line_values) == 4:
-            self.file_sub_type = "BedGraph"
+            self.bed_sub_type = "BedGraph"
         if len(line_values) == 6:
-            self.file_sub_type = "Bed6"
+            self.bed_sub_type = "Bed6"
         if len(line_values) == 9:
-            self.file_sub_type = "Bed9"
+            self.bed_sub_type = "Bed9"
         if len(line_values) == 12:
-            self.file_sub_type = "Bed12"
+            self.bed_sub_type = "Bed12"
 
-        if self.file_sub_type == "BedGraph":
-            self.track_file.file_type = "BG"
+        if self.bed_sub_type == "BedGraph":
+            self.subtrack.track_file.file_type = "BG"
         else:
-            self.track_file.file_type = "BE"
-            self.track_file.file_sub_type = self.file_sub_type
+            self.subtrack.track_file.file_type = "BE"
+            self.subtrack.track_file.bed_sub_type = self.bed_sub_type
 
     def num_of_fields(self):
-        if self.file_sub_type == "Bed3":
+        if self.bed_sub_type == "Bed3":
             return 3
-        if self.file_sub_type == "BedGraph":
+        if self.bed_sub_type == "BedGraph":
             return 4
-        if self.file_sub_type == "Bed6":
+        if self.bed_sub_type == "Bed6":
             return 6
-        if self.file_sub_type == "Bed9":
+        if self.bed_sub_type == "Bed9":
             return 9
-        if self.file_sub_type == "Bed12":
+        if self.bed_sub_type == "Bed12":
             return 12
 
     def __next__(self):
@@ -98,7 +98,7 @@ class BedOrBedGraphReader:
         self.line_number += 1
 
         if len(line_data) != self.num_of_fields():
-            error_text = "Detected file type is {} but line does " "not have {} fields".format(self.file_sub_type, self.num_of_fields())
+            error_text = "Detected file type is {} but line does " "not have {} fields".format(self.bed_sub_type, self.num_of_fields())
             raise ReadBedOrBedGraphException(error_text, self.line_number)
 
         line_values = []
@@ -185,26 +185,26 @@ class BedOrBedGraphReader:
 
         name = score = strand = thick_start = thick_end = itemRGB = block_count = block_sizes = block_starts = None
 
-        if self.file_sub_type in ("BedGraph"):
+        if self.bed_sub_type in ("BedGraph"):
             score = line_values[3]
 
-        if self.file_sub_type in ("Bed6", "Bed9", "Bed12"):
+        if self.bed_sub_type in ("Bed6", "Bed9", "Bed12"):
             name = line_values[3]
             score = line_values[4]
             strand = line_values[5]
 
-        if self.file_sub_type in ("Bed9", "Bed12"):
+        if self.bed_sub_type in ("Bed9", "Bed12"):
             thick_start = line_values[6]
             thick_end = line_values[7]
             itemRGB = line_values[8]
 
-        if self.file_sub_type in ("Bed12"):
+        if self.bed_sub_type in ("Bed12"):
             block_count = line_values[9]
             block_sizes = line_values[10]
             block_starts = line_values[11]
 
         return BedFileEntry(
-            track_file=self.track_file,
+            subtrack=self.subtrack,
             chrom=chrom,
             start=start,
             end=end,

@@ -1,7 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 
 import bbi
-import matplotlib.pyplot as plt
 import numpy as np
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -11,98 +10,39 @@ from django.dispatch import receiver
 from datasources.defaults import BED12, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPE_XAXIS
 from datasources.models import BedFileEntry, Chromosome, FileEntry, Subtrack, TrackFile
 from plots.models import Plot
-from tracks.defaults import DEFAULT_PLOT_COLOR, DEFAULT_PLOT_COLOR_MAP_OPTIONS, DEFAULT_PLOT_EDGE_COLOR, DEFAULT_WIDTH_PROP
 from tracks.trackPlot import PlotArcs, PlotBed, PlotBedGraph, PlotDomains, PlotHiCMatrix, PlotVirtual4C, PlotXAxis
 
-TRANSFORM_NONE = 0
-TRANSFORM_LOG1P = 1
-TRANSFORM_LOG = 2
-TRANSFORM_MINUS_LOG = 3
-
-TRANSFORM_OPTIONS = (
-    (TRANSFORM_NONE, "none"),
-    (TRANSFORM_LOG1P, "log1p"),
-    (TRANSFORM_LOG, "log"),
-    (TRANSFORM_MINUS_LOG, "-log"),
+from .defaults import (
+    AGGREGATE_FUNCTION_AVG,
+    AGGREGATE_FUNCTION_MAX,
+    AGGREGATE_FUNCTION_MIN,
+    AGGREGATE_FUNCTIONS_OPTIONS,
+    BED_DISPLAY_ARCS,
+    BED_DISPLAY_DOMAINS,
+    BED_DISPLAY_FLYBASE,
+    BED_DISPLAY_OPTIONS,
+    BED_DISPLAY_TILES,
+    BED_DISPLAY_VERTICAL_LINES,
+    BED_DISPLAY_WITH_INTORNS,
+    BED_STYLE_OPTIONS,
+    BED_STYLE_STACKED,
+    BEDGRAPH_DISPLAY_OPTIONS,
+    BEDGRAPH_DISPLAY_TRANSPARENT,
+    BEDGRAPH_STYLE_AREA,
+    BEDGRAPH_STYLE_OPTIONS,
+    BEDGRAPH_TYPE_LINECHART,
+    BEDGRAPH_TYPE_OPTIONS,
+    COLOR_MAP_OPTIONS,
+    DEFAULT_PLOT_COLOR,
+    DEFAULT_PLOT_COLOR_MAP_OPTIONS,
+    DEFAULT_PLOT_EDGE_COLOR,
+    DEFAULT_WIDTH_PROP,
+    HIC_DISPLAY_HIC,
+    HIC_DISPLAY_OPTIONS,
+    HIC_DISPLAY_VIRTUAL4C,
+    TRANSFORM_NONE,
+    TRANSFORM_OPTIONS,
 )
-
-BED_DISPLAY_TILES = 1
-BED_DISPLAY_WITH_INTORNS = 2
-BED_DISPLAY_FLYBASE = 3
-BED_DISPLAY_DOMAINS = 4
-BED_DISPLAY_ARCS = 5
-BED_DISPLAY_VERTICAL_LINES = 6
-
-BED_DISPLAY_OPTIONS = (
-    (BED_DISPLAY_TILES, "Tiles"),
-    (BED_DISPLAY_WITH_INTORNS, "With introns"),
-    (BED_DISPLAY_FLYBASE, "Flybase"),
-    (BED_DISPLAY_DOMAINS, "Domains"),
-    (BED_DISPLAY_ARCS, "Arcs"),
-    (BED_DISPLAY_VERTICAL_LINES, "Vertical lines"),
-)
-
-BED_STYLE_STACKED = 1
-BED_STYLE_COLLAPSED = 2
-BED_STYLE_INTERLACED = 3
-
-BED_STYLE_OPTIONS = (
-    (BED_STYLE_STACKED, "Stacked"),
-    (BED_STYLE_COLLAPSED, "Collapsed"),
-    (BED_STYLE_INTERLACED, "Interlaced"),
-)
-
-AGGREGATE_FUNCTION_AVG = "mean"
-AGGREGATE_FUNCTION_SUM = "sum"
-AGGREGATE_FUNCTION_MIN = "min"
-AGGREGATE_FUNCTION_MAX = "max"
-
-AGGREGATE_FUNCTIONS_OPTIONS = (
-    (AGGREGATE_FUNCTION_AVG, "mean"),
-    (AGGREGATE_FUNCTION_SUM, "sum"),
-    (AGGREGATE_FUNCTION_MIN, "min"),
-    (AGGREGATE_FUNCTION_MAX, "max"),
-)
-
-HIC_DISPLAY_HIC = 0
-HIC_DISPLAY_VIRTUAL4C = 1
-
-HIC_DISPLAY_OPTIONS = (
-    (HIC_DISPLAY_HIC, "HIC"),
-    (HIC_DISPLAY_VIRTUAL4C, "Virtual 4C"),
-)
-
-
-BEDGRAPH_DISPLAY_NONE = 0
-BEDGRAPH_DISPLAY_TRANSPARENT = 1
-BEDGRAPH_DISPLAY_SOLID = 2
-BEDGRAPH_DISPLAY_STACKED = 3
-
-BEDGRAPH_DISPLAY_OPTIONS = (
-    (BEDGRAPH_DISPLAY_TRANSPARENT, "Transparent"),
-    (BEDGRAPH_DISPLAY_SOLID, "Solid"),
-    (BEDGRAPH_DISPLAY_STACKED, "Stacked"),
-)
-
-
-BEDGRAPH_TYPE_HISTOGRAM = 0
-BEDGRAPH_TYPE_LINECHART = 1
-
-BEDGRAPH_TYPE_OPTIONS = ((BEDGRAPH_TYPE_HISTOGRAM, "Histogram"), (BEDGRAPH_TYPE_LINECHART, "Linechart"))
-
-BEDGRAPH_STYLE_LINE = 0
-BEDGRAPH_STYLE_LINE_WITH_BORDER = 1
-BEDGRAPH_STYLE_AREA = 2
-BEDGRAPH_STYLE_AREA_WITH_BORDER = 3
-
-BEDGRAPH_STYLE_OPTIONS = (
-    (BEDGRAPH_STYLE_LINE, "Line"),
-    (BEDGRAPH_STYLE_LINE_WITH_BORDER, "Line with border"),
-    (BEDGRAPH_STYLE_AREA, "Area"),
-    (BEDGRAPH_STYLE_AREA_WITH_BORDER, "Area with border"),
-)
-
-COLOR_MAP_OPTIONS = [(color_map, color_map) for color_map in plt.colormaps()]
 
 
 class Track(models.Model):
@@ -217,6 +157,7 @@ class Track(models.Model):
         )
 
     def get_aggregate_function(self):
+
         if self.aggregate_function == AGGREGATE_FUNCTION_AVG:
             return sum
         if self.aggregate_function == AGGREGATE_FUNCTION_AVG:
@@ -277,11 +218,13 @@ class Track(models.Model):
 
 @receiver(pre_save, sender=Track)
 def add_defaults(sender, instance, **kwargs):
+
     if instance.pk is None:
         instance.bin_size = instance.track_file.bin_size
 
 
 @receiver(post_save, sender=Track)
 def add_default_subtracks(sender, instance, created=True, **kwargs):
+
     default_subtracks = instance.track_file.subtracks.filter(default=True)
     instance.subtracks.set(default_subtracks)

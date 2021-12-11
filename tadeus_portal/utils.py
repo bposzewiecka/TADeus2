@@ -61,12 +61,12 @@ def split_seq(seq, n):
 
 
 @transaction.atomic
-def save_datasource(track_file, file_handle, eval=False):
+def save_datasource(subtrack, file_handle):
+
+    subtrack.save()
 
     if file_handle:
-        reader = BedOrBedGraphReader(file_handle=file_handle, track_file=track_file)
-
-    track_file.save()
+        reader = BedOrBedGraphReader(file_handle=file_handle, subtrack=subtrack)
 
     if file_handle:
         for bed_entry in reader:

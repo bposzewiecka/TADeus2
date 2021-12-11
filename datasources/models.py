@@ -1,8 +1,14 @@
+import os
+
 from django.contrib.auth.models import User
-from django.db import models, transaction
+from django.db import models
 from django.db.models import Q
 
+from tadeus_portal.settings import TADEUS_DATA_DIR
+
 from .defaults import BED6, BED9, BED12, FILE_SUB_TYPES, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPES
+
+# import pyBigWig
 
 
 class Species(models.Model):
@@ -70,9 +76,9 @@ class TrackFile(models.Model):
 
     bin_size = models.IntegerField(default=25)
 
-    def get_entries(self, chrom, start, end, name_filter=None):
+    def get_entries_db(self, chrom, start, end, name_filter=None):
 
-        q = self.file_entries.filter(chrom=chrom)
+        q = BedFileEntry.objects.filter(subtrack__in=self.subtracks.all()).filter(chrom=chrom)
 
         if name_filter:
             q = q.filter(name=name_filter)
@@ -115,26 +121,24 @@ class TrackFile(models.Model):
             entries.append(entry)
 
         return entries
-    """
+        """
 
     @property
     def organism(self):
         return self.assembly.organism
 
-    # TOFIX
+    """
     def add_subtrack(self, file_path):
+
+        from .readBed import BedOrBedGraphReader
+
+        subtrack = Subtrack(track_file=self, file_path=file_path)
 
         if self.file_type not in (FILE_TYPE_BED, FILE_TYPE_BED_GRAPH):
             return
 
-        from .readBed import BedOrBedGraphReader
-
-        # subtrack =
-
-        Subtrack(track_file=self, file_path=file_path)
-
         with open(file_path) as handler:
-            bed_entries = BedOrBedGraphReader(handler, self)
+            bed_entries = BedOrBedGraphReader(handler, subtrack)
 
             @transaction.atomic
             def save_bed_entries(bed_entries):
@@ -142,6 +146,7 @@ class TrackFile(models.Model):
                     bed_entry.save()
 
             save_bed_entries(bed_entries)
+    """
 
     def get_attributes(self):
 
@@ -195,10 +200,43 @@ class TrackFile(models.Model):
     def __str__(self):
         return f"Track file id: {self.id}, {self.name} ({self.assembly}, {self.file_type})."
 
+    def read_bed(self, file_handle):
+
+        from tadeus_portal.utils import save_datasource
+
+        subtrack = Subtrack(track_file=self)
+        subtrack.save()
+
+        save_datasource(subtrack, file_handle)
+
+    def get_file_paths(self):
+
+        return [subtrack.get_file_path() for subtrack in self.subtracks.all()]
+
+
+class Subtrack(models.Model):
+
+    track_file = models.ForeignKey(TrackFile, on_delete=models.CASCADE, related_name="subtracks")
+    file_path = models.CharField(max_length=500, null=True)
+    rgb = models.CharField(max_length=7, null=True)
+    sample = models.ForeignKey(Sample, on_delete=models.PROTECT, related_name="subtracks", null=True)
+    name = models.CharField(max_length=500, null=True)
+    default = models.BooleanField(default=False)
+
+    def read_bed(self):
+
+        from tadeus_portal.utils import save_datasource
+
+        with open(self.file_path) as file_handle:
+            save_datasource(self, file_handle)
+
+    def get_file_path(self):
+        return os.path.join(TADEUS_DATA_DIR, self.file_path) if self.file_path else ""
+
 
 class FileEntry(models.Model):
 
-    track_file = models.ForeignKey(TrackFile, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_file_entries")
+    subtrack = models.ForeignKey(Subtrack, on_delete=models.CASCADE, related_name="%(app_label)s_%(class)s_file_entries")
 
     chrom = models.CharField(max_length=50)
     start = models.IntegerField()
@@ -246,12 +284,3 @@ class BedFileEntry(FileEntry):
 
     def get_adj_right(self, n=1000000):
         return self.end + n
-
-
-class Subtrack(models.Model):
-    track_file = models.ForeignKey(TrackFile, on_delete=models.CASCADE, related_name="subtracks")
-    file_path = models.CharField(max_length=500, null=True)
-    rgb = models.CharField(max_length=7, null=True)
-    sample = models.ForeignKey(Sample, on_delete=models.PROTECT, related_name="subtracks", null=True)
-    name = models.CharField(max_length=500, null=True)
-    default = models.BooleanField(default=False)
