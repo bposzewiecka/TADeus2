@@ -13,7 +13,7 @@ from datasources.views import get_file_handle
 from ontologies.models import Gene
 from plots.models import Plot
 from tadeus_portal.utils import get_auth_cookie, set_owner_or_cookie, split_seq
-from tracks.models import BED_DISPLAY_ARCS, BED_DISPLAY_TILES, HIC_DISPLAY_HIC, Track
+from tracks.models import BED_DISPLAY_ARCS, BED_DISPLAY_TILES, HIC_DISPLAY_HIC, TRANSFORM_LOG1P, Track
 
 from .ClassifyCNV import annotate_cnvs_ClassifyCNV
 from .defaults import (
@@ -26,7 +26,6 @@ from .defaults import (
 )
 from .forms import EvaluationAddEntryForm, EvaluationForm
 from .models import Evaluation
-from .statistics import get_TADeus_pvalue
 from .tables import EvaluationEntryTable, EvaluationFilter, EvaluationTable
 from .TADA import annotate_cnvs_TADA
 
@@ -76,7 +75,12 @@ def create_eval_atomic(request, form, p_type):
         (TrackFile.objects.get(assembly=Assembly.objects.get(name="hg38"), file_type=FILE_TYPE_XAXIS).id, {"title": "XAxis"}),
         (
             HIC_NA12787_FILE_ID,
-            {"domains_file": TrackFile.objects.get(pk=HIC_NA12787_TADS_FILE_ID), "title": "HiC Track", "hic_display": HIC_DISPLAY_HIC},
+            {
+                "domains_file": TrackFile.objects.get(pk=HIC_NA12787_TADS_FILE_ID),
+                "title": "HiC Track",
+                "hic_display": HIC_DISPLAY_HIC,
+                "transform": TRANSFORM_LOG1P,
+            },
         ),
         (
             ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
@@ -146,11 +150,7 @@ def update(request, p_id):
     else:
         form = TrackFileForm(instance=eval)
 
-    return render(
-        request,
-        "evaluation/evaluation.html",
-        {"form": form, "p_id": p_id, "assembly_name": eval.track_file.assembly.name, "eval_br": eval.name, "table": table},
-    )
+    return render(request, "evaluation/evaluation.html", {"form": form, "p_id": p_id, "evaluation": eval, "table": table})
 
 
 @transaction.atomic
@@ -207,6 +207,20 @@ def add_entry(request, p_id):
         form = EvaluationAddEntryForm()
 
     return render(request, "evaluation/evaluation_add_entry.html", {"p_id": p_id, "chroms": chroms, "form": form})
+
+
+def delete_entry(request, p_id):
+
+    eval = Evaluation.objects.get(pk=p_id)
+
+    eval.delete()
+
+    eval.plot.delete()
+    eval.track_file.delete()
+
+    messages.success(request, f"Evaluation of SVs '{eval.name}' successfully deleted.")
+
+    return redirect("evaluation:index")
 
 
 def ranking(eval, p_chrom, p_interval_start, p_interval_end):
@@ -273,11 +287,3 @@ def ranking(eval, p_chrom, p_interval_start, p_interval_end):
     results.sort(key=lambda x: (-x[1]["rank"], -x[1]["enh_prom"], x[1]["distance"], x[1]["gene_name"]))
 
     return results
-
-    def set_TADeus_pvalue(self):
-
-        enh_prom_file = TrackFile.objects.get(pk=ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID)
-        n1 = len([enh_prom.name.upper() for enh_prom in enh_prom_file.get_entries(self.chrom, self.start, self.start)])
-        n2 = len([enh_prom.name.upper() for enh_prom in enh_prom_file.get_entries(self.chrom, self.end, self.end)])
-
-        self.score = get_TADeus_pvalue(max(n1, n2))

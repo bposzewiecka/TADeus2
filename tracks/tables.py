@@ -10,9 +10,13 @@ from .models import Track
 class TrackTable(tables.Table):
 
     file_name = tables.Column(empty_values=(), orderable=False)
+    track_type = tables.Column(empty_values=(), orderable=False)
 
     def render_file_name(self, record):
         return record.track_file.name
+
+    def render_track_type(self, record):
+        return record.get_long_track_type_name
 
     def render_id(self, record):
         link = reverse("tracks:update", kwargs={"p_id": record.id})
@@ -22,5 +26,5 @@ class TrackTable(tables.Table):
         model = Track
 
         template_name = "django_tables2/bootstrap.html"
-        sequence = ("id", "title", "file_name", "no", "height")
+        sequence = ("id", "title", "file_name", "track_type", "no", "height")
         fields = sequence

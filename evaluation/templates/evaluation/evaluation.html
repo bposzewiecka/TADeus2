@@ -9,7 +9,7 @@
         <li class="breadcrumb-item"><a href="{% url 'evaluation:index' %}">Evaluations of SVs</a></li>
 
         {% if p_id %}
-            <li class="breadcrumb-item">{{ eval_br }}</li>
+            <li class="breadcrumb-item">{{ evaluation.name }}</li>
         {% else %}
             <li class="breadcrumb-item">New evaluation of SVs</li>
         {% endif %}
@@ -74,7 +74,7 @@
 
             <input class="form-control" type="hidden" name="{{ form.assembly.html_name }}" id="{{ form.assembly.id_for_label }}" value="{{ form.assembly.value}}" >
 
-            <input class="form-control"  value="{{ assembly_name  }}" readonly>
+            <input class="form-control"  value="{{  evaluation.track_file.assembly.name  }}" readonly>
         {% endif %}
     </div>
 </div>

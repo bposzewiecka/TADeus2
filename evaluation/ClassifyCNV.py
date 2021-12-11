@@ -8,9 +8,9 @@ from tadeus_portal.settings import CLASSIFYCNV_SCRIPT, CLASSIFYCNV_TEMP_FILES_DI
 from .defaults import DELETION, DUPLICATION
 
 
-def get_cnv_scores(file_entries, output_directory, path_to_variants, path_to_results):
+def get_cnv_scores(sv_entries, output_directory, path_to_variants, path_to_results):
 
-    save_as_bed(file_entries, path_to_variants)
+    save_as_bed(sv_entries, path_to_variants)
 
     os.system(f"python3 {CLASSIFYCNV_SCRIPT} --GenomeBuild hg38 --infile {path_to_variants} --outdir {output_directory}")
 
@@ -20,16 +20,13 @@ def get_cnv_scores(file_entries, output_directory, path_to_variants, path_to_res
 
         svs_data = list(reader)
 
-        for file_entry, sv_data in zip(file_entries, svs_data):
+        for sv_entry, sv_data in zip(sv_entries, svs_data):
 
-            # p = SVProperty(file_entry=file_entry, value=sv_data["Classification"], file_entry_property_type_id=15)
-            # p.save()
-
-            file_entry.ClassifyCNV = sv_data["Classification"]
-            file_entry.save()
+            sv_entry.ClassifyCNV = sv_data["Classification"]
+            sv_entry.save()
 
 
-def annotate_cnvs_ClassifyCNV(file_entries, evaluation_id):
+def annotate_cnvs_ClassifyCNV(sv_entries, evaluation_id):
 
     output_directory = os.path.join(CLASSIFYCNV_TEMP_FILES_DIR, f"EVALUATION_{evaluation_id}")
     path_to_variants = os.path.join(CLASSIFYCNV_TEMP_FILES_DIR, f"input_{evaluation_id}.bed")
@@ -38,7 +35,7 @@ def annotate_cnvs_ClassifyCNV(file_entries, evaluation_id):
     if os.path.exists(output_directory) and os.path.isdir(output_directory):
         shutil.rmtree(output_directory)
 
-    deldups = [file_entry for file_entry in file_entries if file_entry.sv_type in (DELETION, DUPLICATION)]
+    deldups = [sv_entry for sv_entry in sv_entries if sv_entry.sv_type in (DELETION, DUPLICATION)]
 
     if deldups:
         get_cnv_scores(deldups, output_directory, path_to_variants, path_to_results)

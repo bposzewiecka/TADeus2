@@ -269,6 +269,19 @@ class Track(models.Model):
 
         return attributes
 
+    @property
+    def get_long_track_type_name(self):
+
+        file_type = self.track_file.get_long_file_type_name
+
+        if self.track_file.file_type == FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_HIC:
+            return file_type + " (HIC)"
+
+        if self.track_file.file_type == FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_VIRTUAL4C:
+            return file_type + " (Virtual 4C)"
+
+        return file_type
+
 
 @receiver(pre_save, sender=Track)
 def add_defaults(sender, instance, **kwargs):
