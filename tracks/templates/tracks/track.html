@@ -47,7 +47,15 @@
         {% if file_type == 'HI' %}
         <div class="form-group col-md-2">
             <label>Track type</label>
-            <input class="form-control"  name="{{ form.hic_display.html_name }}"  value="{{ hic_display }}" readonly>
+
+            <select id="{{ form.hic_display.id_for_label }}" class="form-control" name="{{ form.hic_display.html_name }}"  readonly>
+
+                {% for x,y in form.fields.hic_display.choices %}
+                    <option value="{{ x }}"{% if form.hic_display.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+
+            </select>
+
         </div>
         {% endif %}
 
@@ -95,7 +103,7 @@
 
                     {{ form.chromosome.errors }}
 
-                    <select name="{{ form.chromosome.html_name }}" class="form-control"  id="{{ form.chromosome.id_for_label }}">
+                    <select name="{{ form.chromosome.html_name }}" class="form-control"  id="{{ form.chromosome.id_for_label }}" {% if readonly %}readonly{% endif %} required>>
                         {% for chromosome in chroms %}
                             <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
                         {% endfor %}

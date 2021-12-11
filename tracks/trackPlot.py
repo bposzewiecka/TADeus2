@@ -1166,21 +1166,25 @@ class PlotHiCMatrix(TrackPlot):
 
         adj_depth = self.bin_adjust(depth, bin_size)
 
-        if self.visualize_breakpoint:
-            matrix, start_matrix = self.get_breakpoint_matrix(bin_size, adj_depth)
-            no_bins = np.shape(matrix)[0]
-        else:
+        # if self.visualize_breakpoint:
+        #    matrix, start_matrix = self.get_breakpoint_matrix(bin_size, adj_depth)
+        #    no_bins = np.shape(matrix)[0]
+        # else:
 
-            adj_start = self.bin_adjust(start, bin_size)
-            adj_end = self.bin_adjust(end, bin_size)
-            adj_size = adj_end - adj_start
-            adj_depth = self.bin_adjust(depth, bin_size)
-            no_bins = int((adj_size + 2 * adj_depth) // bin_size)
+        # start
 
-            start_matrix = adj_start - adj_depth
-            end_matrix = adj_start + adj_depth + adj_size
+        adj_start = self.bin_adjust(start, bin_size)
+        adj_end = self.bin_adjust(end, bin_size)
+        adj_size = adj_end - adj_start
+        adj_depth = self.bin_adjust(depth, bin_size)
+        no_bins = int((adj_size + 2 * adj_depth) // bin_size)
 
-            matrix = self.get_sub_matrix(bin_size, chrom, start_matrix, end_matrix)
+        start_matrix = adj_start - adj_depth
+        end_matrix = adj_start + adj_depth + adj_size
+
+        # stop
+
+        matrix = self.get_sub_matrix(bin_size, chrom, start_matrix, end_matrix)
 
         matrix = self.get_transformed_matrix(matrix)
 
@@ -1227,8 +1231,11 @@ class PlotHiCMatrix(TrackPlot):
 class PlotVirtual4C(TrackPlot):
     def __init__(self, *args, **kwarg):
         super().__init__(*args, **kwarg)
-        self.hic_ma = hiCMatrix("/home/basia/CNVBrowser/tadeus/4DNFIQI8SFNE.mcool::resolutions/50000")
-        self.bin_size = 50 * 1000
+
+        file_path = self.track_file.get_file_paths()[0]
+
+        self.bin_size = 10 * 1000
+        self.hic_ma = hiCMatrix(f"{file_path}::resolutions/{self.bin_size}")
 
     def aggregate_and_transform(self, columns):
         agg = np.apply_along_axis(self.aggregate_function, 0, columns)
@@ -1238,7 +1245,9 @@ class PlotVirtual4C(TrackPlot):
         # print(self.v4c_chromosome, self.start_coordinate, self.end_coordinate)
 
         # all_columns = self.hic_ma.get_column_region(self.v4c_chromosome.name, self.start_coordinate, self.end_coordinate, chrom)
-        columns = self.hic_ma.get_sub_matrix(self.v4c_chromosome.name, self.start_coordinate, self.end_coordinate, chrom, start, end)
+        columns = self.hic_ma.get_sub_matrix(
+            self.v4c_chromosome.name, self.start_coordinate, max(self.end_coordinate, self.start_coordinate + self.bin_size), chrom, start, end
+        )
 
         # all_values = self.aggregate_and_transform(all_columns)
         values = self.aggregate_and_transform(columns)
@@ -1250,7 +1259,7 @@ class PlotVirtual4C(TrackPlot):
 
         max_value = np.max(values)
 
-        self.axis.set_ylim(-max_value * 0.05, 40)
+        self.axis.set_ylim(-max_value * 0.05, max_value * 1.05)
         self.axis.set_xlim(start, end)
 
     def get_height(self):

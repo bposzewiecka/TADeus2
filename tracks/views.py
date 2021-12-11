@@ -1,3 +1,5 @@
+from itertools import groupby
+
 from django.contrib import messages
 from django.db.models import Q
 from django.db.models.functions import Lower
@@ -89,6 +91,12 @@ def create(request, p_plot_id):
     else:
         form = CreateTrackForm(initial={"no": track_number})
 
-    track_files = TrackFile.objects.filter(Q(assembly=plot.assembly), only_public_or_user(request)).order_by(Lower("name"), "id")
+    track_files = TrackFile.objects.filter(Q(assembly=plot.assembly), only_public_or_user(request), Q(eval__isnull=True)).order_by(
+        "file_type", Lower("name"), "id"
+    )
+
+    track_files = groupby(track_files, key=lambda x: x.get_long_file_type_name)
+
+    track_files = [(group_name, list(elements)) for group_name, elements in track_files]
 
     return render(request, "tracks/add_track.html", {"form": form, "p_plot_id": p_plot_id, "track_files": track_files, "plot": plot})

@@ -13,7 +13,6 @@ class TrackFileTable(tables.Table):
 
     source = tables.Column(empty_values=(), order_by=("source_name"))
     organism = tables.Column(orderable=False)
-    number_of_entries = tables.Column(empty_values=())
 
     def render_id(self, record):
         link = reverse("datasources:update", kwargs={"p_id": record.id})

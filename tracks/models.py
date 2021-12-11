@@ -7,7 +7,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from datasources.defaults import BED12, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPE_XAXIS
+from datasources.defaults import BED6, BED9, BED12, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPE_XAXIS
 from datasources.models import BedFileEntry, Chromosome, FileEntry, Subtrack, TrackFile
 from plots.models import Plot
 from tracks.trackPlot import PlotArcs, PlotBed, PlotBedGraph, PlotDomains, PlotHiCMatrix, PlotVirtual4C, PlotXAxis
@@ -49,7 +49,7 @@ class Track(models.Model):
 
     plot = models.ForeignKey(Plot, on_delete=models.CASCADE, related_name="tracks")
     subtracks = models.ManyToManyField(Subtrack, related_name="subtracks")
-    track_file = models.ForeignKey(TrackFile, on_delete=models.PROTECT)
+    track_file = models.ForeignKey(TrackFile, on_delete=models.PROTECT, null=False)
     no = models.IntegerField()
 
     title = models.CharField(max_length=100, null=True, blank=True)
@@ -214,6 +214,60 @@ class Track(models.Model):
 
     def __str__(self):
         return f"Track id: {self.id}, {self.name} ({self.title}) in plot {self.plot.id}."
+
+    def get_attributes(self):
+
+        attributes = []
+
+        attributes.append("title")
+        attributes.append("no")
+        attributes.append("height")
+        attributes.append("edgecolor")
+
+        if self.track_file.file_type in (FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC):
+            attributes.append("transform")
+
+        if self.track_file.file_type == FILE_TYPE_BED:
+            attributes.append("labels")
+            attributes.append("color")
+            attributes.append("bed_display")
+
+        bed_with_name_and_color = self.track_file.file_type == FILE_TYPE_BED and (self.track_file.bed_sub_type in (BED6, BED9, BED12))
+
+        if bed_with_name_and_color:
+            attributes.append("labels")
+            attributes.append("name_filter")
+
+        if (self.track_file.file_type in FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_HIC) or bed_with_name_and_color:
+            attributes.append("colormap")
+
+        if self.track_file.file_type in (FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC) or bed_with_name_and_color:
+            attributes.append("min_value")
+            attributes.append("max_value")
+
+        if self.track_file.file_type == FILE_TYPE_HIC:
+            attributes.append("hic_display")
+
+        if self.track_file.file_type == FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_HIC:
+            attributes.append("domains_file")
+            attributes.append("inverted")
+
+        if self.track_file.file_type == FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_VIRTUAL4C:
+            attributes.append("chromosome")
+            attributes.append("start_coordinate")
+            attributes.append("end_coordinate")
+            attributes.append("color")
+
+        if self.track_file.file_type == FILE_TYPE_BED_GRAPH:
+            attributes.append("subtracks")
+            attributes.append("bedgraph_display")
+            attributes.append("bedgraph_type")
+            attributes.append("bedgraph_style")
+            attributes.append("style")
+            attributes.append("bin_size")
+            attributes.append("aggregate_function")
+
+        return attributes
 
 
 @receiver(pre_save, sender=Track)

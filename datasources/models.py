@@ -6,7 +6,7 @@ from django.db.models import Q
 
 from tadeus_portal.settings import TADEUS_DATA_DIR
 
-from .defaults import BED6, BED9, BED12, FILE_SUB_TYPES, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPES
+from .defaults import FILE_SUB_TYPES, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPE_XAXIS, FILE_TYPES
 
 # import pyBigWig
 
@@ -148,55 +148,6 @@ class TrackFile(models.Model):
             save_bed_entries(bed_entries)
     """
 
-    def get_attributes(self):
-
-        attributes = []
-
-        attributes.append("title")
-        attributes.append("no")
-        attributes.append("height")
-        attributes.append("edgecolor")
-
-        if self.file_type in (FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC):
-            attributes.append("transform")
-
-        if self.file_type == FILE_TYPE_BED:
-            attributes.append("labels")
-            attributes.append("color")
-            attributes.append("bed_display")
-
-        bed_with_name_and_color = self.file_type == FILE_TYPE_BED and (self.bed_sub_type in (BED6, BED9, BED12))
-
-        if bed_with_name_and_color:
-            attributes.append("labels")
-            attributes.append("name_filter")
-
-        if self.file_type in FILE_TYPE_HIC or bed_with_name_and_color:
-            attributes.append("colormap")
-
-        if self.file_type in (FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC) or bed_with_name_and_color:
-            attributes.append("min_value")
-            attributes.append("max_value")
-
-        if self.file_type == FILE_TYPE_HIC:
-            attributes.append("domains_file")
-            attributes.append("inverted")
-            attributes.append("hic_display")
-            attributes.append("chromosome")
-            attributes.append("start_coordinate")
-            attributes.append("end_coordinate")
-
-        if self.file_type == FILE_TYPE_BED_GRAPH:
-            attributes.append("subtracks")
-            attributes.append("bedgraph_display")
-            attributes.append("bedgraph_type")
-            attributes.append("bedgraph_style")
-            attributes.append("style")
-            attributes.append("bin_size")
-            attributes.append("aggregate_function")
-
-        return attributes
-
     def __str__(self):
         return f"Track file id: {self.id}, {self.name} ({self.assembly}, {self.file_type})."
 
@@ -212,6 +163,17 @@ class TrackFile(models.Model):
     def get_file_paths(self):
 
         return [subtrack.get_file_path() for subtrack in self.subtracks.all()]
+
+    @property
+    def get_long_file_type_name(self):
+        if self.file_type == FILE_TYPE_BED:
+            return "Bed"
+        if self.file_type == FILE_TYPE_BED_GRAPH:
+            return "Bedgraph"
+        if self.file_type == FILE_TYPE_HIC:
+            return "HiC"
+        if self.file_type == FILE_TYPE_XAXIS:
+            return "XAxis"
 
 
 class Subtrack(models.Model):

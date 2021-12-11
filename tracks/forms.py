@@ -13,7 +13,7 @@ class TrackForm(forms.ModelForm):
 
         super(forms.ModelForm, self).__init__(*args, **kwargs)
 
-        instance_attributes = self.instance.track_file.get_attributes()
+        instance_attributes = self.instance.get_attributes()
         all_fields_attributes = list(self.fields.keys())
 
         for attribute in all_fields_attributes:

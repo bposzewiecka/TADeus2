@@ -33,15 +33,24 @@
     <div class="form-row">
         <div class="form-group col-md-10">
             <label for="{{ form.track_file.id_for_label }}">Track file</label>
-            <select id="{{ form.track_file.id_for_label }}" class="form-control" name="{{ form.track_file.html_name }}">
+            <select id="{{ form.track_file.id_for_label }}" class="form-control" name="{{ form.track_file.html_name }}"  required>
 
-            {% for track_file in track_files %}
-                <option value="{{ track_file.id }}" {% if form.track_file.value|add:0   == track_file.id %} selected{% endif %}>{{ track_file.name }}</option>
+            {%  for group_name, group in  track_files %}
+
+                <optgroup label="{{group_name}}">
+                    {% for track_file in  group %}
+                        <option value="{{ track_file.id }}" {% if form.track_file.value|add:0   == track_file.id %} selected{% endif %} data-filetype="{{ track_file.file_type }}">{{ track_file.name }}</option>
+                    {% endfor %}
+                </optgroup>
+
             {% endfor %}
+
             </select>
         </div>
 
-        <div class="form-group col-md-2">
+
+
+        <div class="form-group col-md-2" id="hic-display">
             {{ form.hic_display.errors }}
             <label for="{{ form.hic_display.id_for_label }}">Display</label>
 
@@ -74,12 +83,6 @@
             <input class="form-control" type="number" name="{{ form.height.html_name }}" id="{{ form.height.id_for_label }}" value="{{ form.height.value}}" >
         </div>
 
-    <!--<div class="form-group col-md-6">
-      <label for="{{ form.column.id_for_label }}">Column</label>
-      {{ form.column.errors }}
-      <input class="form-control" type="number" name="{{ form.column.html_name }}" id="{{ form.column.id_for_label }}" value="{{ form.column.value}}"
-     {% if readonly %}readonly{% endif %}>
-    </div>-->
         <input class="form-control" type="hidden" name="{{ form.column.html_name }}" id="{{ form.column.id_for_label }}" value="{{ form.column.value}}" >
 
     </div>
@@ -89,4 +92,34 @@
 
 {% block end %}
 </form>
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+
+function is_hic(el) {
+    return el.options[el.selectedIndex].dataset.filetype=="HI";
+}
+
+
+var track_select_el = document.getElementById('id_track_file');
+var hic_display_el = document.getElementById('hic-display');
+
+function toogle_hic(){
+  if (is_hic(track_select_el)) {
+    hic_display_el.style.display="block";
+  } else {
+    hic_display_el.style.display="none";
+  }
+}
+
+toogle_hic()
+
+track_select_el.addEventListener('change', (event) => {
+    toogle_hic()
+});
+
+</script>
+
 {% endblock %}
