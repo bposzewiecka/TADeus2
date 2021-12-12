@@ -1,4 +1,6 @@
 from datasources.models import BedFileEntry
+from evaluation.defaults import DELETION, DUPLICATION, TRANSLOCATION
+from evaluation.models import SVEntry
 
 
 class ReadBedOrBedGraphException(Exception):
@@ -9,12 +11,13 @@ class ReadBedOrBedGraphException(Exception):
 
 
 class BedOrBedGraphReader:
-    def __init__(self, file_handle, subtrack):
+    def __init__(self, file_handle, subtrack, return_svs=False):
 
         self.subtrack = subtrack
         self.bed_sub_type = None
         self.file_handle = file_handle
         self.line_number = 0
+        self.return_svs = return_svs
         # guess file type
         fields = self.get_no_comment_line().split("\t")
 
@@ -47,12 +50,16 @@ class BedOrBedGraphReader:
     def get_no_comment_line(self):
 
         line = self.file_handle.readline()
+
         if line.startswith("#") or line.startswith("track") or line.startswith("browser") or line.startswith("chrom"):
             line = self.get_no_comment_line()
 
         return line
 
     def guess_bed_sub_type(self, line_values):
+
+        if self.return_svs:
+            self.bed_sub_type = "Bed6"
         if len(line_values) == 3:
             self.bed_sub_type = "Bed3"
         if len(line_values) == 4:
@@ -71,6 +78,10 @@ class BedOrBedGraphReader:
             self.subtrack.track_file.bed_sub_type = self.bed_sub_type
 
     def num_of_fields(self):
+
+        if self.return_svs:
+            return 4
+
         if self.bed_sub_type == "Bed3":
             return 3
         if self.bed_sub_type == "BedGraph":
@@ -106,8 +117,13 @@ class BedOrBedGraphReader:
             # first field is always chromosome/contig name
             # and should be cast as a string
             # same for field 3 (name)
-            if idx in [0, 3]:
+            if (idx == 0) or (idx == 3 and self.subtrack.track_file.file_type == "BE" or self.return_svs):
                 line_values.append(r)
+            elif idx == 3 and self.subtrack.track_file.file_type == "BG":
+                try:
+                    line_values.append(float(r))
+                except Exception:
+                    raise ReadBedOrBedGraphException("Bedgraph value should be float.", self.line_number)
             # check field strand
             elif idx == 5:
                 if r not in ["+", "-", "."]:
@@ -188,7 +204,13 @@ class BedOrBedGraphReader:
         if self.bed_sub_type in ("BedGraph"):
             score = line_values[3]
 
-        if self.bed_sub_type in ("Bed6", "Bed9", "Bed12"):
+        if self.return_svs:
+            name, sv_type = get_name_and_sv_type(line_values[3], self.line_number)
+
+            score = 0
+            strand = "."
+
+        if self.bed_sub_type in ("Bed6", "Bed9", "Bed12") and not self.return_svs:
             name = line_values[3]
             score = line_values[4]
             strand = line_values[5]
@@ -202,6 +224,10 @@ class BedOrBedGraphReader:
             block_count = line_values[9]
             block_sizes = line_values[10]
             block_starts = line_values[11]
+
+        if self.return_svs:
+
+            return SVEntry(subtrack=self.subtrack, chrom=chrom, start=start, end=end, name=name, score=score, strand=strand, sv_type=sv_type)
 
         return BedFileEntry(
             subtrack=self.subtrack,
@@ -218,3 +244,31 @@ class BedOrBedGraphReader:
             block_sizes=block_sizes,
             block_starts=block_starts,
         )
+
+
+def get_name_and_sv_type(name, line_number):
+
+    name_with_semicolon = name + ";"
+
+    index = name_with_semicolon.find(";")
+
+    sv_type_str = name_with_semicolon[:index].strip()
+    name = name_with_semicolon[index + 1 : -1].strip()
+
+    if sv_type_str.upper() not in ("DEL", "DUP", "TRANS"):
+        raise ReadBedOrBedGraphException(
+            'Structural variants without type specified. Add  "DEL", "DUP" or "TRANS" with semicolon at the beginning of bed entry name to specify a structural variant type.',
+            line_number,
+        )
+    else:
+        if sv_type_str == "DEL":
+            sv_type = DELETION
+        elif sv_type_str == "DUP":
+            sv_type = DUPLICATION
+        else:
+            sv_type = TRANSLOCATION
+
+    if name != "":
+        return name, sv_type
+
+    return sv_type_str, sv_type

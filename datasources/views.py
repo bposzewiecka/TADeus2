@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django_tables2 import RequestConfig
 
 from datasources.readBed import ReadBedOrBedGraphException
-from tadeus_portal.utils import get_file_handle, is_object_readonly, only_public_or_user, save_datasource, set_owner_or_cookie
+from tadeus_portal.utils import get_file_handle, is_object_readonly, only_public_or_user, set_owner_or_cookie
 
 from .forms import TrackFileForm
 from .models import Assembly, TrackFile
@@ -63,9 +63,15 @@ def create(request, p_type):
             try:
 
                 track_file = form.save(commit=False)
+
                 set_owner_or_cookie(request, track_file)
                 file_handle = get_file_handle(p_type, form)
-                save_datasource(track_file, file_handle)
+
+                track_file.save()
+
+                track_file.read_bed(file_handle)
+
+                track_file.save()
 
                 messages.success(request, f"Data source '{track_file.name}' successfully created.")
 
@@ -91,4 +97,4 @@ def delete(request, p_id):
         messages.error(request, "You cannot delete this data source. It is used in a plot.")
         return redirect("datasources:update", p_id=p_id)
 
-    return redirect("datasources:datasources")
+    return redirect("datasources:index")

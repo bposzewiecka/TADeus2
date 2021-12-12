@@ -52,7 +52,7 @@ def set_owner_or_cookie(request, p_obj):
 
 
 def getLink(link, icon):
-    return format_html('<a href="{link}"><i class="fas ' + icon + '"></i></a>', link=link)
+    return format_html(f'<a href="{link}"><i class="fas {icon}"></i></a>')
 
 
 def split_seq(seq, n):
@@ -61,16 +61,21 @@ def split_seq(seq, n):
 
 
 @transaction.atomic
-def save_datasource(subtrack, file_handle):
+def save_datasource(subtrack, file_handle, return_svs=False):
 
     subtrack.save()
 
     if file_handle:
-        reader = BedOrBedGraphReader(file_handle=file_handle, subtrack=subtrack)
+        reader = BedOrBedGraphReader(file_handle=file_handle, subtrack=subtrack, return_svs=return_svs)
+
+    bed_entries = []
 
     if file_handle:
         for bed_entry in reader:
             bed_entry.save()
+            bed_entries.append(bed_entry)
+
+    return bed_entries
 
 
 def get_file_handle(p_type, form):

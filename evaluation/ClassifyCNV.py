@@ -23,6 +23,7 @@ def get_cnv_scores(sv_entries, output_directory, path_to_variants, path_to_resul
         for sv_entry, sv_data in zip(sv_entries, svs_data):
 
             sv_entry.ClassifyCNV = sv_data["Classification"]
+
             sv_entry.save()
 
 
@@ -32,13 +33,14 @@ def annotate_cnvs_ClassifyCNV(sv_entries, evaluation_id):
     path_to_variants = os.path.join(CLASSIFYCNV_TEMP_FILES_DIR, f"input_{evaluation_id}.bed")
     path_to_results = os.path.join(output_directory, "Scoresheet.txt")
 
-    if os.path.exists(output_directory) and os.path.isdir(output_directory):
-        shutil.rmtree(output_directory)
-
     deldups = [sv_entry for sv_entry in sv_entries if sv_entry.sv_type in (DELETION, DUPLICATION)]
 
     if deldups:
+
+        if os.path.exists(output_directory) and os.path.isdir(output_directory):
+            shutil.rmtree(output_directory)
+
         get_cnv_scores(deldups, output_directory, path_to_variants, path_to_results)
 
-    shutil.rmtree(output_directory)
-    os.remove(path_to_variants)
+        shutil.rmtree(output_directory)
+        os.remove(path_to_variants)

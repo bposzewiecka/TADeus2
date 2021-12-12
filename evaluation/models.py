@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from datasources.models import Assembly, FileEntry
+from datasources.models import Assembly, BedFileEntry
 from plots.models import Plot
 from tracks.models import TrackFile
 
@@ -17,8 +17,7 @@ class Evaluation(models.Model):
     auth_cookie = models.CharField(max_length=60, null=True)
 
 
-class SVEntry(FileEntry):
-    name = models.CharField(max_length=100, null=True)
+class SVEntry(BedFileEntry):
     sv_type = models.IntegerField(choices=SV_TYPES)
     TADA_score = models.FloatField(null=True)
     ClassifyCNV = models.CharField(max_length=20, null=True)

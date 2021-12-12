@@ -13,7 +13,8 @@ from datasources.views import get_file_handle
 from ontologies.models import Gene
 from plots.models import Plot
 from tadeus_portal.utils import get_auth_cookie, set_owner_or_cookie, split_seq
-from tracks.models import BED_DISPLAY_ARCS, BED_DISPLAY_TILES, HIC_DISPLAY_HIC, TRANSFORM_LOG1P, Track
+from tracks.defaults import BED_DISPLAY_ARCS, BED_DISPLAY_TILES, HIC_DISPLAY_HIC, TRANSFORM_LOG1P
+from tracks.models import Track
 
 from .ClassifyCNV import annotate_cnvs_ClassifyCNV
 from .defaults import (
@@ -25,9 +26,10 @@ from .defaults import (
     PLI_SCORE_FILE_ID,
 )
 from .forms import EvaluationAddEntryForm, EvaluationForm
-from .models import Evaluation
+from .models import Evaluation, SVEntry
 from .tables import EvaluationEntryTable, EvaluationFilter, EvaluationTable
 from .TADA import annotate_cnvs_TADA
+from .TADeusScore import annotate_translocations_TADeusScore
 
 
 def index(request):
@@ -102,8 +104,10 @@ def create_eval_atomic(request, form, p_type):
         track.save()
 
     eval.plot = plot
-    track_file.read_bed(file_handle)
+    sv_entries = track_file.read_bed(file_handle, return_svs=True)
     eval.save()
+
+    annotate_sv_entries(sv_entries, eval.id, request)
 
     return eval
 
@@ -134,7 +138,10 @@ def update(request, p_id):
 
     eval = Evaluation.objects.get(pk=p_id)
 
-    table = EvaluationEntryTable(eval.track_file.subtracks.all()[0].evaluation_sventry_file_entries.all(), eval.plot.id)
+    # sv_entries_id = [ file_entry.id for file_entry in eval.track_file.subtracks.all()[0].datasources_bedfileentry_file_entries.all()]
+    sv_entries = SVEntry.objects.filter(subtrack__in=eval.track_file.subtracks.all())
+
+    table = EvaluationEntryTable(sv_entries, eval.plot.id)
 
     RequestConfig(request).configure(table)
 
@@ -189,15 +196,13 @@ def add_entry(request, p_id):
         form = EvaluationAddEntryForm(request.POST)
 
         if form.is_valid():
-            sv_file_entry = form.save(commit=False)
-            sv_file_entry.subtrack = eval.track_file.subtracks.all()[0]
+            sv_entry = form.save(commit=False)
+            sv_entry.subtrack = eval.track_file.subtracks.all()[0]
 
-            sv_file_entry.save()
+            annotate_sv_entries([sv_entry], p_id, request)
+            sv_entry.save()
 
-            annotate_cnvs_TADA([sv_file_entry], p_id)
-            annotate_cnvs_ClassifyCNV([sv_file_entry], p_id)
-
-            messages.success(request, f"Breakpoint '{sv_file_entry.name}' added to evaluation.")
+            messages.success(request, f"Breakpoint '{sv_entry.name}' added to evaluation.")
 
             return redirect("evaluation:update", p_id=eval.id)
 
@@ -211,16 +216,14 @@ def add_entry(request, p_id):
 
 def delete_entry(request, p_id):
 
-    eval = Evaluation.objects.get(pk=p_id)
+    sv_entry = SVEntry.objects.get(pk=p_id)
+    eval = sv_entry.subtrack.track_file.eval
 
-    eval.delete()
+    sv_entry.delete()
 
-    eval.plot.delete()
-    eval.track_file.delete()
+    messages.success(request, "SV successfully deleted.")
 
-    messages.success(request, f"Evaluation of SVs '{eval.name}' successfully deleted.")
-
-    return redirect("evaluation:index")
+    return redirect("evaluation:update", p_id=eval.id)
 
 
 def ranking(eval, p_chrom, p_interval_start, p_interval_end):
@@ -287,3 +290,21 @@ def ranking(eval, p_chrom, p_interval_start, p_interval_end):
     results.sort(key=lambda x: (-x[1]["rank"], -x[1]["enh_prom"], x[1]["distance"], x[1]["gene_name"]))
 
     return results
+
+
+def annotate_sv_entries(sv_entries, p_id, request):
+
+    try:
+        annotate_cnvs_TADA(sv_entries, p_id)
+    except Exception:
+        messages.error(request, "Error in TADA annotation.")
+
+    try:
+        annotate_cnvs_ClassifyCNV(sv_entries, p_id)
+    except Exception:
+        messages.error(request, "Error in ClassifyCNV annotation.")
+
+    try:
+        annotate_translocations_TADeusScore(sv_entries)
+    except Exception:
+        messages.error(request, "Error in TADeus annotation.")

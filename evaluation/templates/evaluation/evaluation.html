@@ -33,7 +33,7 @@
 
         <a href="{% url 'evaluation:add_entry' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Add new SV</a>
 
-        <a href="{% url 'evaluation:delete' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this evaluation of CNVs?')">Delete</a>
+        <a href="{% url 'evaluation:delete' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this evaluation of SVs?')">Delete</a>
     {% endif %}
 
     <button type="submit" class="btn btn-primary btn-lg active" name="{{ p_type }}">{% if p_id %}Save{% else %}Create{% endif %}</button>

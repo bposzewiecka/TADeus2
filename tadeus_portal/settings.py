@@ -34,8 +34,7 @@ TADA_TEMP_FILES_DIR = os.path.join(BASE_DIR, "data", "TADA")
 CLASSIFYCNV_TEMP_FILES_DIR = os.path.join(BASE_DIR, "data", "ClassifyCNV")
 CLASSIFYCNV_SCRIPT = os.path.join(BASE_DIR, "scripts", "ClassifyCNV", "ClassifyCNV.py")
 
-# TADEUS_DATA_DIR = os.path.join(BASE_DIR, "data")
-TADEUS_DATA_DIR = os.path.join(BASE_DIR)
+TADEUS_DATA_DIR = os.path.join(BASE_DIR, "data")
 
 # Application definition
 

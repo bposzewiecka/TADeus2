@@ -151,14 +151,14 @@ class TrackFile(models.Model):
     def __str__(self):
         return f"Track file id: {self.id}, {self.name} ({self.assembly}, {self.file_type})."
 
-    def read_bed(self, file_handle):
+    def read_bed(self, file_handle, return_svs=False):
 
         from tadeus_portal.utils import save_datasource
 
         subtrack = Subtrack(track_file=self)
         subtrack.save()
 
-        save_datasource(subtrack, file_handle)
+        return save_datasource(subtrack, file_handle, return_svs)
 
     def get_file_paths(self):
 
@@ -189,7 +189,7 @@ class Subtrack(models.Model):
 
         from tadeus_portal.utils import save_datasource
 
-        with open(self.file_path) as file_handle:
+        with open(self.get_file_path()) as file_handle:
             save_datasource(self, file_handle)
 
     def get_file_path(self):
@@ -217,7 +217,7 @@ class FileEntry(models.Model):
         abstract = True
 
     def __str__(self):
-        return f"{self.chrom}:{self.start:,}-{self.end:,}"
+        return f"{self.chrom}:{self.start}-{self.end}"
 
     def __len__(self):
         return self.end - self.start
