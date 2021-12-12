@@ -1,4 +1,5 @@
 import copy
+import math
 import sys
 import textwrap
 import warnings
@@ -760,6 +761,16 @@ class PlotBedGraph(TrackPlot):
             for j in range(no_of_bins):
                 self.entries_list[no_of_layers - i - 2][j].score += self.entries_list[no_of_layers - i - 1][j].score
 
+    def ignore_nan(self, f, x, y):
+
+        if math.isnan(x):
+            return y
+
+        if math.isnan(y):
+            return x
+
+        return f(x, y)
+
     def draw(self, chrom, start, end, width):  # noqa: C901
 
         self.draw_title()
@@ -788,7 +799,7 @@ class PlotBedGraph(TrackPlot):
             pos_list = []
 
             for entry in entries:
-                if entry.score is not None:
+                if entry.score is not None and not math.isnan(entry.score):
 
                     if self.bedgraph_type == BEDGRAPH_TYPE_LINECHART:
                         score_list.append(entry.score)
@@ -797,8 +808,8 @@ class PlotBedGraph(TrackPlot):
                         score_list += [entry.score, entry.score]
                         pos_list += [entry.start, entry.end]
 
-                    max_value = max(max_value, entry.score)
-                    min_value = min(min_value, entry.score)
+                    max_value = self.ignore_nan(max, max_value, entry.score)
+                    min_value = self.ignore_nan(min, min_value, entry.score)
 
             if len(score_list) == 0:
                 continue
@@ -829,6 +840,11 @@ class PlotBedGraph(TrackPlot):
             self.min_value = min_value
 
         self.print_data_range(start, end)
+
+        if math.isnan(self.max_value):
+            self.min_value = 0
+            self.max_value = 10
+
         self.axis.set_ylim(self.min_value * (SMALL_RELATIVE + 1), self.max_value * (SMALL_RELATIVE + 1))
         self.axis.set_xlim(start, end)
 
