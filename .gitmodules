@@ -1,0 +1,3 @@
+[submodule "scripts/ClassifyCNV"]
+	path = scripts/ClassifyCNV
+	url = https://github.com/Genotek/ClassifyCNV.git
