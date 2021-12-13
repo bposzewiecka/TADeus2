@@ -124,7 +124,10 @@ def create(request, p_type):
 
                 messages.success(request, "Successful evaluation.")
 
-                return redirect("evaluation:update", p_id=eval.id)
+                if p_type == "blank":
+                    return redirect("evaluation:add_entry", p_id=eval.id)
+                else:
+                    return redirect("evaluation:update", p_id=eval.id)
 
             except ReadBedOrBedGraphException as exp:
                 messages.error(request, exp)
