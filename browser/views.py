@@ -54,7 +54,7 @@ def image(request, p_cols, p_id, p_chrom, p_start, p_end, p_breakpoint_id=None, 
 
     track = Track.objects.get(id=p_id)
 
-    breakpoint = None
+    breakpoint = {}
 
     if request.method == "GET":
         name_filter = request.GET.get("name_filter", None)
@@ -68,14 +68,16 @@ def image(request, p_cols, p_id, p_chrom, p_start, p_end, p_breakpoint_id=None, 
         if interval_end:
             interval_end = int(interval_end)
 
-        if p_breakpoint_id:
-            breakpoint = Breakpoint.objects.get(id=p_breakpoint_id)
-
-        breakpoint_coordinates = {}
-        breakpoint_coordinates["left_start"] = int(request.GET.get("left_start", "-1"))
-        breakpoint_coordinates["left_end"] = int(request.GET.get("left_end", "-1"))
-        breakpoint_coordinates["right_start"] = int(request.GET.get("right_start", "-1"))
-        breakpoint_coordinates["right_end"] = int(request.GET.get("right_end", "-1"))
+        breakpoint = {
+            "left_start": int(request.GET.get("left_start", "-1")),
+            "left_end": int(request.GET.get("left_end", "-1")),
+            "right_start": int(request.GET.get("right_start", "-1")),
+            "right_end": int(request.GET.get("right_end", "-1")),
+            "right_coord": int(request.GET.get("right_coord", "-1")),
+            "left_coord": int(request.GET.get("left_coord", "-1")),
+            "right_inverse": get_bool_param(request, "right_inverse"),
+            "left_inverse": get_bool_param(request, "left_inverse"),
+        }
 
     fig = track.draw_track(
         p_cols,
@@ -88,7 +90,6 @@ def image(request, p_cols, p_id, p_chrom, p_start, p_end, p_breakpoint_id=None, 
         breakpoint=breakpoint,
         left_side=p_left_side,
         width_prop=p_width_prop,
-        breakpoint_coordinates=breakpoint_coordinates,
     )
 
     buf = BytesIO()
@@ -102,6 +103,12 @@ def get_chrom_length(plot_id, chrom):
 
     assembly = Plot.objects.get(id=plot_id).assembly
     return assembly.chromosomes.get(name=chrom).size
+
+
+def get_chrom(chrom, plot_id):
+
+    assembly = Plot.objects.get(id=plot_id).assembly
+    return assembly.chromosomes.get(name=chrom)
 
 
 def get_region_or_err_msg(search_text, plot_id):
@@ -244,15 +251,18 @@ def browser(request, p_id, p_chrom=None, p_start=None, p_end=None):
     )
 
 
-def zoom_breakpoint(size, shift, perc, zoom_in):
+def zoom_breakpoint(size, shift, perc, zoom_in, form_params):
 
     if zoom_in:
         perc = 1 / perc
 
-    return urlencode({"shift": int(shift * perc), "size": int(size * perc)}, quote_via=quote_plus)
+    attributes = {"shift": int(shift * perc), "size": int(size * perc)}
+    attributes.update(form_params)
+
+    return urlencode(attributes, quote_via=quote_plus)
 
 
-def move_breakpoint(size, shift, perc, right):
+def move_breakpoint(size, shift, perc, right, form_params):
 
     m = int(size * perc)
 
@@ -261,73 +271,200 @@ def move_breakpoint(size, shift, perc, right):
     else:
         new_shift = shift - m
 
-    return urlencode({"shift": new_shift, "size": size}, quote_via=quote_plus), 100 * perc
+    attributes = {"shift": new_shift, "size": size}
+    attributes.update(form_params)
+
+    return urlencode(attributes, quote_via=quote_plus), 100 * perc
 
 
-def breakpoint_browser(request, p_id, p_breakpoint_id):
+def get_coordinate_or_err_msg(request, name, plot_id):
+    def get_results(request, name, plot_id):
+
+        search_text = request.GET.get(name, "")
+
+        search_text = re.sub(r"(\s|,)", "", search_text)
+
+        if search_text == "":
+            return "Enter valid coordinate."
+
+        sre = re.search(r"^chr(\d+|X|Y):(\d+)$", search_text)
+
+        if not sre:
+            return f'"{search_text}" is not valid coordinate.'
+
+        sre = sre.groups()
+
+        chrom = "chr" + sre[0]
+        coordinate = int(sre[1])
+
+        try:
+            chrom_size = get_chrom_length(plot_id, chrom)
+
+            if coordinate > chrom_size:
+                return "Coordinate greater than chromosome size ({chrom_size}). Your coordinate: {search_text}".format(
+                    chrom_size=chrom_size, search_text=search_text
+                )
+
+        except ObjectDoesNotExist:
+            return f'Chromosome "{chrom}" does not exists. Search text: {search_text}.'
+
+        return chrom, coordinate
+
+    results = get_results(request, name, plot_id)
+
+    if type(results) == tuple:
+        return results
+    else:
+        messages.error(request, results)
+        return None, None
+
+
+def get_param(request, name, default):
+
+    val = request.GET.get(name, default)
+
+    if val == "":
+        val = default
+
+    return int(val)
+
+
+def get_bool_param(request, name):
+
+    val = request.GET.get(name, "false")
+    return val == "true"
+
+
+WILDTYPES_OPTIONS_NONE = 0
+WILDTYPES_OPTIONS_LEFT = 1
+WILDTYPES_OPTIONS_RIGHT = 2
+WILDTYPES_OPTIONS_BOTH = 3
+
+WILDTYPES_OPTIONS = (
+    (WILDTYPES_OPTIONS_NONE, "None"),
+    (WILDTYPES_OPTIONS_LEFT, "Left"),
+    (WILDTYPES_OPTIONS_RIGHT, "Right"),
+    (WILDTYPES_OPTIONS_BOTH, "Both"),
+)
+
+
+def get_wildtype_params(direction, p_chrom, p_start, p_end, p_inverse, p_size, p_wildtype_option):
+
+    if direction == ("left" and p_wildtype_option in (WILDTYPES_OPTIONS_LEFT, WILDTYPES_OPTIONS_BOTH)) or (
+        direction == "left" and p_wildtype_option in (WILDTYPES_OPTIONS_RIGHT, WILDTYPES_OPTIONS_BOTH)
+    ):
+
+        if (p_inverse and direction == "left") or (not p_inverse and direction == "right"):
+            p_wildtype_start = p_end - p_size
+            p_wildtype_end = p_end
+        else:
+            p_wildtype_start = p_start
+            p_wildtype_end = p_start + p_size
+
+        return {"chrom": p_chrom, "start": p_wildtype_start, "end": p_wildtype_end, "inverse": "true" if p_inverse else "false"}
+
+    else:
+        return {}
+
+
+def breakpoint_browser(request, p_id):
 
     perc_move = (0.2, 0.1)
     perc_zoom = 1.25
 
-    breakpoint = Breakpoint.objects.get(id=p_breakpoint_id)
-
     p_plot = Plot.objects.get(id=p_id)
 
+    breakpoint_params = {}
+    form_params = {}
+    wildtype_left_params = {}
+    wildtype_right_params = {}
+
     if request.method == "GET":
-        p_size = int(request.GET.get("size", 2000000))
-        p_shift = int(request.GET.get("shift", 0))
 
-    else:
-        pass
+        p_size = get_param(request, "size", 2000000)
+        p_shift = get_param(request, "shift", 0)
 
-    if 2 * abs(p_shift) < p_size:
+        p_right_inverse = get_bool_param(request, "right_inverse")
+        p_left_inverse = get_bool_param(request, "left_inverse")
 
-        right_size = int(p_size / 2) - p_shift
+        p_left_chrom, p_left_coord = get_coordinate_or_err_msg(request, "left_coordinate", p_id)
+        p_right_chrom, p_right_coord = get_coordinate_or_err_msg(request, "right_coordinate", p_id)
 
-        if breakpoint.right_inverse:
-            breakpoint.right_start = breakpoint.right_coord - right_size
-            breakpoint.right_end = breakpoint.right_coord
-        else:
-            breakpoint.right_start = breakpoint.right_coord
-            breakpoint.right_end = breakpoint.right_coord + right_size
+        p_wildtype_option = get_param(request, "wildtype_option", WILDTYPES_OPTIONS_NONE)
 
-        left_size = int(p_size / 2) + p_shift
+        if p_left_chrom is not None and p_right_chrom is not None:
 
-        if breakpoint.left_inverse:
-            breakpoint.left_start = breakpoint.left_coord
-            breakpoint.left_end = breakpoint.left_coord + left_size
-        else:
-            breakpoint.left_start = breakpoint.left_coord - left_size
-            breakpoint.left_end = breakpoint.left_coord
+            p_left_start = p_left_end = p_right_start = p_right_end = None
+            p_left_width_prop = p_right_width_prop = 0
 
-        breakpoint.left_width_prop = int(left_size / p_size * DEFAULT_WIDTH_PROP)
-        breakpoint.right_width_prop = int(right_size / p_size * DEFAULT_WIDTH_PROP)
+            if 2 * abs(p_shift) < p_size:
 
-    elif p_size <= 2 * p_shift:
+                right_size = int(p_size / 2) - p_shift
 
-        breakpoint.left_start = breakpoint.left_coord - p_shift - p_size
-        breakpoint.left_end = breakpoint.left_coord - p_shift
+                if p_right_inverse:
+                    p_right_start = p_right_coord - right_size
+                    p_right_end = p_right_coord
+                else:
+                    p_right_start = p_right_coord
+                    p_right_end = p_right_coord + right_size
 
-        breakpoint.left_width_prop = DEFAULT_WIDTH_PROP
+                left_size = int(p_size / 2) + p_shift
 
-    else:
-        breakpoint.right_start = breakpoint.right_coord - p_shift - p_size
-        breakpoint.right_end = breakpoint.right_coord - p_shift
+                if p_left_inverse:
+                    p_left_start = p_left_coord
+                    p_left_end = p_left_coord + left_size
+                else:
+                    p_left_start = p_left_coord - left_size
+                    p_left_end = p_left_coord
 
-        breakpoint.right_width_prop = DEFAULT_WIDTH_PROP
+                p_left_width_prop = int(left_size / p_size * DEFAULT_WIDTH_PROP)
+                p_right_width_prop = int(right_size / p_size * DEFAULT_WIDTH_PROP)
 
-    url_params = {}
+            elif p_size <= 2 * p_shift:
 
-    if breakpoint.left_start:
-        url_params["left_start"] = breakpoint.left_start
-    if breakpoint.left_end:
-        url_params["left_end"] = breakpoint.left_end
-    if breakpoint.right_start:
-        url_params["right_start"] = breakpoint.right_start
-    if breakpoint.right_end:
-        url_params["right_end"] = breakpoint.right_end
+                p_left_start = p_left_coord - p_shift - p_size
+                p_left_end = p_left_coord - p_shift
 
-    get_url = "?" + urlencode(url_params, quote_via=quote_plus)
+                p_left_width_prop = DEFAULT_WIDTH_PROP
+
+            else:
+
+                p_right_start = p_right_coord - p_shift - p_size
+                p_right_end = p_right_coord - p_shift
+                p_right_width_prop = DEFAULT_WIDTH_PROP
+
+            wildtype_left_params = get_wildtype_params("left", p_left_chrom, p_left_start, p_left_end, p_left_inverse, p_size, p_wildtype_option)
+            wildtype_right_params = get_wildtype_params(
+                "right", p_right_chrom, p_right_start, p_right_end, p_right_inverse, p_size, p_wildtype_option
+            )
+
+            form_params = {
+                "left_inverse": request.GET.get("left_inverse", "false"),
+                "right_inverse": request.GET.get("right_inverse", "false"),
+                "left_coordinate": request.GET.get("left_coordinate", ""),
+                "right_coordinate": request.GET.get("right_coordinate", ""),
+                "wildtype_option": p_wildtype_option,
+            }
+
+            breakpoint_params = {
+                "left_chrom": p_left_chrom,
+                "left_coord": p_left_coord,
+                "right_chrom": p_right_chrom,
+                "right_coord": p_right_coord,
+                "right_width_prop": p_right_width_prop,
+                "left_width_prop": p_left_width_prop,
+                "right_inverse": request.GET.get("right_inverse", "false"),
+                "left_inverse": request.GET.get("left_inverse", "false"),
+            }
+
+            if p_left_start:
+                breakpoint_params["left_start"] = p_left_start
+            if p_left_end:
+                breakpoint_params["left_end"] = p_left_end
+            if p_right_start:
+                breakpoint_params["right_start"] = p_right_start
+            if p_right_end:
+                breakpoint_params["right_end"] = p_right_end
 
     return TemplateResponse(
         request,
@@ -335,18 +472,21 @@ def breakpoint_browser(request, p_id, p_breakpoint_id):
         {
             "p_id": p_id,
             "p_plot": p_plot,
-            "p_breakpoint": breakpoint,
             "p_size": p_size,
             "p_shift": p_shift,
             "move": (
-                move_breakpoint(p_size, p_shift, perc_move[0], False),
-                move_breakpoint(p_size, p_shift, perc_move[1], False),
-                move_breakpoint(p_size, p_shift, perc_move[1], True),
-                move_breakpoint(p_size, p_shift, perc_move[0], True),
+                move_breakpoint(p_size, p_shift, perc_move[0], False, form_params),
+                move_breakpoint(p_size, p_shift, perc_move[1], False, form_params),
+                move_breakpoint(p_size, p_shift, perc_move[1], True, form_params),
+                move_breakpoint(p_size, p_shift, perc_move[0], True, form_params),
             ),
-            "zoom_in": zoom_breakpoint(p_size, p_shift, perc_zoom, True),
-            "zoom_out": zoom_breakpoint(p_size, p_shift, perc_zoom, False),
-            "get_url": get_url,
+            "zoom_in": zoom_breakpoint(p_size, p_shift, perc_zoom, True, form_params),
+            "zoom_out": zoom_breakpoint(p_size, p_shift, perc_zoom, False, form_params),
+            "breakpoint_params_url": "?" + urlencode(breakpoint_params, quote_via=quote_plus),
+            "breakpoint_params": breakpoint_params,
+            "wildtype_left_params": wildtype_left_params,
+            "wildtype_right_params": wildtype_right_params,
+            "wildtypes_options": WILDTYPES_OPTIONS,
         },
     )
 

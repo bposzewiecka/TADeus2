@@ -159,20 +159,7 @@ class TrackPlot:
             vlines, ymin, ymax, linestyle=DEFAULT_VLINE_LINE_STYLE, zorder=10, linewidth=DEFAULT_VLINE_WIDTH, color=color, alpha=DEFAULT_VLINE_ALPHA
         )
 
-    def draw_track(
-        self,
-        cols,
-        chrom,
-        start,
-        end,
-        interval_start,
-        interval_end,
-        name_filter,
-        breakpoint=None,
-        left_side=None,
-        width_prop=None,
-        breakpoint_coordinates=None,
-    ):
+    def draw_track(self, cols, chrom, start, end, interval_start, interval_end, name_filter, breakpoint=None, left_side=None, width_prop=None):
         self.dpi = 600
         if width_prop is None:
             width_prop = DEFAULT_WIDTH_PROP
@@ -185,10 +172,8 @@ class TrackPlot:
         self.breakpoint = breakpoint
         self.left_side = left_side
         self.width_prop = width_prop
-        self.breakpoint_coordinates = breakpoint_coordinates
-        self.visualize_breakpoint = (
-            self.breakpoint_coordinates and "left_start" in self.breakpoint_coordinates and "right_start" in self.breakpoint_coordinates
-        )
+
+        self.visualize_breakpoint = self.breakpoint and "left_start" in self.breakpoint and "right_start" in self.breakpoint
 
         width = self.get_figure_width()
 
@@ -221,10 +206,10 @@ class TrackPlot:
         self.height = self.get_height()
         fig.set_size_inches(cm2inch(self.fig_width, self.height))
 
-        if breakpoint and left_side and breakpoint.left_inverse:
+        if (left_side or left_side is None) and breakpoint["left_inverse"]:
             self.axis.invert_xaxis()
 
-        if breakpoint and not left_side and breakpoint.right_inverse:
+        if not left_side and breakpoint["right_inverse"]:
             self.axis.invert_xaxis()
 
         return fig
@@ -1035,23 +1020,23 @@ class PlotHiCMatrix(TrackPlot):
 
     def get_breakpoint_matrix(self, bin_size, adj_depth):
 
-        left_inverse = self.breakpoint.left_inverse
-        right_inverse = self.breakpoint.right_inverse
+        left_inverse = self.breakpoint["left_inverse"]
+        right_inverse = self.breakpoint["right_inverse"]
 
-        left_start = self.breakpoint_coordinates["left_start"]
-        left_end = self.breakpoint_coordinates["left_end"]
+        left_start = self.breakpoint["left_start"]
+        left_end = self.breakpoint["left_end"]
 
-        right_start = self.breakpoint_coordinates["right_start"]
-        right_end = self.breakpoint_coordinates["right_end"]
+        right_start = self.breakpoint["right_start"]
+        right_end = self.breakpoint["right_end"]
 
-        if not self.breakpoint.left_inverse:
+        if not self.breakpoint["left_inverse"]:
             left_start_adj = self.bin_adjust(left_start, bin_size) - adj_depth
             left_end_adj = self.bin_adjust(left_end + bin_size // 2, bin_size)
         else:
             left_start_adj = self.bin_adjust(left_start, bin_size) - adj_depth
             left_end_adj = self.bin_adjust(left_end + bin_size // 2, bin_size) + adj_depth
 
-        if not self.breakpoint.right_inverse:
+        if not self.breakpoint["right_inverse"]:
             right_start_adj = self.bin_adjust(right_start + bin_size // 2, bin_size)
             right_end_adj = self.bin_adjust(right_end + bin_size, bin_size) + adj_depth
         else:
@@ -1062,12 +1047,12 @@ class PlotHiCMatrix(TrackPlot):
         right_no_bins = (right_end_adj - right_start_adj) // bin_size
         no_bins = left_no_bins + right_no_bins
 
-        if not self.breakpoint.left_inverse:
+        if not self.breakpoint["left_inverse"]:
             left_br_start = left_start_adj
         else:
             left_br_start = left_end_adj - no_bins * bin_size
 
-        if not self.breakpoint.right_inverse:
+        if not self.breakpoint["right_inverse"]:
             right_br_start = right_start_adj - left_no_bins * bin_size
         else:
             right_br_start = left_end_adj - right_no_bins * bin_size
@@ -1083,10 +1068,10 @@ class PlotHiCMatrix(TrackPlot):
 
         matrix = self.get_sub_matrix(
             bin_size,
-            self.breakpoint.left_chrom.name,
+            self.breakpoint["left_chrom"],
             left_br_start,
             left_br_start + no_bins * bin_size,
-            self.breakpoint.right_chrom.name,
+            self.breakpoint["right_chrom"],
             right_br_start,
             right_br_start + no_bins * bin_size,
         )
@@ -1099,7 +1084,7 @@ class PlotHiCMatrix(TrackPlot):
 
         # matrix_size = matrix.shape[0]
 
-        left_matrix = self.get_sub_matrix(bin_size, self.breakpoint.left_chrom.name, left_start_adj, left_end_adj)
+        left_matrix = self.get_sub_matrix(bin_size, self.breakpoint["left_chrom"], left_start_adj, left_end_adj)
 
         if left_inverse:
             left_matrix = np.flipud(left_matrix)
@@ -1108,7 +1093,7 @@ class PlotHiCMatrix(TrackPlot):
         # left_matrix_size = left_matrix.shape[0]
         # matrix[0:left_matrix_size,0:left_matrix_size] = left_matrix
 
-        right_matrix = self.get_sub_matrix(bin_size, self.breakpoint.right_chrom.name, right_start_adj, right_end_adj)
+        right_matrix = self.get_sub_matrix(bin_size, self.breakpoint["right_chrom"], right_start_adj, right_end_adj)
 
         if right_inverse:
             right_matrix = np.flipud(right_matrix)

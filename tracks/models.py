@@ -112,18 +112,7 @@ class Track(models.Model):
         return self.bed_display == BED_DISPLAY_VERTICAL_LINES and self.track_file.file_type == FILE_TYPE_BED
 
     def draw_track(
-        self,
-        col,
-        chrom,
-        start,
-        end,
-        interval_start,
-        interval_end,
-        name_filter=None,
-        breakpoint=None,
-        left_side=None,
-        width_prop=DEFAULT_WIDTH_PROP,
-        breakpoint_coordinates=None,
+        self, col, chrom, start, end, interval_start, interval_end, name_filter=None, breakpoint=None, left_side=None, width_prop=DEFAULT_WIDTH_PROP
     ):
 
         if not self.name_filter:
@@ -152,9 +141,7 @@ class Track(models.Model):
         elif file_type == FILE_TYPE_XAXIS:
             trackPlot = PlotXAxis(model=self)
 
-        return trackPlot.draw_track(
-            col, chrom, start, end, interval_start, interval_end, name_filter, breakpoint, left_side, width_prop, breakpoint_coordinates
-        )
+        return trackPlot.draw_track(col, chrom, start, end, interval_start, interval_end, name_filter, breakpoint, left_side, width_prop)
 
     def get_aggregate_function(self):
 

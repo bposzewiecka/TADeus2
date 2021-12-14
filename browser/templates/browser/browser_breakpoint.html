@@ -1,0 +1,212 @@
+{% extends 'tadeus_portal/base_card.html' %}
+
+{% load humanize %}
+
+{% block header %}
+
+<form action="{% url 'browser:breakpoint_browser' p_id=p_id %}" method="get" >
+    <div class="btn-toolbar" role="toolbar" aria-label="" style="align-items: center; justify-content: center;">
+
+        {% with left_inverse=request.GET.left_inverse|default:'false' right_inverse=request.GET.right_inverse|default:'false'  %}
+
+        <div class="input-group mr-2">
+
+             <div class="input-group-prepend">
+                <button class="btn btn-secondary btn-lg" type="submit" value="Submit">Wildtypes</button>
+            </div>
+
+            <select name="wildtype_option" class="form-control input-group-append" style="height: 48px">
+                {% for x, y in wildtypes_options %}
+                    <option value="{{x}}"  {% if request.GET.wildtype_option|add:0 == x %} selected{% endif %}>{{y}}</option>
+                {% endfor %}
+            </select>
+
+
+        </div>
+
+        <div class="input-group mr-2">
+
+            <div class="input-group-prepend">
+                <button id="button_left_inverse" class="btn btn-danger btn-lg"><i class="fas {% if left_inverse == 'false' %}fa-forward{% else %}fa-backward{% endif %}"></i></button>
+            </div>
+
+            <div class="input-group-append">
+                <input type="text" class="form-control" placeholder="Enter left breakpoint"  name="left_coordinate" style="width: 200px" value="{{ request.GET.left_coordinate }}">
+            </div>
+
+            <div class="input-group-append" style="border-left: 4px solid #dc3545;">
+                <input type="text" class="form-control" placeholder="Enter right breakpoint"  name="right_coordinate" style="width: 200px" value="{{ request.GET.right_coordinate }}">
+            </div>
+
+            <div class="input-group-append">
+                <button id="button_right_inverse" class="btn btn-danger btn-lg"><i  class="fas {% if right_inverse == 'false' %}fa-forward{% else %}fa-backward{% endif %}"></i></button>
+            </div>
+        </div>
+
+        <input type="hidden"  id="left_inverse"  name="left_inverse" value="{{ left_inverse  }}">
+        <input type="hidden"  id="right_inverse" name="right_inverse" value="{{ right_inverse }}">
+
+        {% endwith %}
+
+        <div class="input-group mr-2">
+            <div class="input-group-prepend">
+                <button id="button_left_inverse" class="btn btn-secondary btn-lg">Size</button>
+            </div>
+            <input type="number" class="form-control" placeholder="Enter size"  name="size" style="width: 150px" value="{{request.GET.size}}">
+        </div>
+
+        <div class="input-group mr-2">
+            <div class="input-group-prepend">
+                <button id="button_left_inverse" class="btn btn-secondary btn-lg">Shift</button>
+            </div>
+            <input type="number" class="form-control" placeholder="Enter shift"  name="shift" style="width: 150px" value="{{request.GET.shift}}">
+        </div>
+
+        <div class="input-group mr-2">
+            <div class="input-group">
+                <button class="btn btn-primary btn-lg" type="submit" value="Submit"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        {% if p_name_filters %}
+            <div class="input-group mr-2">
+                <select name="name_filter" class="form-control" style="height: 48px">
+                    <option value="" {% if name_filter is None %} selected{% endif %}>All</option>
+                    {% for x in p_name_filters %}
+                        <option value="{{ x }}" {% if name_filter == x %} selected{% endif %}>{{ x }}</option>
+                    {% endfor %}
+                </select>
+                <div class="input-group-append">
+                    <button class="btn btn-secondary btn-lg" type="submit" value="Submit"><i class="fas fa-filter"></i></button>
+                </div>
+            </div>
+
+        {% endif %}
+
+        <input type="hidden" name="interval_start" value="{{ interval_start }}">
+        <input type="hidden" name="interval_end" value="{{ interval_end }}">
+
+
+    </div>
+
+    <div class="btn-toolbar" role="toolbar" aria-label="" style="align-items: center; justify-content: center; padding-top:10px">
+
+        <div class="btn-group mr-2" role="group" aria-label="">
+            <a href="{% url 'plots:update' p_id=p_id %}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="edit"><i class="fas fa-edit"></i></a>
+            <a href="{% url 'browser:breakpoint_browser' p_id=p_id %}?{{zoom_in|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom in"><i class="fas fa-search-plus"></i></a>
+            <a href="{% url 'browser:breakpoint_browser' p_id=p_id %}?{{zoom_out|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom out"><i class="fas fa-search-minus"></i></a>
+        </div>
+
+
+        <div class="btn-group mr-2" role="group" aria-label="">
+            <a href="{% url 'browser:breakpoint_browser' p_id=p_id  %}?{{move.0.0|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.0.1 }} % the left"><i class="fas fa-angle-double-left"></i></a>
+            <a href="{% url 'browser:breakpoint_browser' p_id=p_id  %}?{{move.1.0|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.1.1 }} % the left"><i class="fas fa-angle-left"></i></a>
+            <a href="{% url 'browser:breakpoint_browser' p_id=p_id  %}?{{move.2.0|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.2.1 }} % the right"><i class="fas fa-angle-right"></i></a>
+            <a href="{% url 'browser:breakpoint_browser' p_id=p_id  %}?{{move.3.0|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to {{ move.3.1 }} % the right"><i class="fas fa-angle-double-right"></i></a>
+        </div>
+    </div>
+
+
+</form>
+
+{% endblock %}
+
+
+{% block body %}
+
+
+     <div style="display: table; margin: 0 auto;">
+
+
+        <table style="float:left;">
+
+            {% for p_track in p_plot.tracks.all %}
+                <tr>
+
+                    {% if breakpoint_params.left_start %}
+
+                        <td  {% if breakpoint_params.right_start %} style="border-right: 4px solid #dc3545;"{% endif %}>
+
+                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=breakpoint_params.left_chrom p_start=breakpoint_params.left_start p_end=breakpoint_params.left_end p_left_side=1 p_width_prop=breakpoint_params.left_width_prop %}{{breakpoint_params_url|safe}}" alt="Track">
+
+                        </td>
+
+                    {% endif %}
+
+                    {% if breakpoint_params.right_start %}
+
+                        <td>
+                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=breakpoint_params.right_chrom p_start=breakpoint_params.right_start p_end=breakpoint_params.right_end p_left_side=0 p_width_prop=breakpoint_params.right_width_prop %}{{breakpoint_params_url|safe}}" alt="Track">
+                        </td>
+
+                    {% endif %}
+
+                </tr>
+            {% endfor %}
+
+            {% if wildtype_left_params %}
+                {% for p_track in p_plot.tracks.all %}
+                    <tr>
+                        <td colspan="2">
+                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_left_params.chrom p_start=wildtype_left_params.start p_end=wildtype_left_params.end %}?left_inverse={{breakpoint_params.left_inverse}}" alt="Track">
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+
+
+            {% if wildtype_right_params %}
+                {% for p_track in p_plot.tracks.all %}
+                    <tr>
+                        <td colspan="2">
+                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_right_params.chrom p_start=wildtype_right_params.start p_end=wildtype_right_params.end %}?right_inverse={{breakpoint_params.right_inverse}}" alt="Track">
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+
+
+        </table>
+     </div>
+
+
+{% endblock %}
+
+
+
+{% block javascript %}
+
+<script>
+
+
+
+function toogle_directions(direction_name) {
+
+
+    document.getElementById("button_" + direction_name + "_inverse").addEventListener('click', function(event){
+
+        var input_id = direction_name + "_inverse"
+
+        event.preventDefault();
+
+        if (document.getElementById(input_id).value == "false") {
+            document.getElementById(input_id).value = "true";
+        } else {
+            document.getElementById(input_id).value = "false";
+        }
+
+        var icon = document.getElementById("button_" + direction_name + "_inverse").firstChild;
+
+        icon.classList.toggle("fa-backward");
+        icon.classList.toggle("fa-forward");
+    });
+
+}
+
+toogle_directions("right");
+toogle_directions("left")
+
+</script>
+
+
+{% endblock javascript %}
