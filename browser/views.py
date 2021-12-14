@@ -350,8 +350,8 @@ WILDTYPES_OPTIONS = (
 
 def get_wildtype_params(direction, p_chrom, p_start, p_end, p_inverse, p_size, p_wildtype_option):
 
-    if direction == ("left" and p_wildtype_option in (WILDTYPES_OPTIONS_LEFT, WILDTYPES_OPTIONS_BOTH)) or (
-        direction == "left" and p_wildtype_option in (WILDTYPES_OPTIONS_RIGHT, WILDTYPES_OPTIONS_BOTH)
+    if (direction == "left" and p_wildtype_option in (WILDTYPES_OPTIONS_LEFT, WILDTYPES_OPTIONS_BOTH)) or (
+        direction == "right" and p_wildtype_option in (WILDTYPES_OPTIONS_RIGHT, WILDTYPES_OPTIONS_BOTH)
     ):
 
         if (p_inverse and direction == "left") or (not p_inverse and direction == "right"):
