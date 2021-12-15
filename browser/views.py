@@ -397,50 +397,25 @@ def breakpoint_browser(request, p_id):  # noqa: C901
             p_left_start = p_left_end = p_right_start = p_right_end = None
             p_left_width_prop = p_right_width_prop = 0
 
-            if 2 * abs(p_shift) < p_size:
-
-                right_size = int(p_size // 2) - p_shift
-
-                if p_right_inverse:
-                    p_right_start = p_right_coord - right_size
-                    p_right_end = p_right_coord
-                else:
-                    p_right_start = p_right_coord
-                    p_right_end = p_right_coord + right_size
-
-                left_size = int(p_size / 2) + p_shift
-
-                if p_left_inverse:
-                    p_left_start = p_left_coord
-                    p_left_end = p_left_coord + left_size
-                else:
-                    p_left_start = p_left_coord - left_size
-                    p_left_end = p_left_coord
-
-                p_left_width_prop = int(left_size / p_size * DEFAULT_WIDTH_PROP)
-                p_right_width_prop = int(right_size / p_size * DEFAULT_WIDTH_PROP)
-
-            elif p_size <= 2 * p_shift:
-
-                if p_left_inverse:
-                    p_left_end = p_left_coord + p_shift + p_size // 2
-                    p_left_start = p_left_end - p_size
-                else:
-                    p_left_start = p_left_coord - p_shift - p_size // 2
-                    p_left_end = p_left_start + p_size
-
-                p_left_width_prop = DEFAULT_WIDTH_PROP
-
+            if p_left_inverse:
+                p_left_end = p_left_coord + p_shift + p_size // 2
+                p_left_start = p_left_end - min(p_shift + p_size // 2, p_size)
             else:
+                p_left_start = p_left_coord - p_shift - p_size // 2
+                p_left_end = p_left_start + min(p_shift + p_size // 2, p_size)
 
-                if p_right_inverse:
-                    p_right_start = p_right_coord + p_shift - p_size // 2
-                    p_right_end = p_right_start + p_size
-                else:
-                    p_right_end = p_right_coord - p_shift + p_size // 2
-                    p_right_start = p_right_end - p_size
+            if p_right_inverse:
+                p_right_start = p_right_coord + p_shift - p_size // 2
+                p_right_end = max(p_right_coord, p_right_start - p_size)
+            else:
+                p_right_end = p_right_coord - p_shift + p_size // 2
+                p_right_start = max(p_right_coord, p_right_end - p_size)
 
-                p_right_width_prop = DEFAULT_WIDTH_PROP
+            left_size = int(p_size / 2) + p_shift
+            right_size = int(p_size // 2) - p_shift
+
+            p_left_width_prop = min(max(int(left_size / p_size * DEFAULT_WIDTH_PROP), 0), 1000)
+            p_right_width_prop = min(max(int(right_size / p_size * DEFAULT_WIDTH_PROP), 0), 1000)
 
             wildtype_left_params = get_wildtype_params("left", p_left_chrom, p_left_start, p_left_end, p_left_inverse, p_size, p_wildtype_option)
 

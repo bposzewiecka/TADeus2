@@ -71,7 +71,7 @@
 
     <div style="float:left">
         {% for p_track in  p_plot.tracks.all %}
-        <div>
+        <div {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
             <img src="{% url 'browser:image' p_id=p_track.id p_cols=p_cols p_chrom=p_chrom p_start=p_start p_end=p_end %}{{ get_url|safe }}" alt="">
         </div>
         {% endfor %}

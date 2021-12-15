@@ -712,7 +712,7 @@ class PlotXAxis(TrackPlot):
         if size <= 4e3:
             scale = 1
             text = ""
-        elif size <= 1e6:
+        elif size <= 500000:
             scale = 1e3
             text = "Kbp"
         else:
@@ -720,7 +720,7 @@ class PlotXAxis(TrackPlot):
             text = "Mbp"
 
         scaled_start = start / scale
-        scaled_end = end / scale
+        scaled_end = end / scale - 0.02
 
         self.axis.set_xlim(scaled_start, scaled_end)
 
