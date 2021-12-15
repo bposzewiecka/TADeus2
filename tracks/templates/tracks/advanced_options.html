@@ -1,0 +1,245 @@
+<div class="card-body">
+
+    {% if form.min_value or form.max_value or form.bed_display %}
+
+        <div class="form-row">
+
+            {% if form.min_value %}
+
+                <div class="form-group col-md-3">
+
+                    {{ form.min_value.errors }}
+
+                    <label for="{{ form.min_value.id_for_label }}">Minimum value</label>
+
+                    <input class="form-control" name="{{ form.min_value.html_name }}" id="{{ form.min_value.id_for_label }}" {% if form.min_value.value is not None %} value="{{ form.min_value.value}}" {% endif %}  {% if readonly %}readonly{% endif %}>
+
+                </div>
+
+            {% endif %}
+
+            {% if form.max_value %}
+
+                <div class="form-group col-md-3">
+
+                    {{ form.max_value.errors }}
+                    <label for="{{ form.max_value.id_for_label }}">Maximum value</label>
+                    <input  class="form-control"  name="{{ form.max_value.html_name }}" id="{{ form.max_value.id_for_label }}" {% if form.max_value.value is not None %} value="{{ form.max_value.value}}" {% endif %}  {% if readonly %}readonly{% endif %}>
+
+                </div>
+
+            {% endif %}
+
+            {% if form.bed_display %}
+
+                <div class="form-group col-md-3">
+
+                    {{ form.bed_display.errors }}
+
+                    <label for="{{ form.bed_display.id_for_label }}">Display</label>
+
+                    <select id="{{ form.bed_display.id_for_label }}" class="form-control" name="{{ form.bed_display.html_name }}"  {% if readonly %}disabled{% endif %}>
+
+                    {% for x,y in form.fields.bed_display.choices %}
+                        <option value="{{ x }}" {% if form.bed_display.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+
+                    </select>
+
+                </div>
+
+            {% endif %}
+
+
+            {% if form.name_filter  %}
+
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input type="checkbox" name="{{ form.name_filter.html_name }}" id="{{ form.name_filter.id_for_label }}" {% if form.name_filter.value %}checked{% endif %} {% if readonly %}disabled{% endif %}/>
+                        <label class="form-check-label" for="{{ form.name_filter.id_for_label }}">Name filter</label>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+    {% if form.height or form.color or form.edgecolor or form.colormap or form.bed_style or form.bed_display or form.inverted or form.labels %}
+
+        <div class="form-row">
+
+            {% if form.height %}
+
+                <div class="form-group col-md-3">
+                    <label for="{{ form.height.id_for_label }}">Height</label>
+
+                    {{ form.height.errors }}
+
+                    <input class="form-control" type="number" name="{{ form.height.html_name }}" id="{{ form.height.id_for_label }}" value="{{ form.height.value}}" {% if readonly %}readonly{% endif %}>
+                </div>
+
+            {% endif %}
+
+
+
+            {% if form.color %}
+
+                <div class="form-group col-md-3">
+                    <label for="{{ form.color.id_for_label }}">Color</label>
+
+                    {{ form.color.errors }}
+
+                    <input class="form-control"  name="{{ form.color.html_name }}" id="{{ form.color.id_for_label }}" value="{{ form.color.value}}" {% if readonly %}readonly{% endif %}>
+                </div>
+
+            {% endif %}
+
+            {% if form.edgecolor %}
+
+                <div class="form-group col-md-3">
+                    <label for="{{ form.edgecolor.id_for_label }}">Border color</label>
+
+                    {{ form.edgecolor.errors }}
+
+                    <input class="form-control"  name="{{ form.edgecolor.html_name }}" id="{{ form.edgecolor.id_for_label }}" value="{{ form.edgecolor.value}}" {% if readonly %}readonly{% endif %}>
+                </div>
+
+            {% endif %}
+
+            {% if form.colormap %}
+
+                <div class="form-group col-md-3">
+
+                    {{ form.colormap.errors }}
+
+                    <label for="{{ form.colormap.id_for_label }}">Colormap</label>
+
+                    <select id="{{ form.colormap.id_for_label }}" class="form-control" name="{{ form.colormap.html_name }}"  {% if readonly %}disabled{% endif %}>
+
+                    {% for x,y in form.fields.colormap.choices %}
+                        <option value="{{ x }}" {% if form.colormap.value == x %} selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+
+                    </select>
+                </div>
+
+            {% endif %}
+
+
+            {% if form.bed_style %}
+
+                <div class="form-group col-md-3">
+
+                    {{ form.bed_style.errors }}
+
+                    <label for="{{ form.bed_style.id_for_label }}">BED Style</label>
+
+                    <select id="{{ form.bed_style.id_for_label }}" class="form-control" name="{{ form.bed_style.html_name }}"  {% if readonly %}disabled{% endif %}>
+
+                    {% for x,y in style_choices %}
+                        <option value="{{ x }}" {% if form.bed_style.value|add:0 == x %} selected{% endif %} >{{ y }}</option>
+                    {% endfor %}
+
+                    </select>
+                </div>
+
+            {% endif %}
+
+            {% if form.inverted %}
+
+                <div class="col-md-2">
+
+                    <div class="form-check">
+                        <input type="checkbox" name="{{ form.inverted.html_name }}" id="{{ form.inverted.id_for_label }}" {% if form.inverted.value %}checked{% endif %} {% if readonly %}disabled{% endif %}/>
+                        <label class="form-check-label" for="{{ form.inverted.id_for_label }}">Inverted</label>
+
+                    </div>
+                </div>
+
+            {% endif %}
+
+            {% if form.labels %}
+
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input type="checkbox" name="{{ form.labels.html_name }}" id="{{ form.labels.id_for_label }}" {% if form.labels.value %}checked{% endif %} {% if readonly %}disabled{% endif %}/>
+                        <label class="form-check-label" for="{{ form.labels.id_for_label }}">Labels</label>
+                    </div>
+                 </div>
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+
+    {%  if form.bedgraph_display or form.bedgraph_type or form.bedgraph_style or form.bin_size %}
+
+        <div class="form-row">
+
+            {% if form.bedgraph_display %}
+
+                <div class="form-group col-3">
+                    <label for="{{ form.bedgraph_display.id_for_label }}">Display</label>
+                    <select id="{{ form.bedgraph_display.id_for_label }}" class="form-control" name="{{ form.bedgraph_display.html_name }}"  {% if readonly %}disabled{% endif %}>
+
+                        {% for x,y in form.fields.bedgraph_display.choices %}
+                            <option value="{{ x }}"{% if form.bedgraph_display.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+            {% endif %}
+
+            {% if form.bedgraph_type %}
+
+                <div class="form-group col-3">
+                    <label for="{{ form.bedgraph_type.id_for_label }}">Type</label>
+                    <select id="{{ form.bedgraph_type.id_for_label }}" class="form-control" name="{{ form.bedgraph_type.html_name }}"  {% if readonly %}disabled{% endif %}>
+
+                        {% for x,y in form.fields.bedgraph_type.choices %}
+                            <option value="{{ x }}"{% if form.bedgraph_type.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+            {% endif %}
+
+            {% if form.bedgraph_style  %}
+
+                <div class="form-group col-md-3">
+
+                    {{ form.bedgraph_style.errors }}
+
+                    <label for="{{ form.bedgraph_style.id_for_label }}">BEDgraph style</label>
+                    <select id="{{ form.bedgraph_style.id_for_label }}" class="form-control" name="{{ form.bedgraph_style.html_name }}"  {% if readonly %}disabled{% endif %}>
+
+                    {% for x,y in form.fields.bedgraph_style.choices %}
+                        <option value="{{ x }}" {% if form.bedgraph_style.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+
+                    </select>
+
+                </div>
+
+            {% endif %}
+
+            {% if form.bin_size %}
+
+                <div class="form-group col-3">
+                    <label for="{{ form.bin_size.id_for_label }}">Bin size</label>
+                    {{ form.max_value.errors }}
+                    <input  class="form-control"  name="{{ form.bin_size.html_name }}" id="{{ form.bin_size.id_for_label }}" {% if form.bin_size.value is not None %} value="{{ form.bin_size.value}}" {% endif %}  {% if readonly %}readonly{% endif %}>
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+
+</div>

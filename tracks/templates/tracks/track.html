@@ -39,432 +39,53 @@
 {% block body %}
     {% csrf_token %}
 
-    <div class="form-row">
 
-        <div class="form-group col-md-{% if file_type  == 'HI' %}10{% else %}12{% endif %}">
-            <label>Track file</label>
-            <input class="form-control"  value="{{  track.track_file.name   }}" readonly>
-        </div>
 
-        {% if file_type == 'HI' %}
-        <div class="form-group col-md-2">
-            <label>Track type</label>
 
-            <select id="{{ form.hic_display.id_for_label }}" class="form-control" name="{{ form.hic_display.html_name }}"  readonly>
-
-                {% for x,y in form.fields.hic_display.choices %}
-                    <option value="{{ x }}"{% if form.hic_display.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
-                {% endfor %}
-
-            </select>
-
-        </div>
-        {% endif %}
-
-    </div>
-
-    <div class="form-row">
-
-        <div class="form-group col-md-12">
-            <label for="{{ form.title.id_for_label }}">Title</label>
-            {{ form.title.errors }}
-            <input class="form-control" name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}" {% if form.title.value  %} value="{{ form.title.value}}" {% endif %} {% if readonly %}readonly{% endif %}>
-        </div>
-
-    </div>
-
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="{{ form.no.id_for_label }}">Sort order</label>
-
-            {{ form.no.errors }}
-
-            <input class="form-control" type="number" name="{{ form.no.html_name }}" id="{{ form.no.id_for_label }}" value="{{ form.no.value}}" {% if readonly %}readonly{% endif %}>
-        </div>
-
-        <div class="form-group col-md-6">
-            <label for="{{ form.height.id_for_label }}">Height</label>
-
-            {{ form.height.errors }}
-
-            <input class="form-control" type="number" name="{{ form.height.html_name }}" id="{{ form.height.id_for_label }}" value="{{ form.height.value}}" {% if readonly %}readonly{% endif %}>
-        </div>
-
-        <input class="form-control" type="hidden" name="{{ form.column.html_name }}" id="{{ form.column.id_for_label }}" value="{{ form.column.value}}" >
-    </div>
-
-
-    {% if form.chromosome or form.start_coordinate or form.end_coordinate or form.aggregate_function %}
-
-        <div class="form-row">
-
-            {% if form.chromosome %}
-
-                <div class="form-group col-md-3">
-                    <label for="{{ form.chromosome.id_for_label }}">Chromosome</label>
-
-                    {{ form.chromosome.errors }}
-
-                    <select name="{{ form.chromosome.html_name }}" class="form-control"  id="{{ form.chromosome.id_for_label }}" {% if readonly %}readonly{% endif %} required>>
-                        {% for chromosome in chroms %}
-                            <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-            {% endif %}
-
-            {% if form.start_coordinate %}
-
-                <div class="form-group col-md-3">
-                    <label for="{{ form.start_coordinate.id_for_label }}">Start coordinate</label>
-
-                    {{ form.start_coordinate.errors }}
-
-                    <input class="form-control" type="number" name="{{ form.start_coordinate.html_name }}" id="{{ form.start_coordinate.id_for_label }}" value="{{ form.start_coordinate.value}}" {% if readonly %}readonly{% endif %} required>
-                </div>
-
-            {% endif %}
-
-            {% if form.start_coordinate %}
-
-                <div class="form-group col-md-3">
-                    <label for="{{ form.end_coordinate.id_for_label }}">End coordinate</label>
-
-                    {{ form.end_coordinate.errors }}
-
-                    <input class="form-control" type="number"  name="{{ form.end_coordinate.html_name }}" id="{{ form.end_coordinate.id_for_label }}" value="{{ form.end_coordinate.value}}" {% if readonly %}readonly{% endif %} required>
-
-                </div>
-
-            {% endif %}
-
-            {% if form.aggregate_function %}
-
-                <div class="form-group col-md-3">
-                    <label for="{{ form.aggregate_function.id_for_label }}">Aggregate function</label>
-
-                    {{ form.aggregate_function.errors }}
-
-                    <select id="{{ form.aggregate_function.id_for_label }}" class="form-control" name="{{ form.aggregate_function.html_name }}"  {% if readonly %}disabled{% endif %}>
-                        {% for x,y in form.fields.aggregate_function.choices %}
-                            <option value="{{ x }}"{% if form.aggregate_function.value == x %} selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-            {% endif %}
-        </div>
-
-    {% endif %}
-
-    {% if form.color or form.edgecolor or form.colormap or form.min_value or form.max_value or form.bed_style or form.bed_display or form.transform or form.domains_file or form.inverted %}
-
-        <div class="form-row">
-
-            {% if form.color %}
-
-                <div class="form-group col-md-3">
-                    <label for="{{ form.color.id_for_label }}">Color</label>
-
-                    {{ form.color.errors }}
-
-                    <input class="form-control"  name="{{ form.color.html_name }}" id="{{ form.color.id_for_label }}" value="{{ form.color.value}}" {% if readonly %}readonly{% endif %}>
-                </div>
-
-            {% endif %}
-
-            {% if form.edgecolor %}
-
-                <div class="form-group col-md-3">
-                    <label for="{{ form.edgecolor.id_for_label }}">Border color</label>
-
-                    {{ form.edgecolor.errors }}
-
-                    <input class="form-control"  name="{{ form.edgecolor.html_name }}" id="{{ form.edgecolor.id_for_label }}" value="{{ form.edgecolor.value}}" {% if readonly %}readonly{% endif %}>
-                </div>
-
-            {% endif %}
-
-            {% if form.colormap %}
-
-                <div class="form-group col-md-3">
-
-                    {{ form.colormap.errors }}
-
-                    <label for="{{ form.colormap.id_for_label }}">Colormap</label>
-
-                    <select id="{{ form.colormap.id_for_label }}" class="form-control" name="{{ form.colormap.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                    {% for x,y in form.fields.colormap.choices %}
-                        <option value="{{ x }}" {% if form.colormap.value == x %} selected{% endif %}>{{ y }}</option>
-                    {% endfor %}
-
-                    </select>
-                </div>
-
-            {% endif %}
-
-            {% if form.min_value %}
-
-                <div class="form-group col-md-3">
-
-                    {{ form.min_value.errors }}
-
-                    <label for="{{ form.min_value.id_for_label }}">Minimum value</label>
-
-                    <input class="form-control" name="{{ form.min_value.html_name }}" id="{{ form.min_value.id_for_label }}" {% if form.min_value.value is not None %} value="{{ form.min_value.value}}" {% endif %}  {% if readonly %}readonly{% endif %}>
-
-                </div>
-
-            {% endif %}
-
-            {% if form.max_value %}
-
-                <div class="form-group col-md-3">
-
-                    {{ form.max_value.errors }}
-                    <label for="{{ form.max_value.id_for_label }}">Maximum value</label>
-                    <input  class="form-control"  name="{{ form.max_value.html_name }}" id="{{ form.max_value.id_for_label }}" {% if form.max_value.value is not None %} value="{{ form.max_value.value}}" {% endif %}  {% if readonly %}readonly{% endif %}>
-
-                </div>
-
-            {% endif %}
-
-            {% if form.bed_style %}
-
-                <div class="form-group col-md-3">
-
-                    {{ form.bed_style.errors }}
-
-                    <label for="{{ form.bed_style.id_for_label }}">BED Style</label>
-
-                    <select id="{{ form.bed_style.id_for_label }}" class="form-control" name="{{ form.bed_style.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                    {% for x,y in style_choices %}
-                        <option value="{{ x }}" {% if form.bed_style.value|add:0 == x %} selected{% endif %} >{{ y }}</option>
-                    {% endfor %}
-
-                    </select>
-                </div>
-
-            {% endif %}
-
-            {% if form.bed_display %}
-
-                <div class="form-group col-md-3">
-
-                    {{ form.bed_display.errors }}
-
-                    <label for="{{ form.bed_display.id_for_label }}">Display</label>
-
-                    <select id="{{ form.bed_display.id_for_label }}" class="form-control" name="{{ form.bed_display.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                    {% for x,y in form.fields.bed_display.choices %}
-                        <option value="{{ x }}" {% if form.bed_display.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
-                    {% endfor %}
-
-                    </select>
-
-                </div>
-
-            {% endif %}
-
-            {% if form.transform %}
-
-                <div class="form-group col-md-3">
-
-                    {{ form.transform.errors }}
-
-                    <label for="{{ form.transform.id_for_label }}">Transform</label>
-
-                    <select id="{{ form.transform.id_for_label }}" class="form-control" name="{{ form.transform.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                        {% for x,y in form.fields.transform.choices %}
-                            <option value="{{ x }}"{% if form.transform.value == x|add:0 %} selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-
-                    </select>
-                </div>
-
-            {% endif %}
-
-            {% if form.domains_file %}
-
-                <div class="form-group col-md-4">
-
-                    {{ form.domains_file.errors }}
-
-                    <label for="{{ form.domains_file.id_for_label }}">Domains datasource</label>
-
-                    <select id="{{ form.domains_file.id_for_label }}" class="form-control" name="{{ form.domains_file.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                        <option value="">None</option>
-
-                        {% for domains_file in domains_files %}
-                            <option value="{{ domains_file.id }}"{% if form.domains_file.value|add:0  == domains_file.id %} selected{% endif %}>{{ domains_file.name }}</option>
-                        {% endfor %}
-
-                    </select>
-                </div>
-
-            {% endif %}
-
-            {% if form.inverted %}
-
-                <div class="col-md-2">
-
-                    <div class="form-check">
-                        <input type="checkbox" name="{{ form.inverted.html_name }}" id="{{ form.inverted.id_for_label }}" {% if form.inverted.value %}checked{% endif %} {% if readonly %}disabled{% endif %}/>
-                        <label class="form-check-label" for="{{ form.inverted.id_for_label }}">Inverted</label>
-
-                    </div>
-                </div>
-
-            {% endif %}
-
-        </div>
-
-    {% endif %}
-
-    {% if form.labels or form.name_filter %}
-
-    <div class="form-group row">
-
-        {% if form.labels %}
-
-            <div class="col-md-2">
-                <div class="form-check">
-                    <input type="checkbox" name="{{ form.labels.html_name }}" id="{{ form.labels.id_for_label }}" {% if form.labels.value %}checked{% endif %} {% if readonly %}disabled{% endif %}/>
-                    <label class="form-check-label" for="{{ form.labels.id_for_label }}">Labels</label>
-                </div>
-             </div>
-        {% endif %}
-
-        {% if form.name_filter  %}
-
-            <div class="col-md-2">
-                <div class="form-check">
-                    <input type="checkbox" name="{{ form.name_filter.html_name }}" id="{{ form.name_filter.id_for_label }}" {% if form.name_filter.value %}checked{% endif %} {% if readonly %}disabled{% endif %}/>
-                    <label class="form-check-label" for="{{ form.name_filter.id_for_label }}">Name filter</label>
-                </div>
+    <div class="accordion" id="options">
+        <div class="card">
+            <div class="card-header bg-primary" id="basic_options_heading">
+                <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Basic options</button>
             </div>
-        {% endif %}
 
-    </div>
+            <div id="collapseOne" class="collapse show" aria-labelledby="basic_options_heading" data-parent="#options">
 
-    {% endif %}
+                {% include 'tracks/basic_options.html' %}
 
-
-    {%  if form.bedgraph_display or form.bedgraph_type or form.bedgraph_style or form.bin_size %}
-
-        <div class="form-row">
-
-            {% if form.bedgraph_display %}
-
-                <div class="form-group col-3">
-                    <label for="{{ form.bedgraph_display.id_for_label }}">Display</label>
-                    <select id="{{ form.bedgraph_display.id_for_label }}" class="form-control" name="{{ form.bedgraph_display.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                        {% for x,y in form.fields.bedgraph_display.choices %}
-                            <option value="{{ x }}"{% if form.bedgraph_display.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-
-                    </select>
-                </div>
-
-            {% endif %}
-
-            {% if form.bedgraph_type %}
-
-                <div class="form-group col-3">
-                    <label for="{{ form.bedgraph_type.id_for_label }}">Type</label>
-                    <select id="{{ form.bedgraph_type.id_for_label }}" class="form-control" name="{{ form.bedgraph_type.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                        {% for x,y in form.fields.bedgraph_type.choices %}
-                            <option value="{{ x }}"{% if form.bedgraph_type.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-
-                    </select>
-                </div>
-
-            {% endif %}
-
-            {% if form.bedgraph_style  %}
-
-                <div class="form-group col-md-3">
-
-                    {{ form.bedgraph_style.errors }}
-
-                    <label for="{{ form.bedgraph_style.id_for_label }}">BEDgraph style</label>
-                    <select id="{{ form.bedgraph_style.id_for_label }}" class="form-control" name="{{ form.bedgraph_style.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                    {% for x,y in form.fields.bedgraph_style.choices %}
-                        <option value="{{ x }}" {% if form.bedgraph_style.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
-                    {% endfor %}
-
-                    </select>
-
-                </div>
-
-            {% endif %}
-
-            {% if form.bin_size %}
-
-                <div class="form-group col-3">
-                    <label for="{{ form.bin_size.id_for_label }}">Bin size</label>
-                    {{ form.max_value.errors }}
-                    <input  class="form-control"  name="{{ form.bin_size.html_name }}" id="{{ form.bin_size.id_for_label }}" {% if form.bin_size.value is not None %} value="{{ form.bin_size.value}}" {% endif %}  {% if readonly %}readonly{% endif %}>
-                </div>
-
-            {% endif %}
-
-        <div>
-
-    {% endif %}
-
-    {% if form.subtracks %}
-
-        <div class="form-row">
-
-            <div class="form-group col-12">
-                <label>Subtrackts</label>
-
-                {{ form.subtracks.errors }}
-
-                <div>
-                    <label>View</label>
-                    <label class="radio-inline"><input type="radio" name="subtrack_view" checked value="selected">Selected</label>
-                    <label class="radio-inline"><input type="radio" name="subtrack_view" value="all">All</label>
-                </div>
-
-                <table id="subtrack-table">
-
-                {% for subtrack in subtracks %}
-
-                    <tr>
-                        <td>
-                            <div class="checkbox">
-                                <input  type="checkbox" id="id_subtracks_{{ forloop.counter0 }}" value="{{ subtrack.id }}" name="subtracks" {% for subtrack_checked in track.subtracks.all %}{% if subtrack.id == subtrack_checked.id %}checked="checked"{% endif %}{% endfor %} />
-                            </div>
-                        </td>
-
-                        <td >
-                            <div style="width: 30px; height:30px; background-color: {{subtrack.rgb}}; border: black 2px solid; padding: 4px"></div>
-                        </td>
-                        <td>{{subtrack.saple}}</td>
-                        <td>{{subtrack.name}}</td>
-                    </tr>
-
-                {% endfor %}
-
-                </table>
             </div>
         </div>
 
-    {% endif %}
+        <div class="card">
+            <div class="card-header" id="advanced_options_heading">
+                <h2 class="mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Advanced options</button>
+                </h2>
+            </div>
+
+            <div id="collapseTwo" class="collapse" aria-labelledby="advanced_options_heading" data-parent="#options">
+
+                {% include 'tracks/advanced_options.html' %}
+
+            </div>
+        </div>
+
+        {% if form.subtracks %}
+
+        <div class="card">
+            <div class="card-header" id="headingThree">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Subtracks</button>
+            </div>
+            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#options">
+                {% include 'tracks/subtracks.html' %}
+            </div>
+        </div>
+
+        {% endif %}
+    </div>
+
 
 </form>
+
 
 {% endblock %}
 

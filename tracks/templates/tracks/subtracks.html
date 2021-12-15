@@ -1,0 +1,37 @@
+<div class="card-body">
+    <div class="form-row">
+        <div class="form-group col-12">
+
+            <label>Subtrackts</label>
+            {{ form.subtracks.errors }}
+
+            <div>
+                <label>View</label>
+                <label class="radio-inline"><input type="radio" name="subtrack_view" checked value="selected">Selected</label>
+                <label class="radio-inline"><input type="radio" name="subtrack_view" value="all">All</label>
+            </div>
+
+            <table id="subtrack-table">
+
+            {% for subtrack in subtracks %}
+
+                <tr>
+                    <td>
+                        <div class="checkbox">
+                            <input  type="checkbox" id="id_subtracks_{{ forloop.counter0 }}" value="{{ subtrack.id }}" name="subtracks" {% for subtrack_checked in track.subtracks.all %}{% if subtrack.id == subtrack_checked.id %}checked="checked"{% endif %}{% endfor %} />
+                        </div>
+                    </td>
+
+                    <td >
+                        <div style="width: 30px; height:30px; background-color: {{subtrack.rgb}}; border: black 2px solid; padding: 4px"></div>
+                    </td>
+                    <td>{{subtrack.saple}}</td>
+                    <td>{{subtrack.name}}</td>
+                </tr>
+
+            {% endfor %}
+
+            </table>
+        </div>
+    </div>
+</div>
