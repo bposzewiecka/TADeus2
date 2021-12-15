@@ -367,7 +367,7 @@ def get_wildtype_params(direction, p_chrom, p_start, p_end, p_inverse, p_size, p
         return {}
 
 
-def breakpoint_browser(request, p_id):
+def breakpoint_browser(request, p_id):  # noqa: C901
 
     perc_move = (0.2, 0.1)
     perc_zoom = 1.25
@@ -399,7 +399,7 @@ def breakpoint_browser(request, p_id):
 
             if 2 * abs(p_shift) < p_size:
 
-                right_size = int(p_size / 2) - p_shift
+                right_size = int(p_size // 2) - p_shift
 
                 if p_right_inverse:
                     p_right_start = p_right_coord - right_size
@@ -422,18 +422,28 @@ def breakpoint_browser(request, p_id):
 
             elif p_size <= 2 * p_shift:
 
-                p_left_start = p_left_coord - p_shift - p_size
-                p_left_end = p_left_coord - p_shift
+                if p_left_inverse:
+                    p_left_end = p_left_coord + p_shift + p_size // 2
+                    p_left_start = p_left_end - p_size
+                else:
+                    p_left_start = p_left_coord - p_shift - p_size // 2
+                    p_left_end = p_left_start + p_size
 
                 p_left_width_prop = DEFAULT_WIDTH_PROP
 
             else:
 
-                p_right_start = p_right_coord - p_shift - p_size
-                p_right_end = p_right_coord - p_shift
+                if p_right_inverse:
+                    p_right_start = p_right_coord + p_shift - p_size // 2
+                    p_right_end = p_right_start + p_size
+                else:
+                    p_right_end = p_right_coord - p_shift + p_size // 2
+                    p_right_start = p_right_end - p_size
+
                 p_right_width_prop = DEFAULT_WIDTH_PROP
 
             wildtype_left_params = get_wildtype_params("left", p_left_chrom, p_left_start, p_left_end, p_left_inverse, p_size, p_wildtype_option)
+
             wildtype_right_params = get_wildtype_params(
                 "right", p_right_chrom, p_right_start, p_right_end, p_right_inverse, p_size, p_wildtype_option
             )
