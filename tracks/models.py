@@ -199,9 +199,6 @@ class Track(models.Model):
     def file_name(self):
         return self.track_file.name
 
-    def __str__(self):
-        return f"Track id: {self.id}, {self.name} ({self.title}) in plot {self.plot.id}."
-
     def get_attributes(self):
 
         attributes = []
@@ -268,6 +265,10 @@ class Track(models.Model):
             return file_type + " (Virtual 4C)"
 
         return file_type
+
+    def __str__(self):
+
+        return (self.title + " - " if self.title else "") + self.track_file.name
 
 
 @receiver(pre_save, sender=Track)

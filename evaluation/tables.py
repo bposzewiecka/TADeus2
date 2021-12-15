@@ -5,7 +5,7 @@ import django_tables2 as tables
 from django.urls import reverse
 from django.utils.html import format_html
 
-from tadeus_portal.defaults import DEFAULT_BROWSER_ICON, DEFAULT_EDIT_ICON
+from tadeus_portal.defaults import BREAKPOINT_BROWSER_ICON, DEFAULT_BROWSER_ICON, DEFAULT_EDIT_ICON
 from tadeus_portal.utils import getLink
 
 from .models import Evaluation, SVEntry
@@ -43,6 +43,7 @@ class EvaluationEntryTable(tables.Table):
         self.multi_plot_id = multi_plot_id
 
     show_in_browser = tables.Column(empty_values=(), orderable=False)
+    show_in_breakpoint_browser = tables.Column(empty_values=(), orderable=False)
     length = tables.Column(empty_values=(), orderable=False)
     start = tables.Column(accessor="start")
     end = tables.Column(accessor="end")
@@ -87,11 +88,18 @@ class EvaluationEntryTable(tables.Table):
 
         return getLink(link + get_url, DEFAULT_BROWSER_ICON)
 
+    def render_show_in_breakpoint_browser(self, record):
+
+        link = reverse("browser:breakpoint_browser", kwargs={"p_id": self.multi_plot_id})
+
+        return getLink(link, BREAKPOINT_BROWSER_ICON)
+
     class Meta:
         model = SVEntry
         template_name = "django_tables2/bootstrap.html"
         sequence = (
             "show_in_browser",
+            "show_in_breakpoint_browser",
             "name",
             "sv_type",
             "chrom",

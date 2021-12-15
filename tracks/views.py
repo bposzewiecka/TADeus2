@@ -66,7 +66,7 @@ def delete(request, p_id):
     track.delete()
 
     messages.success(request, "Track successfully deleted.")
-    return redirect("plots:update", p_id=plot_id)
+    return redirect("browser:browser", p_id=plot_id)
 
 
 def create(request, p_plot_id):
@@ -86,7 +86,7 @@ def create(request, p_plot_id):
             track.save()
 
             messages.success(request, "Track successfully created.")
-            return redirect("tracks:update", p_id=track.id)
+            return redirect("browser:browser", p_id=p_plot_id)
 
     else:
         form = CreateTrackForm(initial={"no": track_number})

@@ -7,7 +7,7 @@
 <form action="{% url 'browser:breakpoint_browser' p_id=p_id %}" method="get" >
     <div class="btn-toolbar" role="toolbar" aria-label="" style="align-items: center; justify-content: center;">
 
-        {% with left_inverse=request.GET.left_inverse|default:'false' right_inverse=request.GET.right_inverse|default:'false'  %}
+        {% with left_inverse=form_params.left_inverse|default:'false' right_inverse=form_params.right_inverse|default:'false'  %}
 
         <div class="input-group mr-2">
 
@@ -17,7 +17,7 @@
 
             <select name="wildtype_option" class="form-control input-group-append" style="height: 48px">
                 {% for x, y in wildtypes_options %}
-                    <option value="{{x}}"  {% if request.GET.wildtype_option|add:0 == x %} selected{% endif %}>{{y}}</option>
+                    <option value="{{x}}"  {% if form_params.wildtype_option|add:0 == x %} selected{% endif %}>{{y}}</option>
                 {% endfor %}
             </select>
 
@@ -31,11 +31,11 @@
             </div>
 
             <div class="input-group-append">
-                <input type="text" class="form-control" placeholder="Enter left breakpoint"  name="left_coordinate" style="width: 200px" value="{{ request.GET.left_coordinate }}">
+                <input type="text" class="form-control" placeholder="Enter left breakpoint"  name="left_coordinate" style="width: 200px" value="{{ form_params.left_coordinate }}">
             </div>
 
             <div class="input-group-append" style="border-left: 4px solid #dc3545;">
-                <input type="text" class="form-control" placeholder="Enter right breakpoint"  name="right_coordinate" style="width: 200px" value="{{ request.GET.right_coordinate }}">
+                <input type="text" class="form-control" placeholder="Enter right breakpoint"  name="right_coordinate" style="width: 200px" value="{{ form_params.right_coordinate }}">
             </div>
 
             <div class="input-group-append">
@@ -117,15 +117,15 @@
 
      <div style="display: table; margin: 0 auto;">
 
-
         <table style="float:left;">
 
             {% for p_track in p_plot.tracks.all %}
                 <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
+                    <td style="font-size:8px; width:100px">{{p_track}}</td>
 
                     {% if breakpoint_params.left_start %}
 
-                        <td  {% if breakpoint_params.right_start %} style="border-right: 4px solid #dc3545;"{% endif %}>
+                        <td {% if breakpoint_params.right_start %} style="border-right: 4px solid #dc3545;"{% endif %}>
 
                             <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=breakpoint_params.left_chrom p_start=breakpoint_params.left_start p_end=breakpoint_params.left_end p_left_side=1 p_width_prop=breakpoint_params.left_width_prop %}{{breakpoint_params_url|safe}}" alt="Track">
 
@@ -147,6 +147,7 @@
             {% if wildtype_left_params %}
                 {% for p_track in p_plot.tracks.all %}
                     <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
+                        <td></td>
                         <td colspan="2">
                             <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_left_params.chrom p_start=wildtype_left_params.start p_end=wildtype_left_params.end %}?left_inverse={{breakpoint_params.left_inverse}}" alt="Track">
                         </td>
@@ -158,6 +159,7 @@
             {% if wildtype_right_params %}
                 {% for p_track in p_plot.tracks.all %}
                     <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
+                        <td></td>
                         <td colspan="2">
                             <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_right_params.chrom p_start=wildtype_right_params.start p_end=wildtype_right_params.end %}?right_inverse={{breakpoint_params.right_inverse}}" alt="Track">
                         </td>

@@ -28,8 +28,10 @@
         {% endif%}
 
         {% if p_id %}
-            <a href="{% url 'browser:browser' p_id=track.plot.id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" ><i class="fas fa-sliders-h"></i></a>
+            <a href="{% url 'browser:browser' p_id=track.plot.id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true"  title="Browser"><i class="fas fa-sliders-h"></i></a>
+            <a href="{% url 'browser:browser' p_id=track.plot.id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" title="Breakoint browser"><i class="fas fa-exchange-alt"></i></a>
         {% endif %}
+
     </div>
 
 {% endblock %}
@@ -73,7 +75,7 @@
 
     <div class="form-row">
         <div class="form-group col-md-6">
-            <label for="{{ form.no.id_for_label }}">No.</label>
+            <label for="{{ form.no.id_for_label }}">Sort order</label>
 
             {{ form.no.errors }}
 

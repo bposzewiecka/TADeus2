@@ -39,6 +39,24 @@ def deletePlotCookie(request, p_id):
         del request.session["plot"]
 
 
+def setBreakpointPlotCookie(request, p_id, p_left_inverse, p_right_inverse, p_left_coordinate, p_right_coordinate, p_wildtype_option):
+    request.session["breakpoint_plot_" + str(p_id)] = (
+        p_id,
+        p_left_inverse,
+        p_right_inverse,
+        p_left_coordinate,
+        p_right_coordinate,
+        p_wildtype_option,
+    )
+    request.session["breakpoint_plot"] = (p_id, p_left_inverse, p_right_inverse, p_left_coordinate, p_right_coordinate, p_wildtype_option)
+
+
+def getBreakpointPlotCookie(request, p_id):
+    if "breakpoint_plot_" + str(p_id) in request.session:
+        return request.session["breakpoint_plot_" + str(p_id)]
+    return p_id, "false", "false", "chr1:30000000", "chr2:40000000", WILDTYPES_OPTIONS_NONE
+
+
 """
 def printPlotCookie(request, p_id):
     if "plot_" + str(p_id) in request.session:
@@ -75,8 +93,8 @@ def image(request, p_cols, p_id, p_chrom, p_start, p_end, p_breakpoint_id=None, 
             "right_end": int(request.GET.get("right_end", "-1")),
             "right_coord": int(request.GET.get("right_coord", "-1")),
             "left_coord": int(request.GET.get("left_coord", "-1")),
-            "right_inverse": get_bool_param(request, "right_inverse"),
-            "left_inverse": get_bool_param(request, "left_inverse"),
+            "right_inverse": get_bool_param(request, "right_inverse", "false"),
+            "left_inverse": get_bool_param(request, "left_inverse", "false"),
         }
 
     fig = track.draw_track(
@@ -277,10 +295,8 @@ def move_breakpoint(size, shift, perc, right, form_params):
     return urlencode(attributes, quote_via=quote_plus), 100 * perc
 
 
-def get_coordinate_or_err_msg(request, name, plot_id):
-    def get_results(request, name, plot_id):
-
-        search_text = request.GET.get(name, "")
+def get_coordinate_or_err_msg(request, search_text, plot_id):
+    def get_results(request, search_text, plot_id):
 
         search_text = re.sub(r"(\s|,)", "", search_text)
 
@@ -310,7 +326,7 @@ def get_coordinate_or_err_msg(request, name, plot_id):
 
         return chrom, coordinate
 
-    results = get_results(request, name, plot_id)
+    results = get_results(request, search_text, plot_id)
 
     if type(results) == tuple:
         return results
@@ -329,9 +345,9 @@ def get_param(request, name, default):
     return int(val)
 
 
-def get_bool_param(request, name):
+def get_bool_param(request, name, default):
 
-    val = request.GET.get(name, "false")
+    val = request.GET.get(name, default)
     return val == "true"
 
 
@@ -374,6 +390,8 @@ def breakpoint_browser(request, p_id):  # noqa: C901
 
     p_plot = Plot.objects.get(id=p_id)
 
+    c_id, c_left_inverse, c_right_inverse, c_left_coordinate, c_right_coordinate, c_wildtype_option = getBreakpointPlotCookie(request, p_id)
+
     breakpoint_params = {}
     form_params = {}
     wildtype_left_params = {}
@@ -384,27 +402,34 @@ def breakpoint_browser(request, p_id):  # noqa: C901
         p_size = get_param(request, "size", 2000000)
         p_shift = get_param(request, "shift", 0)
 
-        p_right_inverse = get_bool_param(request, "right_inverse")
-        p_left_inverse = get_bool_param(request, "left_inverse")
+        p_right_inverse = request.GET.get("right_inverse", c_right_inverse)
+        p_right_inverse_bool = p_right_inverse == "true"
+        p_left_inverse = request.GET.get("left_inverse", c_left_inverse)
+        p_left_inverse_bool = p_left_inverse == "true"
 
-        p_left_chrom, p_left_coord = get_coordinate_or_err_msg(request, "left_coordinate", p_id)
-        p_right_chrom, p_right_coord = get_coordinate_or_err_msg(request, "right_coordinate", p_id)
+        p_left_coordinate = request.GET.get("left_coordinate", c_left_coordinate)
+        p_right_coordinate = request.GET.get("right_coordinate", c_right_coordinate)
 
-        p_wildtype_option = get_param(request, "wildtype_option", WILDTYPES_OPTIONS_NONE)
+        p_left_chrom, p_left_coord = get_coordinate_or_err_msg(request, p_left_coordinate, p_id)
+        p_right_chrom, p_right_coord = get_coordinate_or_err_msg(request, p_right_coordinate, p_id)
+
+        p_wildtype_option = get_param(request, "wildtype_option", c_wildtype_option)
+
+        setBreakpointPlotCookie(request, p_id, p_left_inverse, p_right_inverse, p_left_coordinate, p_right_coordinate, p_wildtype_option)
 
         if p_left_chrom is not None and p_right_chrom is not None:
 
             p_left_start = p_left_end = p_right_start = p_right_end = None
             p_left_width_prop = p_right_width_prop = 0
 
-            if p_left_inverse:
+            if p_left_inverse_bool:
                 p_left_end = p_left_coord + p_shift + p_size // 2
                 p_left_start = p_left_end - min(p_shift + p_size // 2, p_size)
             else:
                 p_left_start = p_left_coord - p_shift - p_size // 2
                 p_left_end = p_left_start + min(p_shift + p_size // 2, p_size)
 
-            if p_right_inverse:
+            if p_right_inverse_bool:
                 p_right_start = p_right_coord + p_shift - p_size // 2
                 p_right_end = max(p_right_coord, p_right_start - p_size)
             else:
@@ -417,17 +442,17 @@ def breakpoint_browser(request, p_id):  # noqa: C901
             p_left_width_prop = min(max(int(left_size / p_size * DEFAULT_WIDTH_PROP), 0), 1000)
             p_right_width_prop = min(max(int(right_size / p_size * DEFAULT_WIDTH_PROP), 0), 1000)
 
-            wildtype_left_params = get_wildtype_params("left", p_left_chrom, p_left_start, p_left_end, p_left_inverse, p_size, p_wildtype_option)
+            wildtype_left_params = get_wildtype_params("left", p_left_chrom, p_left_start, p_left_end, p_left_inverse_bool, p_size, p_wildtype_option)
 
             wildtype_right_params = get_wildtype_params(
-                "right", p_right_chrom, p_right_start, p_right_end, p_right_inverse, p_size, p_wildtype_option
+                "right", p_right_chrom, p_right_start, p_right_end, p_right_inverse_bool, p_size, p_wildtype_option
             )
 
             form_params = {
-                "left_inverse": request.GET.get("left_inverse", "false"),
-                "right_inverse": request.GET.get("right_inverse", "false"),
-                "left_coordinate": request.GET.get("left_coordinate", ""),
-                "right_coordinate": request.GET.get("right_coordinate", ""),
+                "left_inverse": p_left_inverse,
+                "right_inverse": p_right_inverse,
+                "left_coordinate": p_left_coordinate,
+                "right_coordinate": p_right_coordinate,
                 "wildtype_option": p_wildtype_option,
             }
 
@@ -438,8 +463,8 @@ def breakpoint_browser(request, p_id):  # noqa: C901
                 "right_coord": p_right_coord,
                 "right_width_prop": p_right_width_prop,
                 "left_width_prop": p_left_width_prop,
-                "right_inverse": request.GET.get("right_inverse", "false"),
-                "left_inverse": request.GET.get("left_inverse", "false"),
+                "right_inverse": p_right_inverse,
+                "left_inverse": p_left_inverse,
             }
 
             if p_left_start:
@@ -472,6 +497,7 @@ def breakpoint_browser(request, p_id):  # noqa: C901
             "wildtype_left_params": wildtype_left_params,
             "wildtype_right_params": wildtype_right_params,
             "wildtypes_options": WILDTYPES_OPTIONS,
+            "form_params": form_params,
         },
     )
 
