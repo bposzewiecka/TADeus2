@@ -9,6 +9,11 @@
 
         {% with left_inverse=form_params.left_inverse|default:'false' right_inverse=form_params.right_inverse|default:'false'  %}
 
+
+        <div  class="input-group mr-2">
+            <a href="{% url 'plots:update' p_id=p_id %}" class="btn btn-secondary btn-lg" role="button" aria-pressed="true" title="edit"><i class="fas fa-edit"></i></a>
+        </div>
+
         <div class="input-group mr-2">
 
              <div class="input-group-prepend">
@@ -92,7 +97,6 @@
     <div class="btn-toolbar" role="toolbar" aria-label="" style="align-items: center; justify-content: center; padding-top:10px">
 
         <div class="btn-group mr-2" role="group" aria-label="">
-            <a href="{% url 'plots:update' p_id=p_id %}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="edit"><i class="fas fa-edit"></i></a>
             <a href="{% url 'browser:breakpoint_browser' p_id=p_id %}?{{zoom_in|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom in"><i class="fas fa-search-plus"></i></a>
             <a href="{% url 'browser:breakpoint_browser' p_id=p_id %}?{{zoom_out|safe}}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom out"><i class="fas fa-search-minus"></i></a>
         </div>
@@ -147,7 +151,7 @@
             {% if wildtype_left_params %}
                 {% for p_track in p_plot.tracks.all %}
                     <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
-                        <td></td>
+                        <td style="font-size:8px; width:100px">{{p_track}}</td>
                         <td colspan="2">
                             <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_left_params.chrom p_start=wildtype_left_params.start p_end=wildtype_left_params.end %}?left_inverse={{breakpoint_params.left_inverse}}" alt="Track">
                         </td>
@@ -159,7 +163,7 @@
             {% if wildtype_right_params %}
                 {% for p_track in p_plot.tracks.all %}
                     <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
-                        <td></td>
+                        <td style="font-size:8px; width:100px">{{p_track}}</td>
                         <td colspan="2">
                             <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_right_params.chrom p_start=wildtype_right_params.start p_end=wildtype_right_params.end %}?right_inverse={{breakpoint_params.right_inverse}}" alt="Track">
                         </td>

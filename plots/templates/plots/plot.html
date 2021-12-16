@@ -41,7 +41,7 @@
 
         {% if p_id %}
             <a href="{% url 'browser:browser' p_id=p_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true"  title="Browser"><i class="fas fa-sliders-h"></i></a>
-            <a href="{% url 'browser:browser' p_id=p_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" title="Breakoint browser"><i class="fas fa-exchange-alt"></i></a>
+            <a href="{% url 'browser:breakpoint_browser' p_id=p_id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" title="Breakoint browser"><i class="fas fa-exchange-alt"></i></a>
         {% endif %}
 
     </div>
