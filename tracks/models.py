@@ -1,3 +1,4 @@
+import os
 from concurrent.futures import ThreadPoolExecutor
 
 import bbi
@@ -10,6 +11,7 @@ from django.dispatch import receiver
 from datasources.defaults import BED6, BED9, BED12, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPE_XAXIS
 from datasources.models import BedFileEntry, Chromosome, FileEntry, Subtrack, TrackFile
 from plots.models import Plot
+from tadeus_portal.settings import TADEUS_DATA_DIR
 from tracks.trackPlot import PlotArcs, PlotBed, PlotBedGraph, PlotDomains, PlotHiCMatrix, PlotVirtual4C, PlotXAxis
 
 from .defaults import (
@@ -166,7 +168,8 @@ class Track(models.Model):
     def get_entries_big_wig(self, chrom, start, end, name_filter=None):
         def get_entries_subtrack(file_path):
 
-            with bbi.open(file_path) as f:
+            with bbi.open(os.path.join(TADEUS_DATA_DIR, file_path)) as f:
+                # with bbi.open('/home/basia/wgEncodeBroadHistoneGm12878H3k27acStdSig.bigWig') as f:
 
                 entries_big_wig = []
 
