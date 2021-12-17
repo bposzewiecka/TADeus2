@@ -19,6 +19,9 @@ from datasources.defaults import BED12, FILE_TYPE_HIC
 from plots.models import Plot
 
 from .defaults import (
+    BED_STYLE_COLLAPSED,
+    BED_STYLE_INTERLACED,
+    BED_STYLE_STACKED,
     BEDGRAPH_DISPLAY_STACKED,
     BEDGRAPH_DISPLAY_TRANSPARENT,
     BEDGRAPH_STYLE_AREA,
@@ -303,21 +306,21 @@ class PlotBed(TrackPlot):
         if self.height is not None:
             return self.height
 
-        if self.bed_style == "stacked":
+        if self.bed_style == BED_STYLE_STACKED:
             if self.max_num_row == 0:
                 return DEFAULT_BED_ENTRY_HEIGHT
             return 2 * DEFAULT_BED_ENTRY_HEIGHT * self.max_num_row - DEFAULT_BED_ENTRY_HEIGHT
-        elif self.bed_style == "interlaced":
+        elif self.bed_style == BED_STYLE_INTERLACED:
             return 5 * DEFAULT_BED_ENTRY_HEIGHT
         else:
-            return 1.5 * DEFAULT_BED_ENTRY_HEIGHT * self.max_num_row
+            return 3 * DEFAULT_BED_ENTRY_HEIGHT
 
     def get_y_pos(self, free_row):
 
-        if self.bed_style == "interlaced":
+        if self.bed_style == BED_STYLE_INTERLACED:
             ypos = self.interval_height if self.counter % 2 == 0 else self.interval_height + self.row_scale
 
-        elif self.bed_style == "collapsed":
+        elif self.bed_style == BED_STYLE_COLLAPSED:
             ypos = self.interval_height
 
         else:
@@ -327,9 +330,9 @@ class PlotBed(TrackPlot):
 
     def get_max_y_pos(self):
 
-        if self.bed_style == "interlaced":
+        if self.bed_style == BED_STYLE_INTERLACED:
             ypos = self.interval_height + 2 * self.row_scale
-        elif self.bed_style == "collapsed":
+        elif self.bed_style == BED_STYLE_COLLAPSED:
             ypos = self.interval_height * 3
         else:
             ypos = self.max_num_row * self.row_scale + self.interval_height

@@ -137,7 +137,7 @@
 
                     <select id="{{ form.bed_style.id_for_label }}" class="form-control" name="{{ form.bed_style.html_name }}"  {% if readonly %}disabled{% endif %}>
 
-                    {% for x,y in style_choices %}
+                    {% for x,y in  form.fields.bed_style.choices  %}
                         <option value="{{ x }}" {% if form.bed_style.value|add:0 == x %} selected{% endif %} >{{ y }}</option>
                     {% endfor %}
 

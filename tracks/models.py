@@ -218,6 +218,7 @@ class Track(models.Model):
             attributes.append("labels")
             attributes.append("color")
             attributes.append("bed_display")
+            attributes.append("bed_style")
 
         bed_with_name_and_color = self.track_file.file_type == FILE_TYPE_BED and (self.track_file.bed_sub_type in (BED6, BED9, BED12))
 
