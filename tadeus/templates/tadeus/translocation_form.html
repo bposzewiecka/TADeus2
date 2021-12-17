@@ -1,0 +1,208 @@
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card  border-primary">
+            <div class="card-header bg-primary text-white">
+                Translocation evaluation
+            </div>
+            <div class="card-body">
+
+                <div class="form-row" >
+
+                    <div class="form-group col-md-4" >
+
+                        <div class="input-group mb-3">
+                            {{ trans_form.chrom1.errors }}
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"  style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Chromosome</span>
+                            </div>
+
+                            <select name="{{ trans_form.chrom1.html_name }}" class="form-control"  id="{{ trans_form.chrom1.id_for_label }}" required>
+                                {% for chromosome in chroms %}
+                                    <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-4" >
+
+                        <div class="input-group mb-3" >
+                            {{ trans_form.chrom1.errors }}
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"  style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Coordinate</span>
+                            </div>
+
+                            <input class="form-control" type="number" name="{{ form.height.html_name }}" id="{{ form.height.id_for_label }}" value="{{ form.height.value}}" required>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group col-md-4">
+
+                        <div class="input-group mb-3">
+                            {{ trans_form.direction1.errors }}
+                            <div class="input-group-prepend" >
+                                <span class="input-group-text" id="basic-addon1"  style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Orientation</span>
+                            </div>
+
+                            <select name="{{ trans_form.direction1.html_name }}" class="form-control"  id="{{ trans_form.direction1.id_for_label }}" required>
+                                <option value="H">Head</option>
+                                <option value="T">Tail</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-row">
+
+                    <div class="form-group col-4" >
+
+                        <div class="input-group mb-3">
+                            {{ trans_form.chrom1.errors }}
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"   style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Chromosome</span>
+                            </div>
+
+                            <select name="{{ trans_form.chrom1.html_name  }}" class="form-control"  id="{{ trans_form.chrom1.id_for_label }}" required>
+                                {% for chromosome in chroms %}
+                                    <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-4" >
+
+                        <div class="input-group mb-3" >
+                            {{ trans_form.chrom1.errors }}
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"  style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Coordinate</span>
+                            </div>
+
+                            <select name="{{ trans_form.chrom1.html_name }}" class="form-control"  id="{{ trans_form.chrom1.id_for_label }}" required>
+                                {% for chromosome in chroms %}
+                                    <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group col-4">
+
+                        <div class="input-group mb-3">
+                            {{ trans_form.direction1.errors }}
+                            <div class="input-group-prepend" >
+                                <span class="input-group-text" id="basic-addon1"   style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Orientation</span>
+                            </div>
+
+                            <select name="{{ trans_form.direction1.html_name  }}" class="form-control"  id="{{ trans_form.direction1.id_for_label }}" required>
+
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="text-right"><a href="#" class="btn btn-primary">Evaluate</a></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-12" style="margin-top:20px">
+        <div class="card  border-primary ">
+            <div class="card-header bg-primary text-white">
+                Copy number variation evaluation
+            </div>
+            <div class="card-body">
+
+                 <div class="form-row">
+
+                    <div class="form-group col-md-12">
+
+                      <div class="input-group mb-3">
+                            {{ trans_form.chrom1.errors }}
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1" style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Type</span>
+                            </div>
+
+                            <select name="{{ trans_form.chrom1.html_name }}" class="form-control"  id="{{ trans_form.chrom1.id_for_label }}" required>
+                                {% for chromosome in chroms %}
+                                    <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                <div class="form-row" >
+
+                    <div class="form-group col-md-4" >
+
+                        <div class="input-group mb-3">
+                            {{ trans_form.chrom1.errors }}
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1" style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Chromosome</span>
+                            </div>
+
+                            <select name="{{ trans_form.chrom1.html_name  }}" class="form-control"  id="{{ trans_form.chrom1.id_for_label }}" required>
+                                {% for chromosome in chroms %}
+                                    <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-4" >
+
+                        <div class="input-group mb-3">
+                            {{ trans_form.chrom1.errors }}
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1" style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Start coordinate</span>
+                            </div>
+
+                            <select name="{{ trans_form.chrom1.html_name }}" class="form-control"  id="{{ trans_form.chrom1.id_for_label }}" required>
+                                {% for chromosome in chroms %}
+                                    <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group col-md-4" >
+                        <div class="input-group mb-3">
+                            {{ trans_form.chrom1.errors }}
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1" style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">End coordinate</span>
+                            </div>
+
+                            <select name="{{ trans_form.chrom1.html_name }}" class="form-control"  id="{{ trans_form.chrom1.id_for_label }}" required>
+                                {% for chromosome in chroms %}
+                                    <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="text-right"><a href="#" class="btn btn-primary">Evaluate</a></div>
+            </div>
+        </div>
+    </div>
+
+Formularze jeszcze nie działają
+
+</div>
