@@ -20,7 +20,7 @@ from plots.models import Plot
 
 from .defaults import (
     BED_DISPLAY_FLYBASE,
-    BED_DISPLAY_INTRONS,
+    BED_DISPLAY_WITH_INTRONS,
     BED_STYLE_COLLAPSED,
     BED_STYLE_INTERLACED,
     BED_STYLE_STACKED,
@@ -479,7 +479,7 @@ class PlotBed(TrackPlot):
 
             if self.track_file.bed_sub_type == BED12 and self.bed_display == BED_DISPLAY_FLYBASE:
                 self.draw_gene_with_introns_flybase_style(entry, ypos, rgb=rgb, edgecolor=edgecolor)
-            elif self.track_file.bed_sub_type == BED12 and self.bed_display == BED_DISPLAY_INTRONS:
+            elif self.track_file.bed_sub_type == BED12 and self.bed_display == BED_DISPLAY_WITH_INTRONS:
                 self.draw_gene_with_introns(entry, ypos, rgb=rgb, edgecolor=edgecolor)
             else:
                 self.draw_gene_simple(entry, ypos, rgb=rgb, edgecolor=edgecolor)
