@@ -25,7 +25,7 @@ from .defaults import (
     BED_DISPLAY_OPTIONS,
     BED_DISPLAY_TILES,
     BED_DISPLAY_VERTICAL_LINES,
-    BED_DISPLAY_WITH_INTORNS,
+    BED_DISPLAY_WITH_INTRONS,
     BED_STYLE_OPTIONS,
     BED_STYLE_STACKED,
     BEDGRAPH_DISPLAY_OPTIONS,
@@ -126,7 +126,7 @@ class Track(models.Model):
 
         if file_type == FILE_TYPE_BED and self.bed_display in (
             BED_DISPLAY_TILES,
-            BED_DISPLAY_WITH_INTORNS,
+            BED_DISPLAY_WITH_INTRONS,
             BED_DISPLAY_FLYBASE,
         ):
             trackPlot = PlotBed(model=self)
@@ -272,7 +272,7 @@ class Track(models.Model):
 
     def __str__(self):
 
-        return (self.title + " - " if self.title else "") + self.track_file.name
+        return self.title if self.title else self.track_file.name
 
 
 @receiver(pre_save, sender=Track)
