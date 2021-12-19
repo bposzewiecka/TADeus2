@@ -8,9 +8,9 @@
                 <span class="input-group-text" style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Chromosome</span>
             </div>
 
-            <select name="{{  chromosome.html_name  }}" class="form-control"  id="{{ chromosome.id_for_label }}" required>
+            <select name="{{  chromosome.html_name  }}" class="form-control"  id="{{ chromosome.id_for_label  }}" required>
                 {% for s_chromosome in chromosomes %}
-                    <option value="{{ s_chromosome.id }}" {% if chromosome.value|add:0  == s_chromosome.id %}selected{% endif %}>{{ s_chromosome.name }}</option>
+                    <option value="{{ s_chromosome.name }}" {% if chromosome.name  == s_chromosome.name %}selected{% endif %}>{{ s_chromosome.name }}</option>
                 {% endfor %}
             </select>
 

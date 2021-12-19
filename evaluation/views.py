@@ -1,8 +1,11 @@
 from collections import Counter
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.db import transaction
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django_tables2 import RequestConfig
 
 from datasources.defaults import FILE_TYPE_XAXIS
@@ -12,6 +15,7 @@ from datasources.readBed import ReadBedOrBedGraphException
 from datasources.views import get_file_handle
 from ontologies.models import Gene
 from plots.models import Plot
+from tadeus.forms import CNVForm, TranslocationForm
 from tadeus_portal.utils import get_auth_cookie, set_owner_or_cookie, split_seq
 from tracks.defaults import BED_DISPLAY_ARCS, BED_DISPLAY_TILES, HIC_DISPLAY_HIC, TRANSFORM_LOG1P
 from tracks.models import Track
@@ -55,6 +59,25 @@ def index(request):
     return render(request, "evaluation/evaluations.html", {"table": table, "filter": f})
 
 
+DEFAULT_EVALUATION_TRACKS = (
+    (TrackFile.objects.get(assembly=Assembly.objects.get(name="hg38"), file_type=FILE_TYPE_XAXIS).id, {"title": "XAxis"}),
+    (
+        HIC_NA12787_FILE_ID,
+        {
+            "domains_file": TrackFile.objects.get(pk=HIC_NA12787_TADS_FILE_ID),
+            "title": "HiC Track",
+            "hic_display": HIC_DISPLAY_HIC,
+            "transform": TRANSFORM_LOG1P,
+        },
+    ),
+    (
+        ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
+        {"bed_display": BED_DISPLAY_ARCS, "name_filter": True, "title": "Enhancers-promoters interactions"},
+    ),
+    (PLI_SCORE_FILE_ID, {"bed_display": BED_DISPLAY_TILES, "min_value": 0, "max_value": 1, "title": "Genes coloured by pLI score"}),
+)
+
+
 @transaction.atomic
 def create_eval_atomic(request, form, p_type):
     track_file = TrackFile()
@@ -73,24 +96,7 @@ def create_eval_atomic(request, form, p_type):
 
     eval.track_file = track_file
 
-    tracks = (
-        (TrackFile.objects.get(assembly=Assembly.objects.get(name="hg38"), file_type=FILE_TYPE_XAXIS).id, {"title": "XAxis"}),
-        (
-            HIC_NA12787_FILE_ID,
-            {
-                "domains_file": TrackFile.objects.get(pk=HIC_NA12787_TADS_FILE_ID),
-                "title": "HiC Track",
-                "hic_display": HIC_DISPLAY_HIC,
-                "transform": TRANSFORM_LOG1P,
-            },
-        ),
-        (
-            ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
-            {"bed_display": BED_DISPLAY_ARCS, "name_filter": True, "title": "Enhancers-promoters interactions"},
-        ),
-        (PLI_SCORE_FILE_ID, {"bed_display": BED_DISPLAY_TILES, "min_value": 0, "max_value": 1, "title": "Genes coloured by pLI score"}),
-    )
-
+    tracks = DEFAULT_EVALUATION_TRACKS
     plot = Plot(assembly=assembly)
 
     set_owner_or_cookie(request, plot)
@@ -311,3 +317,112 @@ def annotate_sv_entries(sv_entries, p_id, request):
         annotate_translocations_TADeusScore(sv_entries)
     except Exception:
         messages.error(request, "Error in TADeus annotation.")
+
+
+def create_empty_evaluation(request, title):
+
+    track_file = TrackFile()
+
+    assembly = Assembly.objects.get(name="hg38")
+    track_file.assembly = assembly
+    set_owner_or_cookie(request, track_file)
+    track_file.save()
+
+    plot = Plot(assembly=assembly)
+
+    plot.title = title
+    plot.name = title
+    set_owner_or_cookie(request, plot)
+
+    plot.save()
+
+    eval = Evaluation.objects.create(track_file=track_file, name=title, assembly=assembly, plot=plot)
+
+    set_owner_or_cookie(request, eval)
+    eval.save()
+
+    return eval
+
+
+@transaction.atomic
+def evaluate_translocation(request):
+
+    if request.method == "GET":
+        form = TranslocationForm(request.GET)
+
+        if form.is_valid():
+
+            chrom1 = form.cleaned_data["chrom1"]
+            coordinate1 = form.cleaned_data["coordinate1"]
+            direction1 = form.cleaned_data["direction1"]
+            chrom2 = form.cleaned_data["chrom2"]
+            coordinate2 = form.cleaned_data["coordinate2"]
+            direction2 = form.cleaned_data["direction2"]
+
+            params = {
+                "wildtype_option": "3",
+                "left_coordinate": f"{chrom1}:{coordinate1}",
+                "left_inverse": "false" if direction1 == "H" else "true",
+                "right_coordinate": f"{chrom2}:{coordinate2}",
+                "right_inverse": "true" if direction2 == "H" else "false",
+            }
+
+            eval = create_empty_evaluation(request, "Evaluation")
+            add_tracks(eval.plot, DEFAULT_EVALUATION_TRACKS)
+
+            url = reverse("browser:breakpoint_browser", kwargs={"p_id": eval.plot.id})
+            params_url = urlencode(params)
+
+            messages.success(request, f"Tanslocation involving chromosomes {chrom1} and {chrom2} evaluated.")
+
+            return HttpResponseRedirect(f"{url}?{params_url}")
+
+        else:
+            messages.error(request, "Translocation was not evaluated.")
+
+    return redirect("index")
+
+
+@transaction.atomic
+def evaluate_cnv(request):
+
+    if request.method == "GET":
+        form = CNVForm(request.GET)
+
+        if form.is_valid():
+            # cnv_type = form.cleaned_data["cnv_type"]
+            chrom = form.cleaned_data["chrom"]
+            start_coordinate = form.cleaned_data["start_coordinate"]
+            end_coordinate = form.cleaned_data["end_coordinate"]
+
+            eval = create_empty_evaluation(request, "Evaluation")
+            add_tracks(eval.plot, DEFAULT_EVALUATION_TRACKS)
+
+            messages.success(request, f"Structural variant involving chromosome {chrom} evaluated.")
+
+            params = {
+                "interval_start": start_coordinate,
+                "interval_end": end_coordinate,
+            }
+
+            url = reverse(
+                "browser:browser",
+                kwargs={
+                    "p_id": eval.plot.id,
+                    "p_chrom": chrom,
+                    "p_start": max(start_coordinate - 1 * 1000 * 1000, 0),
+                    "p_end": end_coordinate + 1 * 1000 * 1000,
+                },
+            )
+            params_url = urlencode(params)
+
+            return HttpResponseRedirect(f"{url}?{params_url}")
+
+    return redirect("index")
+
+
+def add_tracks(plot, tracks_params):
+
+    for j, (track_id, params) in enumerate(tracks_params):
+        track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, **params)
+        track.save()

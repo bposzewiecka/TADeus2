@@ -736,6 +736,13 @@ class PlotXAxis(TrackPlot):
 
         self.axis.text(scaled_end, 0.575, text, verticalalignment="bottom", horizontalalignment="right", fontsize=self.fontsize)
 
+        if self.axis_inverted:
+            chrom_label_start = scaled_end
+        else:
+            chrom_label_start = scaled_start
+
+        self.axis.text(chrom_label_start, 0.075, chrom, verticalalignment="bottom", horizontalalignment="left", fontsize=self.fontsize)
+
         self.axis.axis["x"].major_ticklabels.set(size=self.fontsize)
 
         self.axis.axis["x"].set_axis_direction("top")
@@ -1266,7 +1273,7 @@ class PlotVirtual4C(TrackPlot):
         start_positions = list(self.hic_ma.get_start_positions(chrom, start, end))
 
         for start_position, value in zip(start_positions, values):
-            self.axis.add_patch(Rectangle((start_position, 0), self.bin_size, value, edgecolor=self.edgecolor, linewidth=1, color="#3c59a6"))
+            self.axis.add_patch(Rectangle((start_position, 0), self.bin_size, value, edgecolor="#ffffff", linewidth=0.2, color="#3c59a6"))
 
         max_value = np.max(values)
 

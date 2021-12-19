@@ -1,5 +1,8 @@
 from django import forms
 
+from datasources.models import Chromosome
+from evaluation.defaults import DELETION, DUPLICATION
+
 """
 class CNVForm(forms.Form):
     cnv_type = forms.CharField(max_length=1)
@@ -17,9 +20,14 @@ TRANSLOCATION_DIRECTIONS = (
 )
 
 
+CNV_TYPES = ((DELETION, "Deletion"), (DUPLICATION, "Duplication"))
+
+
+def get_chromosomes():
+    return [(chrom.name, chrom.name) for chrom in Chromosome.objects.filter(assembly__name="hg38")]
+
+
 class TranslocationForm(forms.Form):
-    def get_chromosomes():
-        return ((1, "chr1"),)
 
     chrom1 = forms.ChoiceField(choices=get_chromosomes)
     coordinate1 = forms.IntegerField()
@@ -27,3 +35,10 @@ class TranslocationForm(forms.Form):
     chrom2 = forms.ChoiceField(choices=get_chromosomes)
     coordinate2 = forms.IntegerField()
     direction2 = forms.ChoiceField(choices=TRANSLOCATION_DIRECTIONS)
+
+
+class CNVForm(forms.Form):
+    cnv_type = forms.ChoiceField(choices=CNV_TYPES)
+    chrom = forms.ChoiceField(choices=get_chromosomes)
+    start_coordinate = forms.IntegerField()
+    end_coordinate = forms.IntegerField()

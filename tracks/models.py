@@ -274,6 +274,9 @@ class Track(models.Model):
 
         return self.title if self.title else self.track_file.name
 
+    class Meta:
+        ordering = ["no"]
+
 
 @receiver(pre_save, sender=Track)
 def add_defaults(sender, instance, **kwargs):

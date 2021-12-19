@@ -11,5 +11,7 @@ urlpatterns = [
     path("<int:p_id>/delete", views.delete, name="delete"),
     path("<int:p_id>/show", views.show, name="show_evaluation"),
     path("<int:p_id>/add", views.add_entry, name="add_entry"),
-    path("<int:p_id>/delete_ebtry", views.delete_entry, name="delete_entry"),
+    path("<int:p_id>/delete_entry", views.delete_entry, name="delete_entry"),
+    path("evaluate_translocation", views.evaluate_translocation, name="evaluate_translocation"),
+    path("evaluate_cnv", views.evaluate_cnv, name="evaluate_cnv"),
 ]
