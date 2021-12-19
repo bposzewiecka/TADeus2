@@ -190,6 +190,14 @@ class TrackPlot:
         fig.add_subplot(self.axis)
         self.axis.axis[:].set_visible(False)
 
+        self.axis_inverted = False
+
+        if (left_side or left_side is None) and breakpoint["left_inverse"]:
+            self.axis_inverted = True
+
+        if not left_side and breakpoint["right_inverse"]:
+            self.axis_inverted = True
+
         self.draw(chrom, start, end, width)
 
         if self.plot:
@@ -208,14 +216,11 @@ class TrackPlot:
             top=DEFAULT_MARGINS["top"],
         )
 
+        if self.axis_inverted:
+            self.axis.invert_xaxis()
+
         self.height = self.get_height()
         fig.set_size_inches(cm2inch(self.fig_width, self.height))
-
-        if (left_side or left_side is None) and breakpoint["left_inverse"]:
-            self.axis.invert_xaxis()
-
-        if not left_side and breakpoint["right_inverse"]:
-            self.axis.invert_xaxis()
 
         return fig
 
@@ -489,7 +494,7 @@ class PlotBed(TrackPlot):
                     entry.end + self.small_relative,
                     ypos + (float(self.interval_height) / 2),
                     entry.name,
-                    horizontalalignment="left",
+                    horizontalalignment="right" if self.axis_inverted else "left",
                     verticalalignment="center",
                 )
 

@@ -124,8 +124,8 @@
         <table style="float:left;">
 
             {% for p_track in p_plot.tracks.all %}
-                <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
-                    <td style="font-size:8px; width:100px">{{p_track}}</td>
+                <tr style="border: 1px solid #dddddd" >
+                    <td style="font-size:14px; width:140px; font-weight: bold">{% if p_track.track_file.file_type != "XA" %}{{p_track}}  {% endif %}</td>
 
                     {% if breakpoint_params.left_start %}
 
@@ -150,8 +150,8 @@
 
             {% if wildtype_left_params %}
                 {% for p_track in p_plot.tracks.all %}
-                    <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
-                        <td style="font-size:8px; width:100px">{{p_track}}</td>
+                    <tr style="border: 1px solid #dddddd" >
+                        <td style="font-size:14px; width:140px; font-weight: bold">{% if p_track.track_file.file_type != "XA" %}{{p_track}}  {% endif %}</td>
                         <td colspan="2">
                             <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_left_params.chrom p_start=wildtype_left_params.start p_end=wildtype_left_params.end %}?left_inverse={{breakpoint_params.left_inverse}}" alt="Track">
                         </td>
@@ -162,8 +162,8 @@
 
             {% if wildtype_right_params %}
                 {% for p_track in p_plot.tracks.all %}
-                    <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
-                        <td style="font-size:8px; width:100px">{{p_track}}</td>
+                    <tr style="border: 1px solid #dddddd">
+                        <td style="font-size:14px; width:140px; font-weight: bold"> {% if p_track.track_file.file_type != "XA" %}{{p_track}}  {% endif %}</td>
                         <td colspan="2">
                             <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_right_params.chrom p_start=wildtype_right_params.start p_end=wildtype_right_params.end %}?right_inverse={{breakpoint_params.right_inverse}}" alt="Track">
                         </td>
