@@ -28,7 +28,6 @@ def init_human_assemblies():
     Species.objects.all().delete()
 
     human = init_species("Human")
-    init_assembly("hg19", human, "data/hg19/hg19_chrom_sizes.txt")
     init_assembly("hg38", human, "data/hg38/hg38_chrom_sizes.txt")
 
 

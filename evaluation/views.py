@@ -59,23 +59,24 @@ def index(request):
     return render(request, "evaluation/evaluations.html", {"table": table, "filter": f})
 
 
-DEFAULT_EVALUATION_TRACKS = (
-    (TrackFile.objects.get(assembly=Assembly.objects.get(name="hg38"), file_type=FILE_TYPE_XAXIS).id, {"title": "XAxis"}),
-    (
-        HIC_NA12787_FILE_ID,
-        {
-            "domains_file": TrackFile.objects.get(pk=HIC_NA12787_TADS_FILE_ID),
-            "title": "HiC Track",
-            "hic_display": HIC_DISPLAY_HIC,
-            "transform": TRANSFORM_LOG1P,
-        },
-    ),
-    (
-        ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
-        {"bed_display": BED_DISPLAY_ARCS, "name_filter": True, "title": "Enhancers-promoters interactions"},
-    ),
-    (PLI_SCORE_FILE_ID, {"bed_display": BED_DISPLAY_TILES, "min_value": 0, "max_value": 1, "title": "Genes coloured by pLI score"}),
-)
+def get_default_evaluation_tracks():
+    return (
+        (TrackFile.objects.get(assembly=Assembly.objects.get(name="hg38"), file_type=FILE_TYPE_XAXIS).id, {"title": "XAxis"}),
+        (
+            HIC_NA12787_FILE_ID,
+            {
+                "domains_file": TrackFile.objects.get(pk=HIC_NA12787_TADS_FILE_ID),
+                "title": "HiC Track",
+                "hic_display": HIC_DISPLAY_HIC,
+                "transform": TRANSFORM_LOG1P,
+            },
+        ),
+        (
+            ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
+            {"bed_display": BED_DISPLAY_ARCS, "name_filter": True, "title": "Enhancers-promoters interactions"},
+        ),
+        (PLI_SCORE_FILE_ID, {"bed_display": BED_DISPLAY_TILES, "min_value": 0, "max_value": 1, "title": "Genes coloured by pLI score"}),
+    )
 
 
 @transaction.atomic
@@ -96,7 +97,7 @@ def create_eval_atomic(request, form, p_type):
 
     eval.track_file = track_file
 
-    tracks = DEFAULT_EVALUATION_TRACKS
+    tracks = get_default_evaluation_tracks()
     plot = Plot(assembly=assembly)
 
     set_owner_or_cookie(request, plot)
@@ -368,7 +369,7 @@ def evaluate_translocation(request):
             }
 
             eval = create_empty_evaluation(request, "Evaluation")
-            add_tracks(eval.plot, DEFAULT_EVALUATION_TRACKS)
+            add_tracks(eval.plot, get_default_evaluation_tracks())
 
             url = reverse("browser:breakpoint_browser", kwargs={"p_id": eval.plot.id})
             params_url = urlencode(params)
@@ -396,7 +397,7 @@ def evaluate_cnv(request):
             end_coordinate = form.cleaned_data["end_coordinate"]
 
             eval = create_empty_evaluation(request, "Evaluation")
-            add_tracks(eval.plot, DEFAULT_EVALUATION_TRACKS)
+            add_tracks(eval.plot, get_default_evaluation_tracks())
 
             messages.success(request, f"Structural variant involving chromosome {chrom} evaluated.")
 

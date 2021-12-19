@@ -14,7 +14,7 @@ tracks:
         default: True
   - id: 1001
     assembly: 'hg38'
-    name: 'liver'
+    name: 'Hi-C Immortalized Liver cells (DpnII)'
     source_name: 'Job Dekker, UMMS'
     source_url: 'https://data.4dnucleome.org/files-processed/4DNFIS6HAUPP/'
     file_type: 'HI'
@@ -23,10 +23,10 @@ tracks:
     approved: True
     subtracks:
       - sample: 'liver'
-        file_path: 'hg38/HIC/NA12878/4DNFIS6HAUPP.mcool'
+        file_path: 'hg38/HIC/liver/4DNFIS6HAUPP.mcool'
   - id: 1002
     assembly: 'hg38'
-    name: 'fibroblasts'
+    name: 'Hi-C immortalized Fibroblasts (DpnII)'
     source_name: 'Systematic evaluation of chromosome conformation capture assays. Akgol Oksuz B, Yang L, et al., Nature methods 2021'
     source_url: 'https://data.4dnucleome.org/files-processed/4DNFIWMLVHWX/'
     file_type: 'HI'
@@ -35,10 +35,10 @@ tracks:
     approved: True
     subtracks:
       - sample: 'fibroblasts'
-        file_path: 'hg38/HIC/NA12878/4DNFIWMLVHWX.mcool'
+        file_path: 'hg38/HIC/fibroblasts/4DNFIWMLVHWX.mcool'
   - id: 1003
     assembly: 'hg38'
-    name: 'blood_cells'
+    name: 'Hi-C immortalized Blood Cells (HindIII)'
     source_name: 'Liquid chromatin Hi-C characterizes compartment-dependent chromatin interaction dynamics. Belaghzal H, Borrman T, et al., Nature genetics 2021'
     source_url: 'https://data.4dnucleome.org/files-processed/4DNFIE7RGTE9/'
     file_type: 'HI'
@@ -47,10 +47,10 @@ tracks:
     approved: True
     subtracks:
       - sample: 'blood_cells'
-        file_path: 'hg38/HIC/NA12878/4DNFIE7RGTE9.mcool'
+        file_path: 'hg38/HIC/blood_cells/4DNFIE7RGTE9.mcool'
   - id: 1004
     assembly: 'hg38'
-    name: 'cardiac_muscle_cells'
+    name: 'Hi-C stem cell derived Cardiac muscle cells (MboI)'
     source_name: 'Transcriptionally active HERV-H retrotransposons demarcate topologically associating domains in human pluripotent stem cells. Zhang Y, Li T, et al., Nature genetics 2019'
     source_url: 'https://data.4dnucleome.org/files-processed/4DNFI8RH55DO/'
     file_type: 'HI'
@@ -59,10 +59,10 @@ tracks:
     approved: True
     subtracks:
       - sample: 'cardiac_muscle_cells'
-        file_path: 'hg38/HIC/NA12878/4DNFI8RH55DO.mcool'
+        file_path: 'hg38/HIC/cardiac_muscle_cells/4DNFI8RH55DO.mcool'
   - id: 1005
     assembly: 'hg38'
-    name: 'myoblasts'
+    name: 'Hi-C stem cell derived myoblasts (MboI)'
     source_name: 'Transcriptionally active HERV-H retrotransposons demarcate topologically associating domains in human pluripotent stem cells. Zhang Y, Li T, et al., Nature genetics 2019'
     source_url: 'https://data.4dnucleome.org/files-processed/4DNFIPO1DGLH/'
     file_type: 'HI'
@@ -71,10 +71,10 @@ tracks:
     approved: True
     subtracks:
       - sample: 'myoblasts'
-        file_path: 'hg38/HIC/NA12878/4DNFIPO1DGLH.mcool'
+        file_path: 'hg38/HIC/myoblasts/4DNFIPO1DGLH.mcool'
   - id: 1006
     assembly: 'hg38'
-    name: 'lung'
+    name: 'Hi-C primary Lung cells (MboI)'
     source_name: 'A 3D map of the human genome at kilobase resolution reveals principles of chromatin looping. Rao SS, Huntley MH, et al., Cell 2014'
     source_url: 'https://data.4dnucleome.org/files-processed/4DNFIJTOIGOI/'
     file_type: 'HI'
@@ -83,10 +83,10 @@ tracks:
     approved: True
     subtracks:
       - sample: 'lung'
-        file_path: 'hg38/HIC/NA12878/4DNFIJTOIGOI.mcool'
+        file_path: 'hg38/HIC/lung/4DNFIJTOIGOI.mcool'
   - id: 1007
     assembly: 'hg38'
-    name: 'hiPSCs'
+    name: 'Hi-C induced pluripotent stem cells (DpnII)'
     source_name: 'Job Dekker, UMMS'
     source_url: 'https://data.4dnucleome.org/files-processed/4DNFIYGPDLKF/'
     file_type: 'HI'
@@ -95,20 +95,126 @@ tracks:
     approved: True
     subtracks:
       - sample: 'hiPSCs'
-        file_path: 'hg38/HIC/NA12878/4DNFIYGPDLKF.mcool'
+        file_path: 'hg38/HIC/hiPSCs/4DNFIYGPDLKF.mcool'
   - id: 2000
     assembly: 'hg38'
     name: 'Hi-C gm12878 (MboI) Boundaries'
     source_name: 'Rao SS et al. (2014) PMID:25497547'
     source_url: 'https://data.4dnucleome.org/files-processed/4DNFIVAZEUBG/'
-    file_type: 'Bed'
+    file_type: 'BE'
     bed_sub_type: 'BED3'
+    big: False
     owner: 'admin'
     public: True
     approved: True
     subtracks:
       - sample: 'GM12878'
         file_path: 'hg38/HIC/NA12878/4DNFIVAZEUBG.bed3'
+        default: True
+  - id: 2001
+    assembly: 'hg38'
+    name: 'Hi-C Immortalized Liver cells (DpnII) Boundaries'
+    source_name: 'Job Dekker, UMMS'
+    source_url: 'https://data.4dnucleome.org/files-processed/4DNFIFH6XF5T/'
+    file_type: 'BE'
+    bed_sub_type: 'BED3'
+    big: False
+    owner: 'admin'
+    public: True
+    approved: True
+    subtracks:
+      - sample: 'liver'
+        file_path: 'hg38/HIC/liver/4DNFIFH6XF5T.bed3'
+        default: True
+  - id: 2002
+    assembly: 'hg38'
+    name: 'Hi-C immortalized Fibroblasts (DpnII) Boundaries'
+    source_name: 'Systematic evaluation of chromosome conformation capture assays. Akgol Oksuz B, Yang L, et al., Nature methods 2021'
+    source_url: 'https://data.4dnucleome.org/files-processed/4DNFIYJNRQ2W/'
+    file_type: 'BE'
+    bed_sub_type: 'BED3'
+    big: False
+    owner: 'admin'
+    public: True
+    approved: True
+    subtracks:
+      - sample: 'fibroblasts'
+        file_path: 'hg38/HIC/fibroblasts/4DNFIYJNRQ2W.bed3'
+        default: True
+  - id: 2003
+    assembly: 'hg38'
+    name: 'Hi-C immortalized Blood Cells (HindIII) Boundaries'
+    source_name: 'Liquid chromatin Hi-C characterizes compartment-dependent chromatin interaction dynamics. Belaghzal H, Borrman T, et al., Nature genetics 2021'
+    source_url: 'https://data.4dnucleome.org/files-processed/4DNFISAWCB68/'
+    file_type: 'BE'
+    bed_sub_type: 'BED3'
+    big: False
+    owner: 'admin'
+    public: True
+    approved: True
+    subtracks:
+      - sample: 'blood_cells'
+        file_path: 'hg38/HIC/blood_cells/4DNFISAWCB68.bed3'
+        default: True
+  - id: 2004
+    assembly: 'hg38'
+    name: 'Hi-C stem cell derived Cardiac muscle cells (MboI) Boundaries'
+    source_name: 'Transcriptionally active HERV-H retrotransposons demarcate topologically associating domains in human pluripotent stem cells. Zhang Y, Li T, et al., Nature genetics 2019'
+    source_url: 'https://data.4dnucleome.org/files-processed/4DNFIUDNR9AV/'
+    file_type: 'BE'
+    bed_sub_type: 'BED3'
+    big: False
+    owner: 'admin'
+    public: True
+    approved: True
+    subtracks:
+      - sample: 'cardiac_muscle_cells'
+        file_path: 'hg38/HIC/cardiac_muscle_cells/4DNFIUDNR9AV.bed3'
+        default: True
+  - id: 2005
+    assembly: 'hg38'
+    name: 'Hi-C stem cell derived myoblasts (MboI) Boundaries'
+    source_name: 'Transcriptionally active HERV-H retrotransposons demarcate topologically associating domains in human pluripotent stem cells. Zhang Y, Li T, et al., Nature genetics 2019'
+    source_url: 'https://data.4dnucleome.org/files-processed/4DNFI9JHUI2I/'
+    file_type: 'BE'
+    bed_sub_type: 'BED3'
+    big: False
+    owner: 'admin'
+    public: True
+    approved: True
+    subtracks:
+      - sample: 'myoblasts'
+        file_path: 'hg38/HIC/myoblasts/4DNFI9JHUI2I.bed3'
+        default: True
+  - id: 2006
+    assembly: 'hg38'
+    name: 'Hi-C primary Lung cells (MboI) Boundaries'
+    source_name: 'A 3D map of the human genome at kilobase resolution reveals principles of chromatin looping. Rao SS, Huntley MH, et al., Cell 2014'
+    source_url: 'https://data.4dnucleome.org/files-processed/4DNFIMNT2VYL/'
+    file_type: 'BE'
+    bed_sub_type: 'BED3'
+    big: False
+    owner: 'admin'
+    public: True
+    approved: True
+    subtracks:
+      - sample: 'lung'
+        file_path: 'hg38/HIC/lung/4DNFIMNT2VYL.bed3'
+        default: True
+  - id: 2007
+    assembly: 'hg38'
+    name: 'Hi-C induced pluripotent stem cells (DpnII) Boundaries'
+    source_name: 'Job Dekker, UMMS'
+    source_url: 'https://data.4dnucleome.org/files-processed/4DNFIUI752L5/'
+    file_type: 'BE'
+    bed_sub_type: 'BED3'
+    big: False
+    owner: 'admin'
+    public: True
+    approved: True
+    subtracks:
+      - sample: 'hiPSCs'
+        file_path: 'hg38/HIC/hiPSCs/4DNFIUI752L5.bed3'
         default: True
   - id: 5
     assembly: 'hg38'
@@ -138,7 +244,7 @@ tracks:
     approved: True
     subtracks:
       - name: 'pLI score'
-        file_path: 'hg38/genes/score_pLI.hg38.bed'
+        file_path: 'hg38/genes/pLI_processed.hg38.bed'
         default: True
   - id: 7
     assembly: 'hg38'
