@@ -1266,7 +1266,7 @@ class PlotVirtual4C(TrackPlot):
         start_positions = list(self.hic_ma.get_start_positions(chrom, start, end))
 
         for start_position, value in zip(start_positions, values):
-            self.axis.add_patch(Rectangle((start_position, 0), self.bin_size, value, edgecolor=self.edgecolor, linewidth=1))
+            self.axis.add_patch(Rectangle((start_position, 0), self.bin_size, value, edgecolor=self.edgecolor, linewidth=1, color="#3c59a6"))
 
         max_value = np.max(values)
 
