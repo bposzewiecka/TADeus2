@@ -237,7 +237,7 @@ def delete_entry(request, p_id):
 
 
 def ranking(eval, p_chrom, p_interval_start, p_interval_end):
-    return []
+
     p_interval_start, p_interval_end = int(p_interval_start), int(p_interval_end)
 
     region_start = max(p_interval_start - 3 * 1000 * 1000, 0)
@@ -245,18 +245,18 @@ def ranking(eval, p_chrom, p_interval_start, p_interval_end):
 
     gene_file = TrackFile.objects.get(pk=BIOMART_GENES_FILE_ID)
 
-    genes = gene_file.get_entries(p_chrom, region_start, region_end)
+    genes = gene_file.get_entries_db(p_chrom, region_start, region_end)
 
     genes = {gene.name: {"gene": Gene.objects.get(pk=gene.id)} for gene in genes}
 
     pLI_file = TrackFile.objects.get(pk=PLI_SCORE_FILE_ID)
-    pLI = {gene.name.upper(): gene.score for gene in pLI_file.get_entries(p_chrom, region_start, region_end)}
+    pLI = {gene.name.upper(): gene.score for gene in pLI_file.get_entries_db(p_chrom, region_start, region_end)}
 
     clingen_file = TrackFile.objects.get(pk=CLINGEN_FILE_ID)
-    clingen = {gene.name: gene.score for gene in clingen_file.get_entries(p_chrom, region_start, region_end)}
+    clingen = {gene.name: gene.score for gene in clingen_file.get_entries_db(p_chrom, region_start, region_end)}
 
     enh_prom_file = TrackFile.objects.get(pk=ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID)
-    enh_proms = [enh_prom.name.upper() for enh_prom in enh_prom_file.get_entries(p_chrom, p_interval_start, p_interval_end)]
+    enh_proms = [enh_prom.name.upper() for enh_prom in enh_prom_file.get_entries_db(p_chrom, p_interval_start, p_interval_end)]
     enh_proms = Counter(enh_proms)
 
     for gene_name, d in genes.items():
@@ -416,6 +416,8 @@ def evaluate_cnv(request):
                 },
             )
             params_url = urlencode(params)
+
+            ranking(eval, chrom, end_coordinate, start_coordinate)
 
             return HttpResponseRedirect(f"{url}?{params_url}")
 
