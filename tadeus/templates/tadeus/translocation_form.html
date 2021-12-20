@@ -9,9 +9,8 @@
                 </div>
                 <div class="card-body">
 
-                    {% include 'tadeus/breakpoint_form.html' with chromosome=trans_form.chrom1 coordinate=trans_form.coordinate1 direction=trans_form.direction1 %}
-                    {% include 'tadeus/breakpoint_form.html' with chromosome=trans_form.chrom2 coordinate=trans_form.coordinate2 direction=trans_form.direction2 %}
-
+                    {% include 'tadeus/breakpoint_form.html' with chromosome=trans_form.chrom1 coordinate=trans_form.coordinate1 direction=trans_form.direction1 default_chromosome='chr14' default_coordinate=29266299 default_direction=H %}
+                    {% include 'tadeus/breakpoint_form.html' with chromosome=trans_form.chrom2 coordinate=trans_form.coordinate2 direction=trans_form.direction2 default_chromosome='chr6' default_coordinate=7903163 default_direction=H %}
 
                      <div class="form-row">
                         <div class="form-group col-md-6">
