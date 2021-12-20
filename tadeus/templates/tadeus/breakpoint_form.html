@@ -1,51 +1,27 @@
 <div class="form-row" >
     <div class="form-group col-md-4" >
-
-        <div class="input-group mb-3 flex-nowrap">
-            {{ chromosome.errors }}
-            <div class="input-group-prepend" >
-                <span class="input-group-text" style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Chromosome</span>
-            </div>
-
-            <select name="{{  chromosome.html_name  }}" class="form-control"  id="{{ chromosome.id_for_label  }}" required>
-                {% for s_chromosome in chromosomes %}
-                    <option value="{{ s_chromosome.name }}" {% if chromosome.value|default:default_chromosome  == s_chromosome.name %}selected{% endif %}>{{ s_chromosome.name }}</option>
-                {% endfor %}
-            </select>
-
-        </div>
+        {{ chromosome.errors }}
+        <label for="{{ chromosome.id_for_label }}">Chromosome</label>
+        <select name="{{  chromosome.html_name  }}" class="form-control"  id="{{ chromosome.id_for_label  }}" required>
+            {% for s_chromosome in chromosomes %}
+                <option value="{{ s_chromosome.name }}" {% if chromosome.value|default:default_chromosome  == s_chromosome.name %}selected{% endif %}>{{ s_chromosome.name }}</option>
+            {% endfor %}
+        </select>
     </div>
-
     <div class="form-group col-md-4" >
-
-        <div class="input-group mb-3 flex-nowrap">
-            {{ coordinate.errors }}
-            <div class="input-group-prepend">
-                <span class="input-group-text" style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Coordinate</span>
-            </div>
-
-            <input class="form-control" type="number" name="{{ coordinate.html_name }}" id="{{ coordinate.id_for_label }}" value="{{ coordinate.value|default:default_coordinate}}" required>
-
-        </div>
-
+        {{ coordinate.errors }}
+        <label for="{{ coordinate.id_for_label }}">Coordinate</label>
+        <input class="form-control" type="number" name="{{ coordinate.html_name }}" id="{{ coordinate.id_for_label }}" value="{{ coordinate.value|default:default_coordinate}}" required>
     </div>
 
     <div class="form-group col-md-4">
-
-        <div class="input-group mb-3  flex-nowrap">
-            {{ direction.errors }}
-            <div class="input-group-prepend" >
-                <span class="input-group-text" style="font-size: 14px;line-height:1rem; padding: .375rem; width:110px">Orientation</span>
-            </div>
-
-            <select name="{{  direction.html_name  }}" class="form-control"  id="{{  direction.id_for_label }}" required>
-                {% for value, name in trans_form.fields.direction1.choices %}
-                    <option value="{{ value }}" {% if direction.value|default:default_direction  == name %}selected{% endif %}>{{ name }}</option>
-                {% endfor %}
-            </select>
-
-        </div>
-
+        {{  direction.errors }}
+        <label for="{{ direction.id_for_label }}">Orientation</label>
+        <select name="{{  direction.html_name  }}" class="form-control"  id="{{  direction.id_for_label }}" required>
+            {% for value, name in trans_form.fields.direction1.choices %}
+                <option value="{{ value }}" {% if direction.value|default:default_direction  == name %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
     </div>
 
 </div>

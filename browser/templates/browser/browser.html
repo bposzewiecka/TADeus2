@@ -73,7 +73,7 @@
 
         {% for p_track in p_plot.tracks.all %}
             <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
-                <td style="font-size:8px; width:100px">{{p_track}}</td>
+                <td style="font-size:14px; width:140px; font-weight: bold; padding: 4px">{{p_track}}</td>
 
                 <td {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
                     <img src="{% url 'browser:image' p_id=p_track.id p_cols=p_cols p_chrom=p_chrom p_start=p_start p_end=p_end %}{{ get_url|safe }}" alt="">
