@@ -21,7 +21,7 @@ class SVEntry(BedFileEntry):
     sv_type = models.IntegerField(choices=SV_TYPES)
     TADA_score = models.FloatField(null=True)
     ClassifyCNV = models.CharField(max_length=20, null=True)
-    TADeus_score = models.FloatField(null=True)
+    TADeus_breakpoint_pvalue = models.FloatField(null=True)
 
 
 class SVPropertyType(models.Model):

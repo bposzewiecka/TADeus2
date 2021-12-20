@@ -48,7 +48,7 @@ class EvaluationEntryTable(tables.Table):
     start = tables.Column(accessor="start")
     end = tables.Column(accessor="end")
     TADA_score = tables.Column(accessor="TADA_score")
-    TADeus_score = tables.Column(accessor="TADeus_score")
+    TADeus_breakpoint_pvalue = tables.Column(accessor="TADeus_breakpoint_pvalue")
     ClassifyCNV = tables.Column(accessor="ClassifyCNV")
     delete_button = tables.Column(empty_values=(), orderable=False)
 
@@ -107,7 +107,7 @@ class EvaluationEntryTable(tables.Table):
             "end",
             "TADA_score",
             "ClassifyCNV",
-            "TADeus_score",
+            "TADeus_breakpoint_pvalue",
             "length",
             "delete_button",
         )

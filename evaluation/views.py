@@ -10,7 +10,7 @@ from django_tables2 import RequestConfig
 
 from datasources.defaults import FILE_TYPE_XAXIS
 from datasources.forms import TrackFileForm
-from datasources.models import Assembly, TrackFile
+from datasources.models import Assembly, Subtrack, TrackFile
 from datasources.readBed import ReadBedOrBedGraphException
 from datasources.views import get_file_handle
 from ontologies.models import Gene
@@ -328,6 +328,8 @@ def create_empty_evaluation(request, title):
     track_file.assembly = assembly
     set_owner_or_cookie(request, track_file)
     track_file.save()
+
+    Subtrack.objects.create(track_file=track_file)
 
     plot = Plot(assembly=assembly)
 

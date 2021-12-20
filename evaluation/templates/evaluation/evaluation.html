@@ -47,6 +47,11 @@
 {% csrf_token %}
 
 <div class="form-row">
+CNV (Deletions and duplication) are evaluated using <a href="https://www.biorxiv.org/content/10.1101/2020.06.30.180711v1">TADAscore</a>  and <a href="https://www.nature.com/articles/s41598-020-76425-3">ClassifyCNV</a>.
+Translocationos are evaluated using TADeus breakpoint p-value.
+</div>
+
+<div class="form-row">
     <div class="form-group col-md-8">
         <label for="{{ form.name.id_for_label }}">Name</label>
         {{ form.name.errors }}
