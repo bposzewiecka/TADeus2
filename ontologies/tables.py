@@ -30,7 +30,7 @@ class PhenotypeFilter(django_filters.FilterSet):
 
 class GeneTable(tables.Table):
     def render_id(self, record):
-        link = reverse("gene", kwargs={"p_id": record.id})
+        link = reverse("ontologies:gene", kwargs={"p_id": record.id})
         return getLink(link, DEFAULT_EDIT_ICON)
 
     class Meta:
