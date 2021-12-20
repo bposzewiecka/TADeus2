@@ -3,7 +3,7 @@ import csv
 from django.contrib.auth.models import User
 from django.db import transaction
 
-from datasources.models import Assembly, TrackFile
+from datasources.models import Assembly, Subtrack, TrackFile
 from evaluation.defaults import BIOMART_GENES_FILE_ID
 from ontologies.models import Gene, GeneToPhenotype, Phenotype
 
@@ -21,11 +21,11 @@ def get_genes():
 
     file_name = "data/hg38/genes/biomart_genes_hg38_20211207.txt"
 
-    trackFile = TrackFile(
+    track_file = TrackFile(
         id=BIOMART_GENES_FILE_ID,
         assembly=hg38,
-        name="",
-        source_name="",
+        name="Genes from BIOMART",
+        source_name="Custom R script",
         source_url="",
         file_type="BE",
         bed_sub_type="Bed6",
@@ -34,7 +34,9 @@ def get_genes():
         approved=True,
     )
 
-    trackFile.save()
+    track_file.save()
+
+    subtrack = Subtrack.objects.create(track_file=track_file)
 
     with open(file_name) as csvfile:
 
@@ -66,7 +68,7 @@ def get_genes():
                 gene_biotype=gene_biotype,
                 ensembl_gene_id=ensembl_gene_id,
                 entrez_gene_id=entrez_gene_id,
-                track_file=trackFile,
+                subtrack=subtrack,
             )
             gene.save()
 
