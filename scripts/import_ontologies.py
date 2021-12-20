@@ -57,7 +57,10 @@ def get_genes():
             if chrom.startswith("G") or chrom.startswith("H"):
                 continue
 
-            chrom = "chr" + row["chromosome_name"]
+            chrom = row["chromosome_name"]
+
+            if len(chrom) > 10:
+                continue
 
             gene = Gene(
                 name=name,
