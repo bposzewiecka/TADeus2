@@ -20,12 +20,15 @@ class TrackForm(forms.ModelForm):
             if attribute not in instance_attributes:
                 self.fields.pop(attribute)
 
-        if "subtracks" in self.fields and len(self.instance.subtracks.all()) <= 1:
-            self.fields.pop("subtracks")
-
         if "subtracks" in self.fields:
-            self.fields["subtracks"].widget = CheckboxSelectMultiple()
-            self.fields["subtracks"].queryset = Subtrack.objects.filter(track_file=self.instance.track_file)
+
+            track_file_subtracks = Subtrack.objects.filter(track_file=self.instance.track_file)
+
+            if len(track_file_subtracks) <= 1:
+                self.fields.pop("subtracks")
+            else:
+                self.fields["subtracks"].widget = CheckboxSelectMultiple()
+                self.fields["subtracks"].queryset = track_file_subtracks
 
 
 class CreateTrackForm(forms.ModelForm):
