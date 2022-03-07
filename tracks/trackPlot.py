@@ -1156,7 +1156,7 @@ class PlotHiCMatrix(TrackPlot):
             from tracks.models import Track
 
             track = Track(track_file=self.domains_file)
-            track.color = "FF0000"
+            track.color = "#FF0000"
             trackPlot = PlotDomains(model=track)
             trackPlot.axis = self.axis
             trackPlot.label_axis = None
