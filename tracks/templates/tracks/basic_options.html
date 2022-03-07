@@ -1,25 +1,24 @@
 <div class="card-body">
 
     <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="{{ form.track_file.id_for_label }}">Track file</label>
+            <select id="{{ form.track_file.id_for_label }}" class="form-control" name="{{ form.track_file.html_name }}">
 
-        <div class="form-group col-md-{% if file_type  == 'HI' %}10{% else %}12{% endif %}">
-            <label>Track file</label>
-            <input class="form-control"  value="{{  track.track_file.name   }}" readonly>
+            {%  for group_name, group in  track_files %}
+
+                <optgroup label="{{group_name}}">
+                    {% for track_file in  group %}
+                        <option value="{{ track_file.id }}" {% if form.track_file.value|add:0   == track_file.id %} selected{% endif %} data-file-type="{{ track_file.file_type }}{% if track_file.file_type == 'BE' %}-{{ track_file.bed_sub_type}}{% endif %}">{{ track_file.name }}</option>
+                    {% endfor %}
+                </optgroup>
+
+            {% endfor %}
+
+            </select>
         </div>
-
-        {% if file_type == 'HI' %}
-            <div class="form-group col-md-2">
-                <label>Track type</label>
-                <select id="{{ form.hic_display.id_for_label }}" class="form-control" name="{{ form.hic_display.html_name }}"  readonly>
-
-                {% for x,y in form.fields.hic_display.choices %}
-                    <option value="{{ x }}"{% if form.hic_display.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
-                {% endfor %}
-                </select>
-            </div>
-        {% endif %}
-
     </div>
+
 
     <div class="form-row">
 
@@ -28,7 +27,6 @@
             {{ form.title.errors }}
             <input class="form-control" name="{{ form.title.html_name }}" id="{{ form.title.id_for_label }}" {% if form.title.value  %} value="{{ form.title.value}}" {% endif %} {% if readonly %}readonly{% endif %}>
         </div>
-
 
         <div class="form-group col-md-3">
             <label for="{{ form.no.id_for_label }}">Sort order</label>
@@ -39,107 +37,96 @@
         </div>
     </div>
 
-    {% if form.chromosome or form.start_coordinate or form.end_coordinate or form.aggregate_function or form.transform or form.domains_file %}
+    <div class="form-row">
 
-        <div class="form-row">
+        <div class="form-group col-md-2  {% include 'tracks/file_types_classes.html' with attribute='hic_display' %}" id="id_el_hic_display">
+            {{ form.hic_display.errors }}
+            <label for="{{ form.hic_display.id_for_label }}">Display</label>
 
-            {% if form.chromosome %}
+            <select id="{{ form.hic_display.id_for_label }}" class="form-control" name="{{ form.hic_display.html_name }}" >
 
-                <div class="form-group col-md-3">
-                    <label for="{{ form.chromosome.id_for_label }}">Chromosome</label>
+            {% for x,y in form.fields.hic_display.choices %}
+                <option value="{{ x }}" {% if form.hic_display.value|add:0 == x %} selected{% endif %}>{{ y }}</option>
+            {% endfor %}
 
-                    {{ form.chromosome.errors }}
-
-                    <select name="{{ form.chromosome.html_name }}" class="form-control"  id="{{ form.chromosome.id_for_label }}" {% if readonly %}readonly{% endif %} required>>
-                        {% for chromosome in chroms %}
-                            <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0   == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-            {% endif %}
-
-            {% if form.start_coordinate %}
-
-                <div class="form-group col-md-3">
-                    <label for="{{ form.start_coordinate.id_for_label }}">Start coordinate</label>
-
-                    {{ form.start_coordinate.errors }}
-
-                    <input class="form-control" type="number" name="{{ form.start_coordinate.html_name }}" id="{{ form.start_coordinate.id_for_label }}" value="{{ form.start_coordinate.value}}" {% if readonly %}readonly{% endif %} required>
-                </div>
-
-            {% endif %}
-
-            {% if form.end_coordinate %}
-
-                <div class="form-group col-md-3">
-                    <label for="{{ form.end_coordinate.id_for_label }}">End coordinate</label>
-
-                    {{ form.end_coordinate.errors }}
-
-                    <input class="form-control" type="number"  name="{{ form.end_coordinate.html_name }}" id="{{ form.end_coordinate.id_for_label }}" value="{{ form.end_coordinate.value}}" {% if readonly %}readonly{% endif %} required>
-
-                </div>
-
-            {% endif %}
-
-            {% if form.aggregate_function %}
-
-                <div class="form-group col-md-3">
-                    <label for="{{ form.aggregate_function.id_for_label }}">Aggregate function</label>
-
-                    {{ form.aggregate_function.errors }}
-
-                    <select id="{{ form.aggregate_function.id_for_label }}" class="form-control" name="{{ form.aggregate_function.html_name }}"  {% if readonly %}disabled{% endif %}>
-                        {% for x,y in form.fields.aggregate_function.choices %}
-                            <option value="{{ x }}"{% if form.aggregate_function.value == x %} selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-            {% endif %}
-
-
-            {% if form.transform %}
-
-                <div class="form-group col-md-3">
-
-                    {{ form.transform.errors }}
-
-                    <label for="{{ form.transform.id_for_label }}">Transform</label>
-
-                    <select id="{{ form.transform.id_for_label }}" class="form-control" name="{{ form.transform.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                        {% for x,y in form.fields.transform.choices %}
-                            <option value="{{ x }}"{% if form.transform.value == x|add:0 %} selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-
-                    </select>
-                </div>
-
-            {% endif %}
-
-            {% if form.domains_file %}
-
-                <div class="form-group col-md-4">
-
-                    {{ form.domains_file.errors }}
-
-                    <label for="{{ form.domains_file.id_for_label }}">Domains datasource</label>
-
-                    <select id="{{ form.domains_file.id_for_label }}" class="form-control" name="{{ form.domains_file.html_name }}"  {% if readonly %}disabled{% endif %}>
-
-                        <option value="">None</option>
-
-                        {% for domains_file in domains_files %}
-                            <option value="{{ domains_file.id }}"{% if form.domains_file.value|add:0  == domains_file.id %} selected{% endif %}>{{ domains_file.name }}</option>
-                        {% endfor %}
-
-                    </select>
-                </div>
-
-            {% endif %}
+            </select>
         </div>
-    {% endif %}
+    </div>
+
+
+    <div class="form-row">
+
+        <div class="form-group col-md-3  {% include 'tracks/file_types_classes.html' with attribute='chromosome' %} HIC1" id="id_el_chromosome" >
+            <label for="{{ form.chromosome.id_for_label }}">Chromosome</label>
+
+            {{ form.chromosome.errors }}
+
+            <select name="{{ form.chromosome.html_name }}" class="form-control"  id="{{ form.chromosome.id_for_label }}" {% if readonly %}readonly{% endif %}>
+                {% for chromosome in chroms %}
+                    <option value="{{ chromosome.id }}" {% if form.chromosome.value|add:0  == chromosome.id %}selected{% endif %}>{{ chromosome.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group col-md-3 {% include 'tracks/file_types_classes.html' with attribute='start_coordinate' %} HIC1" id="id_el_start_coordinate">
+            <label for="{{ form.start_coordinate.id_for_label }}">Start coordinate</label>
+
+            {{ form.start_coordinate.errors }}
+
+            <input class="form-control" type="number" name="{{ form.start_coordinate.html_name }}" id="{{ form.start_coordinate.id_for_label }}" value="{{ form.start_coordinate.value}}" {% if readonly %}readonly{% endif %}>
+        </div>
+
+        <div class="form-group col-md-3 {% include 'tracks/file_types_classes.html' with attribute='end_coordinate' %} HIC1" id="id_el_end_coordinate" >
+            <label for="{{ form.end_coordinate.id_for_label }}">End coordinate</label>
+
+            {{ form.end_coordinate.errors }}
+
+            <input class="form-control" type="number"  name="{{ form.end_coordinate.html_name }}" id="{{ form.end_coordinate.id_for_label }}" value="{{ form.end_coordinate.value}}" {% if readonly %}readonly{% endif %}>
+
+        </div>
+
+        <div class="form-group col-md-3  {% include 'tracks/file_types_classes.html' with attribute='aggregate_function' %}" id="id_el_aggregate_function">
+            <label for="{{ form.aggregate_function.id_for_label }}">Aggregate function</label>
+
+            {{ form.aggregate_function.errors }}
+
+            <select id="{{ form.aggregate_function.id_for_label }}" class="form-control" name="{{ form.aggregate_function.html_name }}"  {% if readonly %}disabled{% endif %}>
+                {% for x,y in form.fields.aggregate_function.choices %}
+                    <option value="{{ x }}" {% if form.aggregate_function.value == x %} selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group col-md-3  {% include 'tracks/file_types_classes.html' with attribute='transform' %} VHIC" id="id_el_transform">
+
+            {{ form.transform.errors }}
+
+            <label for="{{ form.transform.id_for_label }}">Transform</label>
+
+            <select id="{{ form.transform.id_for_label }}" class="form-control" name="{{ form.transform.html_name }}"  {% if readonly %}disabled{% endif %}>
+
+                {% for x,y in form.fields.transform.choices %}
+                    <option value="{{ x }}"{% if form.transform.value|add:0  == x %} selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div class="form-group col-md-4 {% include 'tracks/file_types_classes.html' with attribute='domains_file' %} HIC0" id="id_el_domains_file" >
+
+            {{ form.domains_file.errors }}
+
+            <label for="{{ form.domains_file.id_for_label }}">Domains datasource</label>
+
+            <select id="{{ form.domains_file.id_for_label }}" class="form-control" name="{{ form.domains_file.html_name }}"  {% if readonly %}disabled{% endif %}>
+
+                <option value="">None</option>
+
+                {% for domains_file in domains_files %}
+                    <option value="{{ domains_file.id }}"{% if form.domains_file.value|add:0  == domains_file.id %} selected{% endif %}>{{ domains_file.name }}</option>
+                {% endfor %}
+
+            </select>
+        </div>
+    </div>
 </div>

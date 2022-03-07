@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from datasources.defaults import BED6, BED9, BED12, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPE_XAXIS
+from datasources.defaults import BED12, FILE_TYPE_BED, FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC, FILE_TYPE_XAXIS, get_attributes
 from datasources.models import BedFileEntry, Chromosome, FileEntry, Subtrack, TrackFile
 from plots.models import Plot
 from tadeus_portal.settings import TADEUS_DATA_DIR
@@ -62,8 +62,8 @@ class Track(models.Model):
 
     inverted = models.BooleanField(default=False)
 
-    color = models.CharField(max_length=6, default=DEFAULT_PLOT_COLOR)
-    edgecolor = models.CharField(max_length=6, default=DEFAULT_PLOT_EDGE_COLOR)
+    color = models.CharField(max_length=7, default=DEFAULT_PLOT_COLOR)
+    edgecolor = models.CharField(max_length=7, default=DEFAULT_PLOT_EDGE_COLOR)
 
     colormap = models.CharField(max_length=18, choices=COLOR_MAP_OPTIONS, default=DEFAULT_PLOT_COLOR_MAP_OPTIONS, null=True, blank=True)
 
@@ -93,7 +93,7 @@ class Track(models.Model):
 
     bedgraph_style = models.IntegerField(choices=BEDGRAPH_STYLE_OPTIONS, default=BEDGRAPH_STYLE_AREA)
 
-    bin_size = models.IntegerField()
+    bin_size = models.IntegerField(null=True, blank=True, default=0)
 
     def get_file_type(self):
         return self.track_file.file_type
@@ -202,61 +202,6 @@ class Track(models.Model):
     def file_name(self):
         return self.track_file.name
 
-    def get_attributes(self):
-
-        attributes = []
-
-        attributes.append("title")
-        attributes.append("no")
-        attributes.append("height")
-        attributes.append("edgecolor")
-
-        if self.track_file.file_type in (FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC):
-            attributes.append("transform")
-
-        if self.track_file.file_type == FILE_TYPE_BED:
-            attributes.append("labels")
-            attributes.append("color")
-            attributes.append("bed_display")
-            attributes.append("bed_style")
-
-        bed_with_name_and_color = self.track_file.file_type == FILE_TYPE_BED and (self.track_file.bed_sub_type in (BED6, BED9, BED12))
-
-        if bed_with_name_and_color:
-            attributes.append("labels")
-            attributes.append("name_filter")
-
-        if (self.track_file.file_type in FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_HIC) or bed_with_name_and_color:
-            attributes.append("colormap")
-
-        if self.track_file.file_type in (FILE_TYPE_BED_GRAPH, FILE_TYPE_HIC) or bed_with_name_and_color:
-            attributes.append("min_value")
-            attributes.append("max_value")
-
-        if self.track_file.file_type == FILE_TYPE_HIC:
-            attributes.append("hic_display")
-
-        if self.track_file.file_type == FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_HIC:
-            attributes.append("domains_file")
-            attributes.append("inverted")
-
-        if self.track_file.file_type == FILE_TYPE_HIC and self.hic_display == HIC_DISPLAY_VIRTUAL4C:
-            attributes.append("chromosome")
-            attributes.append("start_coordinate")
-            attributes.append("end_coordinate")
-            attributes.append("color")
-
-        if self.track_file.file_type == FILE_TYPE_BED_GRAPH:
-            attributes.append("subtracks")
-            attributes.append("bedgraph_display")
-            attributes.append("bedgraph_type")
-            attributes.append("bedgraph_style")
-            attributes.append("style")
-            attributes.append("bin_size")
-            attributes.append("aggregate_function")
-
-        return attributes
-
     @property
     def get_long_track_type_name(self):
 
@@ -276,6 +221,9 @@ class Track(models.Model):
 
     class Meta:
         ordering = ["no"]
+
+    def get_attributes(self):
+        return get_attributes(self.track_file.file_type, self.track_file.bed_sub_type)
 
 
 @receiver(pre_save, sender=Track)

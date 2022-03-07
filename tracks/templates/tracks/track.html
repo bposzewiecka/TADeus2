@@ -7,26 +7,29 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
         <li class="breadcrumb-item"><a href="{% url 'plots:index' %}">Plots</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'plots:update' p_id=track.plot.id %}">{{ track.plot.name }}</a></li>
+
+        <li class="breadcrumb-item"><a href="{% url 'plots:update' p_id=plot.id %}">{{ plot.name }}</a></li>
+
+
         <li class="breadcrumb-item active" aria-current="page">{{ track.track_file.name }} </li>
-    </ol>
 </nav>
 
 
-<form action="{% url 'tracks:update' p_id=p_id %}" method="post">
+<form action="{%if p_id %}{% url 'tracks:update' p_id=p_id %}{%else%}{% url 'tracks:create' p_plot_id=plot.id  %}{% endif %}" method="POST">
 {% endblock %}
 
 {% block header %}
 
     <div class="float-right" role="group">
 
-        <a href="{% url 'plots:update' p_id=track.plot.id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
+         <a href="{% url 'plots:update' p_id=plot.id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true">Cancel</a>
 
         {% if not readonly and p_id %}
             <a href="{% url 'tracks:delete' p_id=p_id %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" onclick="return confirm('Are you sure you want to delete this track?')">Delete</a>
-            <button type="submit" class="btn btn-primary btn-lg active">Save</button>
+
         {% endif%}
 
+         <button type="submit" class="btn btn-primary btn-lg active">Save</button>
         {% if p_id %}
             <a href="{% url 'browser:browser' p_id=track.plot.id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true"  title="Browser"><i class="fas fa-sliders-h"></i></a>
             <a href="{% url 'browser:breakpoint_browser' p_id=track.plot.id  %}" class="btn btn-primary btn-lg active pull-right" role="button" aria-pressed="true" title="Breakoint browser"><i class="fas fa-exchange-alt"></i></a>
@@ -34,21 +37,19 @@
 
     </div>
 
+
 {% endblock %}
 
 {% block body %}
     {% csrf_token %}
 
-
-
-
     <div class="accordion" id="options">
         <div class="card">
             <div class="card-header bg-primary" id="basic_options_heading">
-                <button class="btn btn-link text-white" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Basic options</button>
+                <button class="btn btn-link text-white" type="button"  data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Basic options</button>
             </div>
 
-            <div id="collapseOne" class="collapse show" aria-labelledby="basic_options_heading" data-parent="#options">
+            <div id="collapseOne"  aria-labelledby="basic_options_heading" data-parent="#options">
 
                 {% include 'tracks/basic_options.html' %}
 
@@ -58,36 +59,37 @@
         <div class="card">
             <div class="card-header" id="advanced_options_heading">
                 <h2 class="mb-0">
-                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Advanced options</button>
+                    <button class="btn btn-link" type="button" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Advanced options</button>
                 </h2>
             </div>
 
-            <div id="collapseTwo" class="collapse" aria-labelledby="advanced_options_heading" data-parent="#options">
+            <div id="collapseTwo"  aria-labelledby="advanced_options_heading" data-parent="#options">
 
                 {% include 'tracks/advanced_options.html' %}
 
             </div>
         </div>
 
-        {% if form.subtracks %}
+    {% if form.subtracks   %}
 
         <div class="card">
             <div class="card-header" id="headingThree">
                 <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Subtracks</button>
             </div>
-            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#options">
+            <div id="collapseThree" aria-labelledby="headingThree" data-parent="#options">
                 {% include 'tracks/subtracks.html' %}
             </div>
         </div>
 
-        {% endif %}
+    {% endif %}
     </div>
 
-
-</form>
-
-
 {% endblock %}
+
+{% block end %}
+</form>
+{% endblock %}
+
 
 
 {% block javascript %}
@@ -125,6 +127,66 @@ $("#subtrack-table input:checkbox").change(function(event) {
     if(! checked && is_view_selected() ){
         $(this).parent().parent().parent().hide();
     }
+});
+
+function show_attributes(attribute_class) {
+    console.log(attribute_class);
+    $('.track-attribute').hide()
+    $('.' + attribute_class).show()
+}
+
+
+function get_track_file_class() {
+    el = document.getElementById("{{ form.track_file.id_for_label }}");
+    option = el.options[el.selectedIndex];
+    return option.getAttribute('data-file-type');
+}
+
+function get_hic_display_value() {
+    el = document.getElementById("{{ form.hic_display.id_for_label }}");
+    option = el.options[el.selectedIndex];
+    return option.getAttribute('value');
+}
+
+function show_hic_attributes(value) {
+    $('.HIC' + value).show();
+    $('.HIC' + (1 - value)).hide();
+}
+
+function set_required_for_hic_display(track_file_class, hic_display_value) {
+
+    is_required = hic_display_value == '1' && track_file_class == "HI";
+
+
+    $('.HIC1 input').each(function( index ) {
+        $( this ).attr('required', is_required);
+     });
+}
+
+function set_form_attibutes(){
+
+    track_file_class = get_track_file_class();
+
+    show_attributes(track_file_class);
+
+    if (track_file_class == 'HI') {
+        hic_display_value = get_hic_display_value();
+        show_hic_attributes(hic_display_value);
+    }
+
+    set_required_for_hic_display(track_file_class, hic_display_value)
+}
+
+let select_track_file = document.getElementById("{{ form.track_file.id_for_label }}");
+
+select_track_file.addEventListener("change", set_form_attibutes);
+
+let select_hic_display = document.getElementById("{{ form.hic_display.id_for_label }}");
+
+select_hic_display.addEventListener("change",  set_form_attibutes);
+
+$(document).ready(function(){
+    set_form_attibutes()
 });
 
 </script>

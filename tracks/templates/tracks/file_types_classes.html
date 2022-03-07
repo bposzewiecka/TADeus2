@@ -1,0 +1,1 @@
+{% for  key, values in filetypes_by_attribute.items %}{% if key == attribute %}track-attribute {% for value in values %} {{value.0}}{% if value.1 is not None %}-{{value.1}}{% endif %} {% endfor %} {% endif %} {% endfor %}

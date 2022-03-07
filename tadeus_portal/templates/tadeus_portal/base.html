@@ -30,16 +30,16 @@
                         <a class="nav-link" href="{% url 'datasources:index' %}">Data sources</a>
                     </li>
                     <li class="nav-item  dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ontologies</a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-ontologies" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ontologies</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown-ontologies">
                             <a class="dropdown-item" href="{% url 'ontologies:phenotypes' p_db='HPO' %}">HPO - Human Phenotype Ontology</a>
                             <!--<a class="dropdown-item" href="{% url 'ontologies:phenotypes' p_db='OMIM' %}">OMIM - Online Mendelian Inheritance in Man</a>-->
                             <a class="dropdown-item" href="{% url 'ontologies:genes' %}">Genes</a>
                         </div>
                     </li>
                     <li class="nav-item  dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-help" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown-help">
                             <a class="dropdown-item" href="{% url 'help:sv_evaluation' %}">SV evaluation</a>
                             <a class="dropdown-item" href="{% url 'help:genome_browser' %}">Genome browser</a>
                             <a class="dropdown-item" href="{% url 'help:plots' %}">Plots</a>
