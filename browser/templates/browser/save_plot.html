@@ -1,0 +1,11 @@
+<script>
+
+function save_plot() {
+
+    domtoimage.toBlob(document.getElementById('browser'))
+        .then(function (blob) {
+            window.saveAs(blob, 'plot.png');
+    });
+}
+
+</script>

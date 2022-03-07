@@ -9,6 +9,9 @@
 
         {% with left_inverse=form_params.left_inverse|default:'false' right_inverse=form_params.right_inverse|default:'false'  %}
 
+        <div  class="input-group mr-2">
+             <button class="btn btn-secondary btn-lg"  title="Download. It may take a while." onclick="save_plot(); return false;"><i class="fas fa-download" o></i></button>
+        </div>
 
         <div  class="input-group mr-2">
             <a href="{% url 'plots:update' p_id=p_id %}" class="btn btn-secondary btn-lg" role="button" aria-pressed="true" title="edit"><i class="fas fa-edit"></i></a>
@@ -119,9 +122,9 @@
 {% block body %}
 
 
-     <div style="display: table; margin: 0 auto;">
+     <div style="display: table; margin: 0 auto;" >
 
-        <table style="float:left;">
+        <table style="float:left; background-color:white;" id="browser">
 
             {% for p_track in p_plot.tracks.all %}
                 <tr style="border: 1px solid #dddddd" >
@@ -214,5 +217,6 @@ toogle_directions("left")
 
 </script>
 
+{% include 'browser/save_plot.html' %}
 
 {% endblock javascript %}

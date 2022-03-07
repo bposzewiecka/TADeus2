@@ -8,8 +8,12 @@
 
     <div class="btn-toolbar mb-3" role="toolbar" aria-label="" style="padding-top: 20px;">
 
-        <form action="{% url 'browser:browser' p_id=p_id p_chrom=p_chrom p_start=p_start p_end=p_end %}" method="get" >
+        <form action="{% url 'browser:browser' p_id=p_id p_chrom=p_chrom p_start=p_start p_end=p_end %}" method="get">
             <div class="form-row">
+
+                <div  class="input-group mr-2">
+                     <button class="btn btn-secondary btn-lg"  title="Download. It may take a while." onclick="save_plot(); return false;"><i class="fas fa-download" o></i></button>
+                </div>
 
                 <div class="btn-group mr-2" role="group" aria-label="">
                     <a href="{% url 'browser:browser' p_id=p_id p_chrom=p_chrom p_start=zoom_in.0  p_end=zoom_in.1 %}{{ get_url|safe }}" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom in"><i class="fas fa-search-plus"></i></a>
@@ -69,7 +73,7 @@
 <div style="display: table; margin: 0 auto;">
 
 
-    <table style="float:left;">
+    <table style="float:left; background-color: white;" id="browser">
 
         {% for p_track in p_plot.tracks.all %}
             <tr {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
@@ -146,3 +150,9 @@
 
 
 {% endblock %}
+
+{% block javascript %}
+
+    {% include 'browser/save_plot.html' %}
+
+{% endblock javascript %}
