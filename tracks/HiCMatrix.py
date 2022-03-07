@@ -76,4 +76,4 @@ def get_cooler_bin_sizes(mcooler_fn):
 
     coolers = cooler.fileops.list_coolers(mcooler_fn)
 
-    return [int(cooler.split("/")[-1]) for cooler in coolers]
+    return [int(cooler.split("/")[-1]) for cooler in coolers if cooler != "/"]
