@@ -119,8 +119,8 @@ class TrackPlot:
 
         self.inverted = model.inverted
 
-        self.color = "#" + model.color
-        self.edgecolor = "#" + model.edgecolor
+        self.color = model.color
+        self.edgecolor = model.edgecolor
         self.colormap = model.colormap
 
         self.min_value = model.min_value
