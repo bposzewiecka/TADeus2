@@ -282,7 +282,7 @@ def ranking(eval, p_chrom, p_interval_start, p_interval_end):
         else:
             d["distance_1Mb_score"] = 0
 
-        d["phenotypes"] = gene.phenotypes.order_by("name", "pheno_id")
+        d["phenotypes"] = gene.phenotypes.distinct().order_by("name", "pheno_id")
 
         if d["phenotypes"]:
             d["phenotype_score"] = 100

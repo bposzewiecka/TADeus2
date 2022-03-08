@@ -27,7 +27,7 @@ class Phenotype(models.Model):
         url = None
 
         if self.db == "HPO":
-            url = f"http://compbio.charite.de/hpoweb/showterm?id={self.pheno_id}"
+            url = f"https://hpo.jax.org/app/browse/term/{self.pheno_id}"
 
         if self.db == "OMIM":
             url = f"https://www.omim.org/entry/{self.pheno_id}"
