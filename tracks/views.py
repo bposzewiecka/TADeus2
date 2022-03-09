@@ -10,7 +10,7 @@ from datasources.models import TrackFile
 from plots.models import Plot
 from tadeus_portal.utils import is_object_readonly, only_public_or_user
 
-from .forms import CreateTrackForm, TrackForm
+from .forms import TrackForm
 from .models import Track
 
 
@@ -91,7 +91,7 @@ def create(request, p_plot_id):
     track_number = (max(track_numbers) + 10) // 10 * 10
 
     if request.method == "POST":
-        form = CreateTrackForm(request.POST)
+        form = TrackForm(request.POST)
 
         if form.is_valid():
             track = form.save(commit=False)
@@ -102,7 +102,7 @@ def create(request, p_plot_id):
             return redirect("browser:browser", p_id=p_plot_id)
 
     else:
-        form = CreateTrackForm(initial={"no": track_number})
+        form = TrackForm(initial={"no": track_number})
 
     context = get_track_data(request, plot.id)
     context["form"] = form

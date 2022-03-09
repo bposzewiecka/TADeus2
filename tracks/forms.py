@@ -37,4 +37,4 @@ class TrackForm(forms.ModelForm):
 class CreateTrackForm(forms.ModelForm):
     class Meta:
         model = Track
-        fields = ("no", "title", "height", "track_file", "hic_display")
+        exclude = ["subtracks"]
