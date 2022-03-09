@@ -57,6 +57,17 @@ def getBreakpointPlotCookie(request, p_id):
     return p_id, "false", "false", "chr1:30000000", "chr2:40000000", WILDTYPES_OPTIONS_NONE
 
 
+def setBrowserTypeCookie(request, browser_type):
+    request.session["browser_type"] = browser_type
+
+
+def getBrowserTypeCookie(request):
+    if "browser_type" in request.session:
+        return request.session["browser_type"]
+
+    return "syntenic"
+
+
 """
 def printPlotCookie(request, p_id):
     if "plot_" + str(p_id) in request.session:
@@ -193,6 +204,8 @@ def zoom(start, end, perc, zoom_in):
 
 
 def browser(request, p_id, p_chrom=None, p_start=None, p_end=None):
+
+    setBrowserTypeCookie(request, "synthenic")
 
     perc_move = (0.5, 0.25)
     perc_zoom = 1.25
@@ -384,6 +397,8 @@ def get_wildtype_params(direction, p_chrom, p_start, p_end, p_inverse, p_size, p
 
 
 def breakpoint_browser(request, p_id):  # noqa: C901
+
+    setBrowserTypeCookie(request, "breakpoint")
 
     perc_move = (0.2, 0.1)
     perc_zoom = 1.25

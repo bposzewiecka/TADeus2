@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.db.models.functions import Lower
 from django.shortcuts import redirect, render
 
+from browser.views import getBrowserTypeCookie
 from datasources.defaults import FILE_TYPE_BED, get_filetypes_by_attribute
 from datasources.models import TrackFile
 from plots.models import Plot
@@ -12,6 +13,14 @@ from tadeus_portal.utils import is_object_readonly, only_public_or_user
 
 from .forms import TrackForm
 from .models import Track
+
+
+def redirect_to_plot(request, p_id):
+
+    if getBrowserTypeCookie(request) == "synthenic":
+        return redirect("browser:browser", p_id=p_id)
+
+    return redirect("browser:breakpoint_browser", p_id=p_id)
 
 
 def get_domain_files(request):
@@ -75,11 +84,11 @@ def update(request, p_id):
 def delete(request, p_id):
 
     track = Track.objects.get(pk=p_id)
-    plot_id = track.plot.id
+    p_plot_id = track.plot.id
     track.delete()
 
     messages.success(request, "Track successfully deleted.")
-    return redirect("browser:browser", p_id=plot_id)
+    return redirect_to_plot(request, p_plot_id)
 
 
 def create(request, p_plot_id):
@@ -99,7 +108,8 @@ def create(request, p_plot_id):
             track.save()
 
             messages.success(request, "Track successfully created.")
-            return redirect("browser:browser", p_id=p_plot_id)
+
+            return redirect_to_plot(request, p_plot_id)
 
     else:
         form = TrackForm(initial={"no": track_number})
