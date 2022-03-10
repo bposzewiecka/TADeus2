@@ -80,7 +80,7 @@
                 <td style="font-size:14px; width:140px; font-weight: bold; padding: 4px">{{p_track}}</td>
 
                 <td {% if p_track.track_file.file_type != "XA" %} style="border: 1px solid #dddddd" {% endif %}>
-                    <img src="{% url 'browser:image' p_id=p_track.id p_cols=p_cols p_chrom=p_chrom p_start=p_start p_end=p_end %}{{ get_url|safe }}" alt="">
+                    <img src="{% url 'browser:image' p_id=p_track.id p_cols=p_cols p_chrom=p_chrom p_start=p_start p_end=p_end %}{{ get_url|safe }}&type=wildtype_left" alt="">
                 </td>
             </tr>
         {% endfor %}

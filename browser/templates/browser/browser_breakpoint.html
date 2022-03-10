@@ -28,8 +28,6 @@
                     <option value="{{x}}"  {% if form_params.wildtype_option|add:0 == x %} selected{% endif %}>{{y}}</option>
                 {% endfor %}
             </select>
-
-
         </div>
 
         <div class="input-group mr-2">
@@ -134,7 +132,7 @@
 
                         <td {% if breakpoint_params.right_start %} style="border-right: 4px solid #dc3545;"{% endif %}>
 
-                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=breakpoint_params.left_chrom p_start=breakpoint_params.left_start p_end=breakpoint_params.left_end p_left_side=1 p_width_prop=breakpoint_params.left_width_prop %}{{breakpoint_params_url|safe}}" alt="Track">
+                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=breakpoint_params.left_chrom p_start=breakpoint_params.left_start p_end=breakpoint_params.left_end p_left_side=1 p_width_prop=breakpoint_params.left_width_prop %}{{breakpoint_params_url|safe}}&type=sv_left" alt="Track">
 
                         </td>
 
@@ -143,7 +141,7 @@
                     {% if breakpoint_params.right_start %}
 
                         <td>
-                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=breakpoint_params.right_chrom p_start=breakpoint_params.right_start p_end=breakpoint_params.right_end p_left_side=0 p_width_prop=breakpoint_params.right_width_prop %}{{breakpoint_params_url|safe}}" alt="Track">
+                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=breakpoint_params.right_chrom p_start=breakpoint_params.right_start p_end=breakpoint_params.right_end p_left_side=0 p_width_prop=breakpoint_params.right_width_prop %}{{breakpoint_params_url|safe}}&type=sv_right" alt="Track">
                         </td>
 
                     {% endif %}
@@ -156,7 +154,7 @@
                     <tr style="border: 1px solid #dddddd" >
                         <td style="font-size:14px; width:140px; font-weight: bold; padding: 4px">{% if p_track.track_file.file_type != "XA" %}{{p_track}}  {% endif %}</td>
                         <td colspan="2">
-                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_left_params.chrom p_start=wildtype_left_params.start p_end=wildtype_left_params.end %}?left_inverse={{breakpoint_params.left_inverse}}" alt="Track">
+                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_left_params.chrom p_start=wildtype_left_params.start p_end=wildtype_left_params.end %}?left_inverse={{breakpoint_params.left_inverse}}&type=wildtype_right" alt="Track">
                         </td>
                     </tr>
                 {% endfor %}
@@ -168,7 +166,7 @@
                     <tr style="border: 1px solid #dddddd">
                         <td style="font-size:14px; width:140px; font-weight: bold; padding: 4px"> {% if p_track.track_file.file_type != "XA" %}{{p_track}}  {% endif %}</td>
                         <td colspan="2">
-                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_right_params.chrom p_start=wildtype_right_params.start p_end=wildtype_right_params.end %}?right_inverse={{breakpoint_params.right_inverse}}" alt="Track">
+                            <img src="{% url 'browser:image' p_id=p_track.id p_cols=1 p_chrom=wildtype_right_params.chrom p_start=wildtype_right_params.start p_end=wildtype_right_params.end %}?right_inverse={{breakpoint_params.right_inverse}}&type=wildtype_right" alt="Track">
                         </td>
                     </tr>
                 {% endfor %}
