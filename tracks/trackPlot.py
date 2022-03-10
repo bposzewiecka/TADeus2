@@ -286,12 +286,13 @@ class TrackPlot:
             img = plt.imshow(np.array([[self.min_value, self.max_value]]), cmap=self.cmap)
             img.set_visible(False)
 
-        if self.model.track_file.file_type == "HI" and self.transform and self.transform in ["log", "log1p"]:
+        if self.model.track_file.file_type == "HI" and self.transform in [TRANSFORM_LOG1P, TRANSFORM_LOG]:
+
             from matplotlib.ticker import LogFormatter
 
             formatter = LogFormatter(10)
 
-            cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.7, format=formatter, shrink=0.95)
+            cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.7, format=formatter, shrink=0.93)
         else:
             cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.7, aspect=aspect, shrink=0.8)
 
