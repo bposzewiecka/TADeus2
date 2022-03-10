@@ -7,7 +7,7 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
         <li class="breadcrumb-item"><a href="{% url 'ontologies:genes' %}">Genes</a></li>
-        <li class="breadcrumb-item">{{gene.gene_symbol}}</li>
+        <li class="breadcrumb-item">{{gene.name}}</li>
     </ol>
 </nav>
 
@@ -31,7 +31,7 @@
                 <option value="">All</option>
                 <option value="OMIM" {% if filter.form.db.value == "OMIM" %} selected {% endif %}>OMIM</option>
                 <option value="HPO" {% if filter.form.db.value == "HPO" %} selected {% endif %}>HPO</option>
-                <option value="ORPHA" {% if filter.form.db.value == "ORPHA" %} selected {% endif %}>ORPHA</option>
+               <!-- <option value="ORPHA" {% if filter.form.db.value == "ORPHA" %} selected {% endif %}>ORPHA</option>-->
             </select>
 
 
