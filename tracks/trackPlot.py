@@ -280,7 +280,6 @@ class TrackPlot:
         # self.cbar_ax = copy.copy(self.label_axis)
 
         self.label_axis.set_axis_off()
-        # self.label_axis = self.cbar_ax
 
         if not img:
             # ticks = np.linspace(self.min_value, self.max_value, max(int(height / 1.5), 3))
@@ -291,15 +290,18 @@ class TrackPlot:
             from matplotlib.ticker import LogFormatter
 
             formatter = LogFormatter(10)
-            cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.8, format=formatter)
+
+            cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.7, format=formatter, shrink=0.95)
         else:
-            cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.8, aspect=aspect)
+            cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.7, aspect=aspect, shrink=0.8)
 
         cobar.solids.set_edgecolor("face")
 
         # adjust the labels of the colorbar
-        # labels = cobar.ax.get_yticklabels()
+        labels = cobar.ax.get_yticklabels()
         # ticks = cobar.ax.get_yticks()
+        labels[-1].set_verticalalignment("top")
+        labels[0].set_verticalalignment("bottom")
 
         """
         if 0 in ticks and ticks[0] == 0:
