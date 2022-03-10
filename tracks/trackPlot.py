@@ -1,4 +1,3 @@
-import copy
 import math
 import sys
 import textwrap
@@ -56,9 +55,9 @@ DEFAULT_ARCS_HEIGHT = 3
 DEFAULT_VIRTUAL4C_HEIGHT = 2
 
 DEFAULT_TRACK_HEIGHT = 4  # in centimeters
-DEFAULT_FIGURE_WIDTH = 35  # in centimeters
+DEFAULT_FIGURE_WIDTH = 30  # in centimeters
 # proportion of width dedicated to (figure, legends)
-DEFAULT_WIDTH_RATIOS = (0.99, 0.01)
+DEFAULT_WIDTH_RATIOS = (0.95, 0.05)
 
 DEFAULT_MARGINS = {"left": 0, "right": 1, "bottom": 0, "top": 1}
 
@@ -70,6 +69,8 @@ DEFAULT_VLINE_LINE_STYLE = "dashed"
 
 VSMALL_RELATIVE = 0.005
 SMALL_RELATIVE = 0.02
+
+DEFAULT_LABEL_AXIS_SIZE = 3
 
 
 def cm2inch(*tupl):
@@ -154,8 +155,8 @@ class TrackPlot:
         except Plot.DoesNotExist:
             self.plot = None
 
-    def get_figure_width(self):
-        return self.fig_width * (self.margins["right"] - self.margins["left"]) * self.width_ratios[0]
+    def get_plot_width(self):
+        return self.plot_width * (self.margins["right"] - self.margins["left"])
 
     def plot_vlines(self, vlines, axis, color):
         ymin, ymax = axis.get_ylim()
@@ -164,12 +165,17 @@ class TrackPlot:
             vlines, ymin, ymax, linestyle=DEFAULT_VLINE_LINE_STYLE, zorder=10, linewidth=DEFAULT_VLINE_WIDTH, color=color, alpha=DEFAULT_VLINE_ALPHA
         )
 
-    def draw_track(self, cols, chrom, start, end, interval_start, interval_end, name_filter, breakpoint=None, left_side=None, width_prop=None):
+    def draw_track(
+        self, cols, chrom, start, end, interval_start, interval_end, name_filter, breakpoint=None, left_side=None, width_prop=None, ttype="synthenic"
+    ):
+
         self.dpi = 600
+
         if width_prop is None:
             width_prop = DEFAULT_WIDTH_PROP
-        self.fig_width = DEFAULT_FIGURE_WIDTH / cols * width_prop / DEFAULT_WIDTH_PROP
-        self.width_ratios = DEFAULT_WIDTH_RATIOS
+
+        self.plot_width = DEFAULT_FIGURE_WIDTH / cols * width_prop / DEFAULT_WIDTH_PROP
+
         self.margins = DEFAULT_MARGINS
         self.interval_start = interval_start
         self.interval_end = interval_end
@@ -177,18 +183,48 @@ class TrackPlot:
         self.breakpoint = breakpoint
         self.left_side = left_side
         self.width_prop = width_prop
+        self.ttype = ttype
 
         self.visualize_breakpoint = self.breakpoint and "left_start" in self.breakpoint and "right_start" in self.breakpoint
 
-        width = self.get_figure_width()
+        plot_width = self.get_plot_width()
+
+        if ttype == "sv_left":
+            columns_no = 2
+            self.fig_width = plot_width + 1
+            self.width_ratios = 0.5 / self.fig_width, plot_width / self.fig_width
+        elif ttype in ("sv_right", "synthenic"):
+            columns_no = 2
+            self.fig_width = plot_width + DEFAULT_LABEL_AXIS_SIZE
+            self.width_ratios = plot_width / self.fig_width, DEFAULT_LABEL_AXIS_SIZE / self.fig_width
+        else:
+            columns_no = 3
+            self.fig_width = plot_width + DEFAULT_LABEL_AXIS_SIZE + 1
+            self.width_ratios = 0.5 / self.fig_width, plot_width / self.fig_width, DEFAULT_LABEL_AXIS_SIZE / self.fig_width
 
         fig = plt.figure()
 
-        grids = matplotlib.gridspec.GridSpec(1, 1)
+        grids = matplotlib.gridspec.GridSpec(1, columns_no, width_ratios=self.width_ratios)
 
-        self.axis = axisartist.Subplot(fig, grids[0, 0])
+        if ttype in ("sv_left", "synthenic"):
+            label_column = 0
+            plot_column = 1
+        elif ttype in "sv_right":
+            label_column = 1
+            plot_column = 0
+        else:
+            label_column = 2
+            plot_column = 1
+
+        self.axis = axisartist.Subplot(fig, grids[0, plot_column])
         fig.add_subplot(self.axis)
         self.axis.axis[:].set_visible(False)
+
+        # to make the background transparent
+        self.axis.patch.set_visible(False)
+        self.label_axis = axisartist.Subplot(fig, grids[0, label_column], sharey=self.axis, sharex=self.axis)
+        fig.add_subplot(self.label_axis)
+        self.label_axis.axis[:].set_visible(False)
 
         self.axis_inverted = False
 
@@ -198,7 +234,7 @@ class TrackPlot:
         if not left_side and breakpoint["right_inverse"]:
             self.axis_inverted = True
 
-        self.draw(chrom, start, end, width)
+        self.draw(chrom, start, end, plot_width)
 
         if self.plot:
             vlines = self.plot.getVLineEntries(chrom, start, end)
@@ -233,49 +269,50 @@ class TrackPlot:
             self.label_axis.text(0, y, self.title, fontsize=8, transform=self.label_axis.transAxes, verticalalignment="top")
 
     def draw_colorbar(self, img=None):
-        return
+        # self.label_axis.set_axis_off()
 
-        self.label_axis.set_axis_off()
+        if self.ttype == "sv_left":
+            return
 
         height = self.get_height()
         aspect = height / DEFAULT_HICMATRIX_HEIGHT * 20
 
-        self.cbar_ax = copy.copy(self.label_axis)
-        self.label_axis.set_axis_off()
-        self.label_axis = self.cbar_ax
+        # self.cbar_ax = copy.copy(self.label_axis)
 
-        ticks = None
+        self.label_axis.set_axis_off()
+        # self.label_axis = self.cbar_ax
 
         if not img:
-            ticks = np.linspace(self.min_value, self.max_value, max(int(height / 1.5), 3))
+            # ticks = np.linspace(self.min_value, self.max_value, max(int(height / 1.5), 3))
             img = plt.imshow(np.array([[self.min_value, self.max_value]]), cmap=self.cmap)
             img.set_visible(False)
 
         if self.model.track_file.file_type == "HI" and self.transform and self.transform in ["log", "log1p"]:
             from matplotlib.ticker import LogFormatter
 
-            formatter = LogFormatter(10, labelOnlyBase=False)
-            cobar = plt.colorbar(img, format=formatter, ax=self.label_axis, fraction=0.95)
+            formatter = LogFormatter(10)
+            cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.8, format=formatter)
         else:
-            cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.95, aspect=aspect, ticks=ticks)
+            cobar = plt.colorbar(img, ax=self.label_axis, fraction=0.8, aspect=aspect)
 
         cobar.solids.set_edgecolor("face")
-        cobar.ax.set_ylabel(self.title)
 
         # adjust the labels of the colorbar
-        labels = cobar.ax.get_yticklabels()
-        ticks = cobar.ax.get_yticks()
+        # labels = cobar.ax.get_yticklabels()
+        # ticks = cobar.ax.get_yticks()
 
+        """
         if 0 in ticks and ticks[0] == 0:
             # if the label is at the start of the colobar
             # move it above avoid being cut or overlapping with other track
-            labels[0].set_verticalalignment("bottom")
+            labels[0].set_verticalalignment('bottom')
         if -1 in ticks and ticks[-1] == 1:
             # if the label is at the end of the colobar
             # move it a bit inside to avoid overlapping
             # with other labels
-            labels[-1].set_verticalalignment("top")
+            labels[-1].set_verticalalignment('top')
         cobar.ax.set_yticklabels(labels)
+        """
 
     def print_data_range(self, start, end):
         def get_value_print(value):
