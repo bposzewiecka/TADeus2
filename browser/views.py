@@ -97,6 +97,8 @@ def image(request, p_cols, p_id, p_chrom, p_start, p_end, p_breakpoint_id=None, 
         if interval_end:
             interval_end = int(interval_end)
 
+        p_type = request.GET.get("type", "synthenic")
+
         breakpoint = {
             "left_start": int(request.GET.get("left_start", "-1")),
             "left_end": int(request.GET.get("left_end", "-1")),
@@ -119,6 +121,7 @@ def image(request, p_cols, p_id, p_chrom, p_start, p_end, p_breakpoint_id=None, 
         breakpoint=breakpoint,
         left_side=p_left_side,
         width_prop=p_width_prop,
+        ttype=p_type,
     )
 
     buf = BytesIO()
