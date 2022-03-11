@@ -34,7 +34,7 @@ urlpatterns = [
     path("datasources/", include("datasources.urls")),
     path("evaluation/", include("evaluation.urls")),
     path("admin/", admin.site.urls),
-    path("accounts/", include("allauth.urls")),
+    # path("accounts/", include("allauth.urls")),
 ]
 
 router = routers.DefaultRouter()
