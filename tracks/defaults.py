@@ -14,8 +14,8 @@ TRANSFORM_MINUS_LOG = 3
 TRANSFORM_OPTIONS = (
     (TRANSFORM_NONE, "none"),
     (TRANSFORM_LOG1P, "log1p"),
-    (TRANSFORM_LOG, "log"),
-    (TRANSFORM_MINUS_LOG, "-log"),
+    # (TRANSFORM_LOG, "log"),
+    # (TRANSFORM_MINUS_LOG, "-log"),
 )
 
 BED_DISPLAY_TILES = 1

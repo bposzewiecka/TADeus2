@@ -232,8 +232,8 @@ class BedFileEntry(FileEntry):
     thick_end = models.IntegerField(null=True)
     itemRGB = models.CharField(max_length=6, null=True)
     block_count = models.IntegerField(null=True)
-    block_sizes = models.CharField(max_length=400, null=True)
-    block_starts = models.CharField(max_length=400, null=True)
+    block_sizes = models.CharField(max_length=600, null=True)
+    block_starts = models.CharField(max_length=600, null=True)
 
     def get_block_sizes(self):
         return list(map(int, self.block_sizes.split(",")))

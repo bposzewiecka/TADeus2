@@ -6,7 +6,7 @@ from datasources.models import BedFileEntry
 
 class Gene(BedFileEntry):
     ensembl_gene_id = models.CharField(max_length=20, null=True, blank=True)
-    gene_biotype = models.CharField(max_length=20, null=True, blank=True)
+    gene_biotype = models.CharField(max_length=40, null=True, blank=True)
     entrez_gene_id = models.CharField(max_length=20, null=True, blank=True)
 
 
@@ -14,7 +14,7 @@ class Phenotype(models.Model):
     db = models.CharField(max_length=10)
     pheno_id = models.CharField(max_length=20)
     name = models.CharField(max_length=200)
-    definition = models.CharField(max_length=1000, null=True)
+    definition = models.CharField(max_length=3000, null=True)
     comment = models.CharField(max_length=2000, null=True)
     is_a = models.ManyToManyField("self", symmetrical=False)
     genes = models.ManyToManyField(Gene, related_name="phenotypes", through="GeneToPhenotype")
