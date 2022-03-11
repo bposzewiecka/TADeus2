@@ -151,7 +151,7 @@ def get_hpo_terms_genes():
             entrezgene_id = row["entrez-gene-id"]
             pheno_id = row["HPO-Term-ID"]
 
-            genes = Gene.objects.all().filter(entrez_gene_id=entrezgene_id)
+            genes = Gene.objects.filter(entrez_gene_id=entrezgene_id)
             phenotype = phenotypes[pheno_id]
 
             for gene in genes:
@@ -178,15 +178,14 @@ def get_omim_phenotypes():
             if line[0] in ("Asterisk"):
                 continue
 
-            phenotype = Phenotype(db="OMIM", pheno_id=int(line[1]), name=line[2], comment=line[0])
+            phenotype = Phenotype(db="OMIM", pheno_id=int(line[1]), name=line[2])
             phenotype.save()
 
 
-"""
 @transaction.atomic
 def get_omim_phenotypes_to_genes():
 
-    file_name = "data/ontologies/hpo/diseases_to_genes.txt"
+    file_name = "data/ontologies/HPO/diseases_to_genes.txt"
 
     with open(file_name) as f:
 
@@ -195,15 +194,6 @@ def get_omim_phenotypes_to_genes():
         phenotypes = Phenotype.objects.filter(db="OMIM")
         phenotypes = {phenotype.pheno_id: phenotype for phenotype in phenotypes}
 
-        genes = get_genes_names()
-        gene_ensembl_ids = get_genes_ensembl_ids()
-
-        phenotypes_to_genes = []
-
-        genes_aliases = get_genes_aliases()
-
-        bad_genes = set()
-
         for line in f:
 
             row = line.strip().split("\t")
@@ -211,27 +201,20 @@ def get_omim_phenotypes_to_genes():
             if row[0].startswith("ORPHA"):
                 continue
 
-            pheno_id = row[0].split(":")[1]
-
             if len(row) == 3:
 
-                gene_symbol = row[2]
+                phenotype_id = row[0].split(":")[1]
 
-                gene = None
+                phenotype = Phenotype.objects.get(db="OMIM", pheno_id=int(phenotype_id))
 
-                if gene_symbol in genes:
-                    gene = genes[gene_symbol]
-                elif gene in genes_aliases:
-                    ensembl_gene_id = genes_aliases[gene_symbol]
-                    gene = gene_ensembl_ids.get(ensembl_gene_id, None)
+                name = row[2]
 
-                if gene:
-                    phenotype = phenotypes[pheno_id]
+                genes = Gene.objects.filter(name=name)
+
+                for gene in genes:
                     g2p = GeneToPhenotype(gene=gene, phenotype=phenotype)
                     g2p.save()
-                else:
-                    bad_genes.add(gene_symbol)
-"""
+
 
 globals().update(locals())
 
@@ -242,7 +225,7 @@ get_hpo_terms()
 # print('get_hpo_terms')
 get_hpo_terms_genes()
 # print('get_hpo_terms_genes')
-# get_omim_phenotypes()
+get_omim_phenotypes()
 # print('get_omim_phenotypes')
-# get_omim_phenotypes_to_genes()
+get_omim_phenotypes_to_genes()
 # print('get_omim_phenotypes_to_genes')
