@@ -1,0 +1,261 @@
+
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/solid.css" integrity="sha384-v2Tw72dyUXeU3y4aM2Y0tBJQkGfplr39mxZqlTBDUZAb9BGoC40+rdFCG0m10lXk" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/fontawesome.css" integrity="sha384-q3jl8XQu1OpdLgGFvNRnPdj5VIlCvgsDQTQB6owSOHWlAurxul7f+JpUOVdAiJ5P" crossorigin="anonymous">
+        <script src="/static/FileSaver.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js" integrity="sha512-01CJ9/g7e8cUmY0DFTMcUw/ikS799FHiOA0eyHsUWfOetgbx/t6oV4otQ5zXKQyIrQGTHSmRVPIgrgLcZi/WMA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <title>TADeus2</title>
+    </head>
+    <body>
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary" style="margin-bottom: 30px">
+            <a class="navbar-brand" href="/">TADeus2</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/evaluation/">Evaluate SVs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/plots/">Plots</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/datasources/">Data sources</a>
+                    </li>
+                    <li class="nav-item  dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-ontologies" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ontologies</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown-ontologies">
+                            <a class="dropdown-item" href="/ontologies/HPO">HPO - Human Phenotype Ontology</a>
+                            <a class="dropdown-item" href="/ontologies/OMIM">OMIM - Online Mendelian Inheritance in Man</a>
+                            <a class="dropdown-item" href="/ontologies/genes/">Genes</a>
+                        </div>
+                    </li>
+                    <li class="nav-item  dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-help" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown-help">
+                            <a class="dropdown-item" href="/help/sv_evaluation/">SV evaluation</a>
+                            <a class="dropdown-item" href="/help/genome_browser/">Genome browser</a>
+                            <a class="dropdown-item" href="/help/plots/">Plots</a>
+                            <a class="dropdown-item " href="/help/datasources/">Datasouces</a>
+                            <a class="dropdown-item" href="/help/ontologies/">Ontologies</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/help/about/">About</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!--<div class="navbar-form navbar-right">
+
+                <a id="google_login" href="/accounts/google/login" class="btn btn-outline-light">
+                    Sign in with Google
+                </a>
+
+        </div>-->
+    </nav>
+
+    <div class="container-fluid">
+
+
+
+
+
+
+
+
+
+
+<div class="card">
+    <div class="card-header">
+
+
+<div style="display: table; margin: 0 auto;">
+
+    <div class="btn-toolbar mb-3" role="toolbar" aria-label="" style="padding-top: 20px;">
+
+        <form action="/browser/114/chr7:95935329-97940443" method="get">
+            <div class="form-row">
+
+                <div  class="input-group mr-2">
+                     <button class="btn btn-secondary btn-lg"  title="Download. It may take a while." onclick="save_plot(); return false;"><i class="fas fa-download" o></i></button>
+                </div>
+
+                <div class="btn-group mr-2" role="group" aria-label="">
+                    <a href="/browser/114/chr7:96135840-97739931?name_filter=&interval_start=96935329&interval_end=96940443" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom in"><i class="fas fa-search-plus"></i></a>
+                    <a href="/browser/114/chr7:95684689-98191082?name_filter=&interval_start=96935329&interval_end=96940443" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="zoom out"><i class="fas fa-search-minus"></i></a>
+                </div>
+
+                <div class="btn-group mr-2" role="group" aria-label="">
+                    <a href="/browser/114/chr7:94932772-96937886?name_filter=&interval_start=96935329&interval_end=96940443" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to 50.0 % the left"><i class="fas fa-angle-double-left"></i></a>
+                    <a href="/browser/114/chr7:95434051-97439165?name_filter=&interval_start=96935329&interval_end=96940443" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to 25.0 % the left"><i class="fas fa-angle-left"></i></a>
+                    <a href="/browser/114/chr7:96436607-98441721?name_filter=&interval_start=96935329&interval_end=96940443" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to 25.0 % the right"><i class="fas fa-angle-right"></i></a>
+                    <a href="/browser/114/chr7:96937886-98943000?name_filter=&interval_start=96935329&interval_end=96940443" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="move to 50.0 % the right"><i class="fas fa-angle-double-right"></i></a>
+                </div>
+
+                  <div class="input-group mr-2">
+                      <div class="input-group-prepend">
+                          <span class="input-group-text">chr7:95,935,329-97,940,443</span>
+                      </div>
+                      <div class="input-group-append">
+                         <span class="input-group-text">2,005,114  bp.</span>
+                      </div>
+                  </div>
+
+                  <div class="input-group mr-2">
+                      <input type="text" class="form-control" placeholder="Enter position"  name="search_text" style="width: 400px">
+                      <div class="input-group-append">
+                          <button class="btn btn-secondary btn-lg" type="submit" value="Submit"><i class="fas fa-search"></i></button>
+                      </div>
+                  </div>
+
+
+
+                <input type="hidden" name="interval_start" value="96935329">
+                <input type="hidden" name="interval_end" value="96940443">
+                <a href="/plots/114" class="btn btn-secondary btn-lg active" role="button" aria-pressed="true" title="edit"><i class="fas fa-edit"></i></a>
+            </div>
+          </form>
+    </div>
+</div>
+
+
+    </div>
+    <div class="card-body">
+
+
+<div style="display: table; margin: 0 auto;">
+
+
+    <table style="float:left; background-color: white; width:1500px" id="browser">
+
+            <tr style="border: 1px solid #dddddd ; background-color: #eeeeee"  >
+                <td style="font-size:20px; width:140px; font-weight: bold; padding: 4px" colspan="3">A</td>
+            </tr>
+            <tr   style="border: 1px solid #dddddd" >
+                <td style="font-size:14px; width:200px; font-weight: bold; padding: 4px">XAxis</td>
+
+                <td >
+                    <img src="http://bioputer.mimuw.edu.pl:82/browser/image/1/560/chr7:95935329-97940443?name_filter=&interval_start=96935329&interval_end=96940443&type=wildtype_left" alt="">
+                </td>
+            </tr>
+
+            <tr  style="border: 1px solid #dddddd" >
+                <td style="font-size:14px; width:200px; font-weight: bold; padding: 4px">Stem cell derived myoblasts Hi-C</td>
+
+                <td  style="border: 1px solid #dddddd" >
+                    <img src="http://bioputer.mimuw.edu.pl:82/browser/image/1/561/chr7:95935329-97940443?name_filter=&interval_start=96935329&interval_end=96940443&type=wildtype_left" alt="">
+                </td>
+            </tr>
+
+            <tr  style="border: 1px solid #dddddd" >
+                <td style="font-size:14px; width:200px; font-weight: bold; padding: 4px">gnomAD pLI</td>
+
+                <td  style="border: 1px solid #dddddd" >
+                    <img src="http://bioputer.mimuw.edu.pl:82/browser/image/1/563/chr7:95935329-97940443?name_filter=&interval_start=96935329&interval_end=96940443&type=wildtype_left" alt="">
+                </td>
+            </tr>
+
+            <tr  style="border: 1px solid #dddddd" >
+                <td style="font-size:14px; width:200px; font-weight: bold; padding: 4px">Experimentally verified functional elements</td>
+
+                <td  style="border: 1px solid #dddddd" >
+                    <img src="http://bioputer.mimuw.edu.pl:82/browser/image/1/564/chr7:95935329-97940443?name_filter=&interval_start=96935329&interval_end=96940443&type=wildtype_left" alt="">
+                </td>
+            </tr>
+
+            <tr  style="border: 1px solid #dddddd" >
+                <td style="font-size:14px; width:200px; font-weight: bold; padding: 4px">Virtual 4C DLX5</td>
+
+                <td  style="border: 1px solid #dddddd" >
+                    <img src="http://bioputer.mimuw.edu.pl:82/browser/image/1/569/chr7:95935329-97940443?name_filter=&interval_start=96935329&interval_end=96940443&type=wildtype_left" alt="">
+                </td>
+            </tr>
+
+            <tr  style="border: 1px solid #dddddd" >
+                <td style="font-size:14px; width:200px; font-weight: bold; padding: 4px">Virtual 4C DLX6</td>
+
+                <td  style="border: 1px solid #dddddd" >
+                    <img src="http://bioputer.mimuw.edu.pl:82/browser/image/1/570/chr7:95935329-97940443?name_filter=&interval_start=96935329&interval_end=96940443&type=wildtype_left" alt="">
+                </td>
+            </tr>
+             <tr style="border: 1px solid #dddddd ; background-color: #eeeeee"  >
+                <td style="font-size:20px; width:200px; font-weight: bold; padding: 4px" colspan="3">B</td>
+            </tr>
+
+      <tr >
+                <td style="font-size:14px; width:200px; font-weight: bold; padding: 4px">XAxis</td>
+
+                <td >
+                    <img src="http://bioputer.mimuw.edu.pl:82/browser/image/1/675/chr7:143127299-151202039?name_filter=&interval_start=146841706&interval_end=147487636&type=wildtype_left" alt="">
+                </td>
+            </tr>
+
+            <tr  style="border: 1px solid #dddddd" >
+                <td style="font-size:14px; width:200px; font-weight: bold; padding: 4px">Stem cell derived myoblasts Hi-C</td>
+
+                <td  style="border: 1px solid #dddddd" >
+                    <img src="http://bioputer.mimuw.edu.pl:82/browser/image/1/676/chr7:143127299-151202039?name_filter=&interval_start=146841706&interval_end=147487636&type=wildtype_left" alt="">
+                </td>
+            </tr>
+
+            <tr  style="border: 1px solid #dddddd" >
+                <td style="font-size:14px; width:200px; font-weight: bold; padding: 4px">Genes coloured by pLI score</td>
+
+                <td  style="border: 1px solid #dddddd" >
+                    <img src="http://bioputer.mimuw.edu.pl:82/browser/image/1/678/chr7:143127299-151202039?name_filter=&interval_start=146841706&interval_end=147487636&type=wildtype_left" alt="">
+                </td>
+            </tr>
+
+
+    </table>
+
+</div>
+
+
+
+  </div>
+</div>
+
+
+
+
+
+
+
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+
+    <script>
+
+function save_plot() {
+
+    domtoimage.toBlob(document.getElementById('browser'))
+        .then(function (blob) {
+            window.saveAs(blob, 'plot.png');
+    });
+}
+
+</script>
+
+
+
+
+  </body>
+</html>

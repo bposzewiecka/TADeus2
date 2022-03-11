@@ -122,3 +122,7 @@ def create(request, p_plot_id):
 
 def fox(request):
     return render(request, "tracks/fox.html")
+
+
+def karol(request):
+    return render(request, "tracks/karol.html")
