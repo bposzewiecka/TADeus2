@@ -118,3 +118,7 @@ def create(request, p_plot_id):
     context["form"] = form
 
     return render(request, "tracks/track.html", context)
+
+
+def fox(request):
+    return render(request, "tracks/fox.html")
