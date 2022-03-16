@@ -10,7 +10,7 @@
     </div>
     <div class="form-group col-md-4" >
         {{ coordinate.errors }}
-        <label for="{{ coordinate.id_for_label }}">Coordinate</label>
+        <label for="{{ coordinate.id_for_label }}">Coordinate (hg38)</label>
         <input class="form-control" type="number" name="{{ coordinate.html_name }}" id="{{ coordinate.id_for_label }}" value="{{ coordinate.value|default:default_coordinate}}" required>
     </div>
 
