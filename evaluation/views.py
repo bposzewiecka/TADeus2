@@ -304,15 +304,15 @@ def ranking(eval, p_chrom, p_interval_start, p_interval_end):
 
 def annotate_sv_entries(sv_entries, p_id, request):
 
-    try:
-        annotate_cnvs_TADA(sv_entries, p_id)
-    except Exception:
-        messages.error(request, "Error in TADA annotation.")
+    # try:
+    annotate_cnvs_TADA(sv_entries, p_id)
+    # except Exception:
+    #    messages.error(request, "Error in TADA annotation.")
 
-    try:
-        annotate_cnvs_ClassifyCNV(sv_entries, p_id)
-    except Exception:
-        messages.error(request, "Error in ClassifyCNV annotation.")
+    # try:
+    annotate_cnvs_ClassifyCNV(sv_entries, p_id)
+    # except Exception:
+    #    messages.error(request, "Error in ClassifyCNV annotation.")
 
     try:
         annotate_translocations_TADeusScore(sv_entries)
