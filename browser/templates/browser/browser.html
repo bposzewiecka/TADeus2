@@ -179,6 +179,8 @@
 
     {% include 'browser/save_plot.html' %}
 
+    {% if cnv_type %}
+
     <script type="text/javascript">
 
 
@@ -188,6 +190,8 @@
         });
 
     </script>
+
+    {% endif %}
 
 
 {% endblock javascript %}
