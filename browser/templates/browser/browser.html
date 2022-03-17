@@ -103,8 +103,8 @@
         </thead>
         <tbody>
             <tr>
-               <td id="TADA"></td>
-               <td id="ClassifyCNV"></td>
+               <td id="TADA">Wait for results</td>
+               <td id="ClassifyCNV">Wait for results</td>
                <td></td>
             </tr>
         </tbody>
@@ -185,8 +185,18 @@
 
 
         $.get( "{% url 'evaluation:annotate_from_remote' p_type=cnv_type p_chrom=p_chrom p_start=interval_start p_end=interval_end %}").done(function( data ) {
-            $("#TADA").text(data["TADA"]);
-            $("#ClassifyCNV").text( data["ClassifyCNV"]);
+
+            if (data["TADA"] != null) {
+                $("#TADA").text(data["TADA"]);
+            } else {
+                $("#TADA").text("TADA did not responded for a query.");
+            }
+
+            if (data["ClassifyCNV"]!= null)  {
+                $("#ClassifyCNV").text( data["ClassifyCNV"]);
+            } else {
+                $("#TADA").text("ClassifyCNV did not responded for a query.");
+            }
         });
 
     </script>
