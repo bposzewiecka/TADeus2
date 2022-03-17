@@ -89,6 +89,30 @@
 
 </div>
 
+
+{% if cnv_type %}
+
+<div class="container" style="margin-top:30px;">
+    <table class="table">
+        <thead>
+            <tr>
+               <th>TADA score</th>
+               <th>ClassifyCNV</th>
+               <th>TADeus2 p-value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+               <td id="TADA"></td>
+               <td id="ClassifyCNV"></td>
+               <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% endif %}
+
 {% if results %}
 
 <div class="container" style="margin-top:30px;">
@@ -154,5 +178,16 @@
 {% block javascript %}
 
     {% include 'browser/save_plot.html' %}
+
+    <script type="text/javascript">
+
+
+        $.get( "http://localhost:8000/{% url 'evaluation:annotate' p_type=cnv_type p_chrom=p_chrom p_start=interval_start p_end=interval_end %}").done(function( data ) {
+            $("#TADA").text(data["TADA"]);
+            $("#ClassifyCNV").text( data["ClassifyCNV"]);
+        });
+
+    </script>
+
 
 {% endblock javascript %}

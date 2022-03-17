@@ -26,8 +26,6 @@ from .ClassifyCNV import annotate_cnvs_ClassifyCNV
 from .defaults import (
     BIOMART_GENES_FILE_ID,
     CLINGEN_FILE_ID,
-    DELETION,
-    DUPLICATION,
     ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
     HIC_NA12787_FILE_ID,
     HIC_NA12787_TADS_FILE_ID,
@@ -397,7 +395,7 @@ def evaluate_cnv(request):
         form = CNVForm(request.GET)
 
         if form.is_valid():
-            # cnv_type = form.cleaned_data["cnv_type"]
+            cnv_type = form.cleaned_data["cnv_type"]
             chrom = form.cleaned_data["chrom"]
             start_coordinate = form.cleaned_data["start_coordinate"]
             end_coordinate = form.cleaned_data["end_coordinate"]
@@ -407,10 +405,7 @@ def evaluate_cnv(request):
 
             messages.success(request, f"Structural variant involving chromosome {chrom} evaluated.")
 
-            params = {
-                "interval_start": start_coordinate,
-                "interval_end": end_coordinate,
-            }
+            params = {"interval_start": start_coordinate, "interval_end": end_coordinate, "cnv_type": cnv_type}
 
             url = reverse(
                 "browser:browser",
@@ -445,11 +440,7 @@ def annotate(request, p_type, p_chrom, p_start, p_end):
     sv_entry.chrom = p_chrom
     sv_entry.start = p_start
     sv_entry.end = p_end
-
-    if p_type == "DEL":
-        sv_entry.sv_type = DELETION
-    elif p_type == "DUP":
-        sv_entry.sv_type = DUPLICATION
+    sv_entry.sv_type = int(p_type)
 
     annotate_cnvs_TADA([sv_entry], p_id, save=False)
     annotate_cnvs_ClassifyCNV([sv_entry], p_id, save=False)
