@@ -238,6 +238,7 @@ def browser(request, p_id, p_chrom=None, p_start=None, p_end=None):
         p_interval_end = request.GET.get("interval_end", c_interval_end)
 
         p_cnv_type = request.GET.get("cnv_type", "")
+        p_TADeus_pvalue = request.GET.get("TADeus_pvalue", "")
 
         setPlotCookie(request, p_id, p_chrom, p_start, p_end, p_interval_start, p_interval_end)
 
@@ -284,6 +285,7 @@ def browser(request, p_id, p_chrom=None, p_start=None, p_end=None):
             "interval_start": interval_start,
             "interval_end": interval_end,
             "cnv_type": p_cnv_type,
+            "TADeus_pvalue": p_TADeus_pvalue,
         },
     )
 

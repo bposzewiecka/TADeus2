@@ -36,7 +36,7 @@ from .forms import EvaluationAddEntryForm, EvaluationForm
 from .models import Evaluation, SVEntry
 from .tables import EvaluationEntryTable, EvaluationFilter, EvaluationTable
 from .TADA import annotate_cnvs_TADA
-from .TADeusScore import annotate_translocations_TADeusScore
+from .TADeusScore import annotate_translocations_TADeusScore, get_TADeusScore
 
 
 def index(request):
@@ -406,7 +406,10 @@ def evaluate_cnv(request):
 
             messages.success(request, f"Structural variant involving chromosome {chrom} evaluated.")
 
-            params = {"interval_start": start_coordinate, "interval_end": end_coordinate, "cnv_type": cnv_type}
+            sv_entry = get_sv_entry(cnv_type, chrom, start_coordinate, end_coordinate)
+            TADeus_pvalue = get_TADeusScore(sv_entry)
+
+            params = {"interval_start": start_coordinate, "interval_end": end_coordinate, "cnv_type": cnv_type, "TADeus_pvalue": TADeus_pvalue}
 
             url = reverse(
                 "browser:browser",
@@ -433,15 +436,22 @@ def add_tracks(plot, tracks_params):
         track.save()
 
 
-def annotate(request, p_type, p_chrom, p_start, p_end):
-
-    p_id = "".join(random.choices(string.ascii_uppercase, k=20))
+def get_sv_entry(p_type, p_chrom, p_start, p_end):
 
     sv_entry = SVEntry()
     sv_entry.chrom = p_chrom
     sv_entry.start = p_start
     sv_entry.end = p_end
-    sv_entry.sv_type = int(p_type)
+    sv_entry.sv_type = p_type
+
+    return sv_entry
+
+
+def annotate(request, p_type, p_chrom, p_start, p_end):
+
+    p_id = "".join(random.choices(string.ascii_uppercase, k=20))
+
+    sv_entry = get_sv_entry(p_type, p_chrom, p_start, p_end)
 
     with suppress(Exception):
         annotate_cnvs_TADA([sv_entry], p_id, save=False)
