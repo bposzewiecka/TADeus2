@@ -182,7 +182,7 @@
     <script type="text/javascript">
 
 
-        $.get( "http://localhost:8000/{% url 'evaluation:annotate' p_type=cnv_type p_chrom=p_chrom p_start=interval_start p_end=interval_end %}").done(function( data ) {
+        $.get( "{% url 'evaluation:annotate_from_remote' p_type=cnv_type p_chrom=p_chrom p_start=interval_start p_end=interval_end %}").done(function( data ) {
             $("#TADA").text(data["TADA"]);
             $("#ClassifyCNV").text( data["ClassifyCNV"]);
         });
