@@ -1,6 +1,7 @@
 import random
 import string
 from collections import Counter
+from contextlib import suppress
 from urllib.parse import urlencode
 
 from django.contrib import messages
@@ -442,9 +443,27 @@ def annotate(request, p_type, p_chrom, p_start, p_end):
     sv_entry.end = p_end
     sv_entry.sv_type = int(p_type)
 
-    annotate_cnvs_TADA([sv_entry], p_id, save=False)
-    annotate_cnvs_ClassifyCNV([sv_entry], p_id, save=False)
+    with suppress(Exception):
+        annotate_cnvs_TADA([sv_entry], p_id, save=False)
+
+    with suppress(Exception):
+        annotate_cnvs_ClassifyCNV([sv_entry], p_id, save=False)
 
     d = {"TADA": sv_entry.TADA_score, "ClassifyCNV": sv_entry.ClassifyCNV}
 
     return JsonResponse(d)
+
+
+def annotate_from_remote(request, p_type, p_chrom, p_start, p_end):
+
+    url = reverse("evaluation:annotate", kwargs={"p_type": p_type, "p_chrom": p_chrom, "p_start": p_start, "p_end": p_end})
+
+    url = "http://bioputer.mimuw.edu.pl:82" + url
+
+    import json
+    import urllib.request
+
+    with urllib.request.urlopen(url) as f_url:
+        data = json.loads(f_url.read().decode())
+
+        return JsonResponse(data)
