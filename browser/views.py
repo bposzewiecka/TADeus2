@@ -438,6 +438,9 @@ def breakpoint_browser(request, p_id):  # noqa: C901
 
         p_wildtype_option = get_param(request, "wildtype_option", c_wildtype_option)
 
+        p_TADeus_pvalue1 = request.GET.get("TADeus_pvalue1", "")
+        p_TADeus_pvalue2 = request.GET.get("TADeus_pvalue2", "")
+
         setBreakpointPlotCookie(request, p_id, p_left_inverse, p_right_inverse, p_left_coordinate, p_right_coordinate, p_wildtype_option)
 
         if p_left_chrom is not None and p_right_chrom is not None:
@@ -521,6 +524,8 @@ def breakpoint_browser(request, p_id):  # noqa: C901
             "wildtype_right_params": wildtype_right_params,
             "wildtypes_options": WILDTYPES_OPTIONS,
             "form_params": form_params,
+            "TADeus_pvalue1": p_TADeus_pvalue1,
+            "TADeus_pvalue2": p_TADeus_pvalue2,
         },
     )
 

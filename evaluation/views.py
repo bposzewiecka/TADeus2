@@ -31,6 +31,7 @@ from .defaults import (
     HIC_NA12787_FILE_ID,
     HIC_NA12787_TADS_FILE_ID,
     PLI_SCORE_FILE_ID,
+    TRANSLOCATION,
 )
 from .forms import EvaluationAddEntryForm, EvaluationForm
 from .models import Evaluation, SVEntry
@@ -365,12 +366,19 @@ def evaluate_translocation(request):
             coordinate2 = form.cleaned_data["coordinate2"]
             direction2 = form.cleaned_data["direction2"]
 
+            sv_entry1 = get_sv_entry(TRANSLOCATION, chrom1, coordinate1, coordinate1)
+            sv_entry2 = get_sv_entry(TRANSLOCATION, chrom2, coordinate2, coordinate2)
+            TADeus_pvalue1 = get_TADeusScore(sv_entry1)
+            TADeus_pvalue2 = get_TADeusScore(sv_entry2)
+
             params = {
                 "wildtype_option": "3",
                 "left_coordinate": f"{chrom1}:{coordinate1}",
                 "left_inverse": "false" if direction1 == "H" else "true",
                 "right_coordinate": f"{chrom2}:{coordinate2}",
                 "right_inverse": "true" if direction2 == "H" else "false",
+                "TADeus_pvalue1": TADeus_pvalue1,
+                "TADeus_pvalue2": TADeus_pvalue2,
             }
 
             eval = create_empty_evaluation(request, "Evaluation")

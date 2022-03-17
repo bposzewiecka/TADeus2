@@ -177,6 +177,25 @@
      </div>
 
 
+    {% if TADeus_pvalue1 %}
+        <div class="container" style="margin-top:30px; max-width: 800px">
+            <table class="table">
+                <thead>
+                    <tr>
+                       <th>TADeus2 p-value for left breakpoint</th>
+                       <th>TADeus2 p-value for right breakpoint</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                       <td>{{ TADeus_pvalue1 }}</td>
+                       <td>{{ TADeus_pvalue2 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
 {% endblock %}
 
 
