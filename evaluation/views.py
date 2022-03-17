@@ -1,9 +1,11 @@
+import random
+import string
 from collections import Counter
 from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.db import transaction
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django_tables2 import RequestConfig
@@ -24,6 +26,8 @@ from .ClassifyCNV import annotate_cnvs_ClassifyCNV
 from .defaults import (
     BIOMART_GENES_FILE_ID,
     CLINGEN_FILE_ID,
+    DELETION,
+    DUPLICATION,
     ENCODE_DISTAL_DHS_ENHANCER_PROMOTER_FILE_ID,
     HIC_NA12787_FILE_ID,
     HIC_NA12787_TADS_FILE_ID,
@@ -431,3 +435,25 @@ def add_tracks(plot, tracks_params):
     for j, (track_id, params) in enumerate(tracks_params):
         track = Track(plot=plot, track_file=TrackFile.objects.get(pk=track_id), no=(j + 1) * 10, **params)
         track.save()
+
+
+def annotate(request, p_type, p_chrom, p_start, p_end):
+
+    p_id = "".join(random.choices(string.ascii_uppercase, k=20))
+
+    sv_entry = SVEntry()
+    sv_entry.chrom = p_chrom
+    sv_entry.start = p_start
+    sv_entry.end = p_end
+
+    if p_type == "DEL":
+        sv_entry.sv_type = DELETION
+    elif p_type == "DUP":
+        sv_entry.sv_type = DUPLICATION
+
+    annotate_cnvs_TADA([sv_entry], p_id, save=False)
+    annotate_cnvs_ClassifyCNV([sv_entry], p_id, save=False)
+
+    d = {"TADA": sv_entry.TADA_score, "ClassifyCNV": sv_entry.ClassifyCNV}
+
+    return JsonResponse(d)

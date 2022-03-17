@@ -8,7 +8,7 @@ from tadeus_portal.settings import TADA_TEMP_FILES_DIR
 from .defaults import DELETION, DUPLICATION
 
 
-def get_cnv_scores(file_entries, output_directory, path_to_variants, path_to_results, cnv_type):
+def get_cnv_scores(file_entries, output_directory, path_to_variants, path_to_results, cnv_type, save=True):
 
     save_as_bed(file_entries, path_to_variants)
 
@@ -26,10 +26,12 @@ def get_cnv_scores(file_entries, output_directory, path_to_variants, path_to_res
             # p.save()
 
             file_entry.TADA_score = float(sv_data["Pathogenicity Score"])
-            file_entry.save()
+
+            if save:
+                file_entry.save()
 
 
-def annotate_cnvs_TADA(file_entries, evaluation_id):
+def annotate_cnvs_TADA(file_entries, evaluation_id, save=True):
 
     output_directory = os.path.join(TADA_TEMP_FILES_DIR, f"EVALUATION_{evaluation_id}")
     path_to_variants = os.path.join(output_directory, "input.bed")
@@ -41,8 +43,8 @@ def annotate_cnvs_TADA(file_entries, evaluation_id):
     duplications = [file_entry for file_entry in file_entries if file_entry.sv_type == DUPLICATION]
 
     if deletions:
-        get_cnv_scores(deletions, output_directory, path_to_variants, path_to_results, "DEL")
+        get_cnv_scores(deletions, output_directory, path_to_variants, path_to_results, "DEL", save)
     if duplications:
-        get_cnv_scores(duplications, output_directory, path_to_variants, path_to_results, "DUP")
+        get_cnv_scores(duplications, output_directory, path_to_variants, path_to_results, "DUP", save)
 
     shutil.rmtree(output_directory)
