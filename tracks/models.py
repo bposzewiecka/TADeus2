@@ -171,6 +171,8 @@ class Track(models.Model):
 
         if self.track_file.big and self.track_file.file_type == FILE_TYPE_BED_GRAPH:
             return self.get_entries_big_wig(chrom, start, end, name_filter)
+        elif self.track_file.file_type == FILE_TYPE_BED_GRAPH:
+            return [self.track_file.get_entries_db(chrom, start, end, name_filter)]
         elif self.track_file.big and self.track_file.file_type == FILE_TYPE_BED:
             return self.track_file.get_entries_big_bed(chrom, start, end, name_filter)
         else:

@@ -29,7 +29,6 @@ from .defaults import (
     BEDGRAPH_STYLE_AREA_WITH_BORDER,
     BEDGRAPH_STYLE_LINE,
     BEDGRAPH_STYLE_LINE_WITH_BORDER,
-    BEDGRAPH_TYPE_LINECHART,
     DEFAULT_WIDTH_PROP,
     TRANSFORM_LOG,
     TRANSFORM_LOG1P,
@@ -822,6 +821,9 @@ class PlotBedGraph(TrackPlot):
 
         self.entries_list = self.model.get_entries(chrom, start, end)
 
+        if len(self.entries_list) == 0:
+            return
+
         if self.bedgraph_display == BEDGRAPH_DISPLAY_STACKED:
             self.stack_entries()
 
@@ -835,20 +837,26 @@ class PlotBedGraph(TrackPlot):
         min_value = self.entries_list[0][0].score
         max_value = self.entries_list[0][0].score
 
-        for entries, subtrack in zip(self.entries_list, self.model.subtracks.all()):
+        subtracks = self.model.subtracks.all()
+
+        if len(self.model.track_file.subtracks.all()) == 1:
+            subtracks = self.model.track_file.subtracks.all()
+
+        for entries, subtrack in zip(self.entries_list, subtracks):
 
             score_list = []
             pos_list = []
 
             for entry in entries:
+
                 if entry.score is not None and not math.isnan(entry.score):
 
-                    if self.bedgraph_type == BEDGRAPH_TYPE_LINECHART:
-                        score_list.append(entry.score)
-                        pos_list.append(entry.start + (entry.end - entry.start) / 2)
-                    else:
-                        score_list += [entry.score, entry.score]
-                        pos_list += [entry.start, entry.end]
+                    # if self.bedgraph_type == BEDGRAPH_TYPE_LINECHART:
+                    #    score_list.append(entry.score)
+                    #    pos_list.append(entry.start + (entry.end - entry.start) / 2)
+                    # else:
+                    score_list += [entry.score, entry.score]
+                    pos_list += [entry.start, entry.end]
 
                     max_value = self.ignore_nan(max, max_value, entry.score)
                     min_value = self.ignore_nan(min, min_value, entry.score)
@@ -858,6 +866,9 @@ class PlotBedGraph(TrackPlot):
 
             color = subtrack.rgb
             edgecolor = self.edgecolor
+
+            if self.color:
+                color = self.color
 
             if DEFAULT_BEDGRAPH_WITH_BORDERS_STYLE_MAX_NUMBER_OF_ENTRIES < len(entries) and BEDGRAPH_STYLE_LINE_WITH_BORDER:
                 self.bedgraph_style = BEDGRAPH_STYLE_LINE
