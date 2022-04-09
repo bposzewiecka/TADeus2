@@ -19,7 +19,7 @@
 
         <tbody>
             {% for result in results  %}
-                <tr {% if result.1.rank >= 300 %} style="background-color: #f8d7da;"{% elif result.1.rank >= 200 %}  style="background-color: #fcedee;"{% endif %}>
+                <tr {% if result.1.rank >= 3 %} style="background-color: #f8d7da;"{% elif result.1.rank >= 2 %}  style="background-color: #fcedee;"{% endif %}>
                     <td >{{result.0}}</td>
                     <td>{{result.1.pLI|floatformat:4}}</td>
                     <td>{{result.1.clingen|floatformat:0}}</td>
