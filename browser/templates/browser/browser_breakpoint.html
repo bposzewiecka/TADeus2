@@ -10,7 +10,7 @@
         {% with left_inverse=form_params.left_inverse|default:'false' right_inverse=form_params.right_inverse|default:'false'  %}
 
         <div  class="input-group mr-2">
-             <button class="btn btn-secondary btn-lg"  title="Download. It may take a while." onclick="save_plot(); return false;"><i class="fas fa-download" o></i></button>
+             <button class="btn btn-secondary btn-lg"  title="Download. It may take a while." onclick="save_plot(); return false;"><i class="fas fa-download"></i></button>
         </div>
 
         <div  class="input-group mr-2">
@@ -56,14 +56,14 @@
 
         <div class="input-group mr-2">
             <div class="input-group-prepend">
-                <button id="button_left_inverse" class="btn btn-secondary btn-lg">Size</button>
+                <button class="btn btn-secondary btn-lg">Size</button>
             </div>
             <input type="number" class="form-control" placeholder="Enter size"  name="size" style="width: 150px" value="{{request.GET.size}}">
         </div>
 
         <div class="input-group mr-2">
             <div class="input-group-prepend">
-                <button id="button_left_inverse" class="btn btn-secondary btn-lg">Shift</button>
+                <button class="btn btn-secondary btn-lg">Shift</button>
             </div>
             <input type="number" class="form-control" placeholder="Enter shift"  name="shift" style="width: 150px" value="{{request.GET.shift}}">
         </div>
@@ -196,15 +196,37 @@
         </div>
     {% endif %}
 
-{% endblock %}
+    {% if results_left and  results_right %}
 
+    <div  style="margin:30px;">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#left_breakpoint">Left breakpoint</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#right_breakpoint">Right breakpoint</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" style="border-left: 2px solid #dee2e6; border-right: 2px solid #dee2e6; border-bottom: 2px solid #dee2e6">
+            <div class="tab-pane active" id="left_breakpoint" style="margin-left:30px; margin-right:30px;">
+                {% include 'browser/ranking.html' with results=results_left %}
+            </div>
+            <div  class="tab-pane " id="right_breakpoint" style="margin-left:30px; margin-right:30px;">
+                {% include 'browser/ranking.html' with results=results_right %}
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+
+{% endblock %}
 
 
 {% block javascript %}
 
 <script>
-
-
 
 function toogle_directions(direction_name) {
 

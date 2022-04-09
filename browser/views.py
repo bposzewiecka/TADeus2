@@ -502,6 +502,9 @@ def breakpoint_browser(request, p_id):  # noqa: C901
             if p_right_end:
                 breakpoint_params["right_end"] = p_right_end
 
+    results_left = ranking(None, p_left_chrom, p_left_coord, p_left_coord)
+    results_right = ranking(None, p_right_chrom, p_right_coord, p_right_coord)
+
     return TemplateResponse(
         request,
         "browser/browser_breakpoint.html",
@@ -526,6 +529,8 @@ def breakpoint_browser(request, p_id):  # noqa: C901
             "form_params": form_params,
             "TADeus_pvalue1": p_TADeus_pvalue1,
             "TADeus_pvalue2": p_TADeus_pvalue2,
+            "results_left": results_left,
+            "results_right": results_right,
         },
     )
 

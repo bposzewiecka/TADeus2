@@ -273,7 +273,7 @@ def ranking(eval, p_chrom, p_interval_start, p_interval_end):
         d["gene_name"] = gene_name
 
         d["clingen"] = clingen.get(gene_name, None)
-        d["clingen_score"] = 100 if clingen.get(gene_name, 0) in (3, 2, 30) else 0
+        d["clingen_score"] = 1 if clingen.get(gene_name, 0) in (3, 2, 30) else 0
 
         d["pLI"] = pLI.get(gene_name, None)
 
@@ -282,19 +282,19 @@ def ranking(eval, p_chrom, p_interval_start, p_interval_end):
         d["distance"] = min(abs(p_interval_start - gene.start), abs(p_interval_end - gene.end))
 
         if d["distance"] < 1 * 1000 * 1000:
-            d["distance_1Mb_score"] = 100
+            d["distance_1Mb_score"] = 1
         else:
             d["distance_1Mb_score"] = 0
 
         d["phenotypes"] = gene.phenotypes.distinct().order_by("name", "pheno_id")
 
         if d["phenotypes"]:
-            d["phenotype_score"] = 100
+            d["phenotype_score"] = 1
         else:
             d["phenotype_score"] = 0
 
         if enh_proms[gene_name]:
-            d["enh_prom_score"] = 100
+            d["enh_prom_score"] = 1
         else:
             d["enh_prom_score"] = 0
 
