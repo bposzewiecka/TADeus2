@@ -864,11 +864,14 @@ class PlotBedGraph(TrackPlot):
             if len(score_list) == 0:
                 continue
 
-            color = subtrack.rgb
             edgecolor = self.edgecolor
+
+            color = None
 
             if self.color:
                 color = self.color
+            if subtrack.rgb:
+                color = subtrack.rgb
 
             if DEFAULT_BEDGRAPH_WITH_BORDERS_STYLE_MAX_NUMBER_OF_ENTRIES < len(entries) and BEDGRAPH_STYLE_LINE_WITH_BORDER:
                 self.bedgraph_style = BEDGRAPH_STYLE_LINE
