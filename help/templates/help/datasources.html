@@ -18,9 +18,85 @@ List of public datasets are available on <a href="https://tadeus2.mimuw.edu.pl/d
 
 <p>Users can upload their own datasource in BED3, BED6, BED9, BED12 or BEDGraph format.</p>
 
-<p>Shot film showing how to upload data to TADeus2:</p>
+<p>Short film showing how to upload data to TADeus2:</p>
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/MKXxp8B1zmE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+<p>Subsequent fileds of BED file are:</p>
+
+<ol>
+	<li>Chromosome</li>
+	<li>Chromosome start coordinate</li>
+	<li>Chromosome end coordinate</li>
+	<li>Name of record</li>
+	<li>Score of record</li>
+	<li>Strand ('+' or '-' or'.')</li>
+	<li>The starting position of the record</li>
+	<li>The ending position of the record</li>
+	<li>Color in RGB</li>
+	<li>Number of blocks</li>
+	<li>Comma-separated list of block sizes</li>
+	<li>Comma-separated list of block starts</li>
+</ol>
+
+<p>Examples of records in BED and BEDGRAPH formats that can be uploaded to TADeus2:</p>
+
+<div class="row">
+	<div class="col-md-2">
+		<div class="card border-secondary mb-3">
+		 	<div class="card-header">Bed3 format example:</div>
+		 	<div class="card-body text-secondary">
+				<pre>chr1	100	200
+chr2	300	500</pre>
+		  	</div>
+	 	</div>
+ 	</div>
+
+	<div class="col-md-4">
+		<div class="card border-secondary mb-3">
+		 	<div class="card-header">Bed6 format example:</div>
+		 	<div class="card-body text-secondary">
+				<pre>chr1	100	200	name1	10	+
+chr2	300	500	name2	12	-</pre>
+		  	</div>
+	 	</div>
+ 	</div>
+
+
+	<div class="col-md-6">
+		<div class="card border-secondary mb-3" >
+	 		<div class="card-header">Bed9 format example:</div>
+		 	<div class="card-body text-secondary">
+				<pre>chr1	100	200	name1	10	+	100	200	255,0,0
+chr2	300	500	name2	12	-	300	500	0,255,0</pre>
+	  		</div>
+ 		</div>
+ 	</div>
+
+
+
+	<div class="col-md-8">
+		<div class="card border-secondary mb-3" >
+	 		<div class="card-header">Bed12 format example:</div>
+		 	<div class="card-body text-secondary">
+				<pre>chr1	100	200	name1	10	+	100	200	255,0,0 2	20,50	100,150
+chr2	300	500	name2	12	-	300	500	0,255,0	2	10,20	300,480</pre>
+	  		</div>
+ 		</div>
+ 	</div>
+
+	<div class="col-md-4">
+		<div class="card border-secondary mb-3">
+	 		<div class="card-header">Bedgraph format example:</div>
+	 		<div class="card-body text-secondary">
+				<pre>chr1	100	200	1.2
+chr2	300	500	2.5</pre>
+	  		</div>
+ 		</div>
+	</div>
+</div>
+
 
 <p>To create a private datasource select the "Datasource" menu option. Then click on the "Create from text input" or "Create from file" button and complete the form specifying the name of the datasource and the assembly. Remember that the chosen assembly must match the plot assembly. Depending on the input method, provide a file with datasource or paste in the data.</p>
 
