@@ -32,10 +32,10 @@ def transform_build(file_entries, from_build, to_build):
 
     for file_entry in file_entries:
         sv = SVEntry()
-        sv, chrom = file_entry.chrom
-        sv, start = converter[sv.chrom][file_entry.start]
-        sv.end = converter[sv.chrom][file_entry.end]
+        sv.chrom = file_entry.chrom
+        sv.start = converter[sv.chrom][file_entry.start][0][1]
+        sv.end = converter[sv.chrom][file_entry.end][0][1]
         sv.sv_type = file_entry.sv_type
         tmp.append(sv)
 
-    return sv
+    return tmp
