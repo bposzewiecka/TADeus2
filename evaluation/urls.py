@@ -14,6 +14,6 @@ urlpatterns = [
     path("<int:p_id>/delete_entry", views.delete_entry, name="delete_entry"),
     path("evaluate_translocation", views.evaluate_translocation, name="evaluate_translocation"),
     path("evaluate_cnv", views.evaluate_cnv, name="evaluate_cnv"),
-    path("annotate/<p_type>/<p_chrom>:<int:p_start>-<int:p_end>", views.annotate, name="annotate"),
+    path("annotate/<int:p_type>/<p_chrom>:<int:p_start>-<int:p_end>", views.annotate, name="annotate"),
     path("annotate_from_remote/<int:p_type>/<p_chrom>:<int:p_start>-<int:p_end>", views.annotate_from_remote, name="annotate_from_remote"),
 ]
