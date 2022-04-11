@@ -60,18 +60,18 @@
 
                             <select name="{{ cnv_form.chrom.html_name }}" class="form-control"  id="{{ cnv_form.chrom.id_for_label }}" required>
                             {% for s_chromosome in chromosomes %}
-                                <option value="{{ s_chromosome.name }}" {% if chromosome.value|default:'chrX'  == s_chromosome.name %}selected{% endif %}>{{ s_chromosome.name }}</option>
+                                <option value="{{ s_chromosome.name }}" {% if chromosome.value|default:'chr2'  == s_chromosome.name %}selected{% endif %}>{{ s_chromosome.name }}</option>
                             {% endfor %}
                             </select>
 
 
                         </div>
-
+=
                         <div class="form-group col-md-4" >
 
                             {{ cnv_form.start_coordinate.errors }}
                             <label for="{{ cnv_form.start_coordinate.id_for_label }}">Start coordinate (hg38)</label>
-                            <input class="form-control" type="number" name="{{ cnv_form.start_coordinate.html_name }}" id="{{ cnv_form.start_coordinate.id_for_label }}" value="{{ cnv_form.start_coordinate.value|default:103690000}}" required>
+                            <input class="form-control" type="number" name="{{ cnv_form.start_coordinate.html_name }}" id="{{ cnv_form.start_coordinate.id_for_label }}" value="{{ cnv_form.start_coordinate.value|default:161449756}}" required>
 
                         </div>
 
@@ -80,7 +80,7 @@
 
                             {{ cnv_form.end_coordinate.errors }}
                            <label for="{{ cnv_form.end_coordinate.id_for_label }}">End coordinate (hg38)</label>
-                            <input class="form-control" type="number" name="{{ cnv_form.end_coordinate.html_name }}" id="{{ cnv_form.end_coordinate.id_for_label }}" value="{{ cnv_form.ens_coordinate.value|default:103695000}}" required>
+                            <input class="form-control" type="number" name="{{ cnv_form.end_coordinate.html_name }}" id="{{ cnv_form.end_coordinate.id_for_label }}" value="{{ cnv_form.ens_coordinate.value|default:161730703}}" required>
 
                         </div>
 
