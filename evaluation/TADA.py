@@ -2,7 +2,7 @@ import csv
 import os
 import shutil
 
-from evaluation.utils import save_as_bed
+from evaluation.utils import save_as_bed, transform_build
 from tadeus_portal.settings import TADA_TEMP_FILES_DIR
 
 from .defaults import DELETION, DUPLICATION
@@ -10,18 +10,9 @@ from .defaults import DELETION, DUPLICATION
 
 def get_cnv_scores(file_entries, output_directory, path_to_variants, path_to_results, cnv_type, save=True):
 
-    """
-    from liftover import get_lifter
+    transformed_file_entries = transform_build(file_entries, "hg38", "hg19")
 
-    converter = get_lifter("hg38", "hg19")
-
-    for file_entry in file_entries:
-
-        file_entry.start = converter[file_entry.chrom][file_entry.start]
-        file_entry.end = converter[file_entry.chrom][file_entry.end]
-    """
-
-    save_as_bed(file_entries, path_to_variants)
+    save_as_bed(transformed_file_entries, path_to_variants)
 
     os.system(f"predict_variants -d -t {cnv_type} -v {path_to_variants} -o {output_directory}")
 
