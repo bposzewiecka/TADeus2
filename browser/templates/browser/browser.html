@@ -133,7 +133,9 @@
 
         $.get( "{% url 'evaluation:annotate_from_remote' p_type=cnv_type p_chrom=p_chrom p_start=interval_start p_end=interval_end %}").done(function( data ) {
 
-            if (data["TADA"] != null) {
+            if ('{{p_chrom}}' == 'chrX' || '{{p_chrom}}' == 'chrY')
+                $("#TADA").text("TADA works only for autosomal chromosomes.");
+            else if (data["TADA"] != null) {
                 $("#TADA").text(data["TADA"]);
             } else {
                 $("#TADA").text("TADA did not respond for a query.");

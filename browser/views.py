@@ -489,6 +489,8 @@ def breakpoint_browser(request, p_id):  # noqa: C901
                 "left_coordinate": p_left_coordinate,
                 "right_coordinate": p_right_coordinate,
                 "wildtype_option": p_wildtype_option,
+                "TADeus_pvalue1": p_TADeus_pvalue1,
+                "TADeus_pvalue2": p_TADeus_pvalue2,
             }
 
             breakpoint_params = {
