@@ -251,7 +251,16 @@ def browser(request, p_id, p_chrom=None, p_start=None, p_end=None):
         else:
             messages.error(request, region_or_err_msg)
 
-        get_url = "?" + urlencode({"name_filter": name_filter, "interval_start": interval_start, "interval_end": interval_end}, quote_via=quote_plus)
+        get_url = "?" + urlencode(
+            {
+                "name_filter": name_filter,
+                "interval_start": interval_start,
+                "interval_end": interval_end,
+                "cnv_type": p_cnv_type,
+                "TADeus_pvalue": p_TADeus_pvalue,
+            },
+            quote_via=quote_plus,
+        )
 
         if p_plot.hasEval() and p_interval_start is not None and p_interval_end is not None and p_interval_start != "" and p_interval_end != "":
             results = ranking(p_plot.eval, p_chrom, p_interval_start, p_interval_end)
