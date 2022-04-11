@@ -10,6 +10,15 @@ from .defaults import DELETION, DUPLICATION
 
 def get_cnv_scores(file_entries, output_directory, path_to_variants, path_to_results, cnv_type, save=True):
 
+    from liftover import get_lifter
+
+    converter = get_lifter("hg38", "hg19")
+
+    for file_entry in file_entries:
+
+        file_entry.start = converter[file_entry.chrom][file_entry.start]
+        file_entry.end = converter[file_entry.chrom][file_entry.end]
+
     save_as_bed(file_entries, path_to_variants)
 
     os.system(f"predict_variants -d -t {cnv_type} -v {path_to_variants} -o {output_directory}")
